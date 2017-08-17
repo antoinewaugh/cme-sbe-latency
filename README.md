@@ -13,5 +13,5 @@ docker build -t cme-sbe-latency .
 docker run cme-sbe-latency 0.0.0.0 <multicast_ip> <multicast_port>
 
 ```
-docker run cme-sbe-latency 0.0.0.0 224.0.32.1 15310
+docker run --net=host cme-sbe-latency 0.0.0.0 224.0.32.1 15310
 ```

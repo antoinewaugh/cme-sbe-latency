@@ -49,8 +49,9 @@ COPY . /src
 WORKDIR /src
 RUN mkdir build \
 	&& cd build \
-	&& cmake .. && make
+	&& cmake .. && make \
+  && mv cme_sbe_latency /usr/local/bin
 
 
-ENTRYPOINT ["/src/build/cme_sbe_latency"]
+ENTRYPOINT ["/usr/local/bin/cme_sbe_latency"]
 CMD ["0.0.0.0", "224.0.32.1", "15310"]
