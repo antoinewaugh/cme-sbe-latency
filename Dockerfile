@@ -52,4 +52,5 @@ RUN mkdir build \
 	&& cmake .. && make
 
 
-CMD ["/src/build/cme_sbe_latency", "0.0.0.0", "224.0.32.1"]
+ENTRYPOINT ["/src/build/cme_sbe_latency"]
+CMD ["0.0.0.0", "224.0.32.1", "15310"]
