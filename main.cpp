@@ -21,6 +21,8 @@
 #include <iostream>
 #include <string>
 
+
+
 // 14 bytes for:
 // MsgSeqNum = 4
 // https://www.cmegroup.com/confluence/display/EPICSANDBOX/MDP+3.0+-+Binary+Packet+Header
@@ -111,6 +113,8 @@ public:
     {
         if (!error) {
             std::size_t bytesProcessed = BYTE_OFFSET;
+
+            out.write(data_, sizeof(data_));
 
             int MSG_SIZE = 2;
 
