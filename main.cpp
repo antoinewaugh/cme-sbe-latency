@@ -31,7 +31,7 @@
 // MsgSize=2
 // https://www.cmegroup.com/confluence/display/EPICSANDBOX/MDP+3.0+-+Message+Header
 
-bool hasWrittenToFile = false;
+//bool hasWrittenToFile = false;
 
 constexpr int BYTE_OFFSET = 12;
 
@@ -44,7 +44,7 @@ public:
         : socket_(io_service)
     {
 
-        out = std::ofstream("sample.dat", std::ios::out | std::ios::binary);
+//        out = std::ofstream("sample.dat", std::ios::out | std::ios::binary);
 
         boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),
             multicast_port);
@@ -83,12 +83,17 @@ public:
         if (matchEventIndicator.endOfEvent()) {
             auto &entry = incr.noMDEntries();
             while (entry.hasNext()) {
-                entry.next();
-                std::cout << "SecurityId" << entry.securityID()
-                          << ", MDEntryType: " << entry.mDEntryType() // needs to be converted to CME type
-                          << ", RptSeq: " << entry.rptSeq()
-                          << ", Server TS: " << ns_timestamp
-                          << ", CME TS: " << incr.transactTime() << '\n';
+                if( (entry.securityID() == 23936 )
+                     && (next_seqnum_ == 0 || entry.rptSeq() == next_seqnum_)) {
+
+                        next_seqnum_++;
+                        entry.next();
+                        std::cout << "SecurityId" << entry.securityID()
+                                  << ", MDEntryType: " << entry.mDEntryType() // needs to be converted to CME type
+                                  << ", RptSeq: " << entry.rptSeq()
+                                  << ", Server TS: " << ns_timestamp
+                                  << ", CME TS: " << incr.transactTime() << '\n';
+                }
             }
         }
         return incr.encodedLength();
@@ -114,7 +119,7 @@ public:
         if (!error) {
             std::size_t bytesProcessed = BYTE_OFFSET;
 
-            out.write(data_, sizeof(data_));
+//            out.write(data_, sizeof(data_));
 
             int MSG_SIZE = 2;
 
@@ -179,7 +184,8 @@ private:
     MDIncrementalRefreshTradeSummary42 incrTrade_;
     MDIncrementalRefreshOrderBook43 incrOB_;
 
-    std::ofstream out;
+//    std::ofstream out;
+    int next_seqnum_ = 0;
 
     std::size_t decodeHdr(MessageHeader& hdr, char* buffer, std::uint64_t offset,
         std::uint64_t bufferLength)
