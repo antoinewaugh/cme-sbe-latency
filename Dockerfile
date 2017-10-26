@@ -35,7 +35,7 @@ RUN git clone https://github.com/real-logic/agrona \
 	&& ./cppbuild/cppbuild \
 	&& wget ftp://ftp.cmegroup.com/SBEFix/Production/Templates/templates_FixBinary.xml \
 	&& mkdir include \
-	&& java -Dsbe.keyword.append.token=_ -Dsbe.target.language=Cpp -Dsbe.target.namespace=sbe -Dsbe.output.dir=include -Dsbe.errorLog=yes -jar sbe-all/build/libs/sbe-all-1.7.1-SNAPSHOT.jar templates_FixBinary.xml \
+	&& java -Dsbe.keyword.append.token=_ -Dsbe.target.language=Cpp -Dsbe.target.namespace=sbe -Dsbe.output.dir=include -Dsbe.errorLog=yes -jar sbe-all/build/libs/sbe-all-1.7.4-SNAPSHOT.jar templates_FixBinary.xml \
 	&& mv include/sbe /usr/local/include \
 	&& mv sbe-tool/src/main/cpp/sbe /usr/local/include/sbe \
 	&& mv cppbuild/Release/lib/libsbe.a /usr/local/lib \
@@ -48,7 +48,7 @@ WORKDIR /src
 RUN mkdir build \
 	&& cd build \
 	&& cmake .. && make \
-  && mv cme_sbe_latency /usr/local/bin
+	&& mv cme_sbe_latency /usr/local/bin
 
 
 ENTRYPOINT ["/usr/local/bin/cme_sbe_latency"]
