@@ -21,4 +21,8 @@ include_directories( ${Boost_INCLUDE_DIRS})
 
 set(SOURCE_FILES main.cpp)
 add_executable(cme_sbe_latency ${SOURCE_FILES})
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe)
+
+include_directories(OrderBook)
+add_subdirectory(OrderBook)
+
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe OrderBook)

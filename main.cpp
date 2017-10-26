@@ -21,7 +21,7 @@
 #include <iostream>
 #include <string>
 
-
+#include "OrderBook.h"
 
 // 14 bytes for:
 // MsgSeqNum = 4
@@ -80,14 +80,47 @@ public:
 
         auto& matchEventIndicator = incr.matchEventIndicator();
 
-        if (matchEventIndicator.endOfEvent()) {
+//        if (matchEventIndicator.endOfEvent()) {
             auto &entry = incr.noMDEntries();
             while (entry.hasNext()) {
-                if( (entry.securityID() == 23936 )
-                     && (next_seqnum_ == 0 || entry.rptSeq() == next_seqnum_)) {
+                if( (entry.securityID() == 23936 ) ) {
+//                     && (next_seqnum_ == 0 || entry.rptSeq() == next_seqnum_)) {
 
                         next_seqnum_++;
                         entry.next();
+
+                        int level = entry.MDPriceLevel();
+                        float price = entry.mDEntryPx();
+                        int volume = entry.mDEntrySize();
+
+                        if(entry.mDEntryType() == MDEntryType::Bid) {
+                            if(entry.mDUpdateAction() == MDUpdateAction::New) {
+                                book.add_bid(level, price, volume);
+                            } else if(entry.mDUpdateAction() == MDUpdateAction::Change) {
+                                book.update_bid(level, price, volume);
+                            } else if(entry.mDUpdateAction() == MDUpdateAction::Delete) {
+                                book.delete_bid(level, price);
+                            } else if(entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
+                                book.delete_bid_from(level);
+                            } else if(entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
+                                book.delete_bid_thru(level);
+                            }
+                        }
+                        else if(entry.mDEntryType() == MDEntryType::Offer) {
+                            if (entry.mDUpdateAction() == MDUpdateAction::New) {
+                                book.add_ask(level, price, volume);
+                            } else if (entry.mDUpdateAction() == MDUpdateAction::Change) {
+                                book.update_ask(level, price, volume);
+                            } else if (entry.mDUpdateAction() == MDUpdateAction::Delete) {
+                                book.delete_ask(level, price);
+                            } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
+                                book.delete_ask_from(level);
+                            } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
+                                book.delete_ask_thru(level);
+                            }
+                        }
+
+                        std::cout << book << '\n' ;
                         std::cout << "SecurityId" << entry.securityID()
                                   << ", MDEntryType: " << entry.mDEntryType() // needs to be converted to CME type
                                   << ", RptSeq: " << entry.rptSeq()
@@ -95,7 +128,7 @@ public:
                                   << ", CME TS: " << incr.transactTime() << '\n';
                 }
             }
-        }
+//        }
         return incr.encodedLength();
     }
 
@@ -183,6 +216,8 @@ private:
     MDIncrementalRefreshVolume37 incrVol_;
     MDIncrementalRefreshTradeSummary42 incrTrade_;
     MDIncrementalRefreshOrderBook43 incrOB_;
+
+    OrderBook book;
 
 //    std::ofstream out;
     int next_seqnum_ = 0;
