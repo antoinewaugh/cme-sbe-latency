@@ -11,17 +11,15 @@ RUN apt-get update && apt-get -y install \
   make \
   cmake \
   git \
-  libboost-all-dev \
-  software-properties-common
+  libboost-all-dev 
 
-# Java
-RUN	apt-get -y purge openjdk-\* \
-	&& add-apt-repository ppa:webupd8team/java \
-	&& apt-get -y update \
-	&& echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections \
-	&& apt-get -y install oracle-java8-installer 
+WORKDIR /opt/jdk
+RUN wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz \
+       &&   tar -zxf jdk-8u151-linux-x64.tar.gz -C /opt/jdk \
+       &&   update-alternatives --install /usr/bin/java java /opt/jdk/jdk1.8.0_151/bin/java 100 \
+       &&   update-alternatives --install /usr/bin/javac javac /opt/jdk/jdk1.8.0_151/bin/javac 100
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+ENV JAVA_HOME /opt/jdk/jdk1.8.0_151
 
 # Install SBE Lib & Headers
 
