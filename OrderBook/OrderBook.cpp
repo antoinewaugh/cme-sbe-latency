@@ -12,6 +12,10 @@ bool OrderBook::empty() const {
 }
 
 void OrderBook::add_bid(int level, float price, int quantity) {
+
+    if(level > bids_.size())
+        return;
+
     bids_.insert(bids_.begin()+level-1, {price, quantity});
 }
 
@@ -28,6 +32,9 @@ void OrderBook::update_bid(int level, float price, int quantity) {
 }
 
 void OrderBook::delete_bid(int level, float price) {
+    if(level > bids_.size())
+        return;
+
     auto it = bids_.begin() + level - 1;
     if(it->price == price)
         bids_.erase(it);
@@ -36,6 +43,8 @@ void OrderBook::delete_bid(int level, float price) {
 }
 
 void OrderBook::delete_bid_from(int level) {
+    if(level > bids_.size())
+        return;
     bids_.erase(bids_.begin()+level-1, bids_.end());
 }
 
@@ -47,12 +56,14 @@ void OrderBook::delete_bid_thru(int level) {
 }
 
 void OrderBook::add_ask(int level, float price, int quantity) {
+    if(level > asks_.size())
+        return;
     asks_.insert(asks_.begin()+level-1, {price, quantity});
 }
 
 void OrderBook::update_ask(int level, float price, int quantity) {
 
-    if(level > bids_.size())
+    if(level > asks_.size())
         return;
 
     auto& price_level = asks_[level-1];
@@ -63,6 +74,8 @@ void OrderBook::update_ask(int level, float price, int quantity) {
 }
 
 void OrderBook::delete_ask(int level, float price) {
+    if(level > asks_.size())
+        return;
     auto it = asks_.begin() + level - 1;
     if(it->price == price)
         asks_.erase(it);
@@ -71,6 +84,8 @@ void OrderBook::delete_ask(int level, float price) {
 }
 
 void OrderBook::delete_ask_from(int level) {
+    if(level > asks_.size())
+        return;
     asks_.erase(asks_.begin()+level-1, asks_.end());
 }
 

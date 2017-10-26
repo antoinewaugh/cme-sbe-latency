@@ -80,54 +80,57 @@ public:
 
         auto& matchEventIndicator = incr.matchEventIndicator();
 
-//        if (matchEventIndicator.endOfEvent()) {
-            auto &entry = incr.noMDEntries();
-            while (entry.hasNext()) {
-                if( (entry.securityID() == 23936 ) ) {
-//                     && (next_seqnum_ == 0 || entry.rptSeq() == next_seqnum_)) {
+        auto &entry = incr.noMDEntries();
+        while (entry.hasNext()) {
+            entry.next();
+            if(entry.securityID() == 23936 ) {
+                // below would change when we subscribe  to snapshot
+                if(next_seqnum_ == 0) {
+                    next_seqnum_ = entry.rptSeq();
+                }
+                if(entry.rptSeq() == next_seqnum_) {
 
-                        next_seqnum_++;
-                        entry.next();
+                    next_seqnum_++;
 
-                        int level = entry.mDPriceLevel();
-                        float price = entry.mDEntryPx().mantissa() * 10^entry.mDEntryPx().exponent();
-                        int volume = entry.mDEntrySize();
+                    int level = entry.mDPriceLevel();
+                    float price = entry.mDEntryPx().mantissa() * 10 ^entry.mDEntryPx().exponent();
+                    int volume = entry.mDEntrySize();
 
-                        if(entry.mDEntryType() == MDEntryTypeBook::Bid) {
-                            if(entry.mDUpdateAction() == MDUpdateAction::New) {
-                                book.add_bid(level, price, volume);
-                            } else if(entry.mDUpdateAction() == MDUpdateAction::Change) {
-                                book.update_bid(level, price, volume);
-                            } else if(entry.mDUpdateAction() == MDUpdateAction::Delete) {
-                                book.delete_bid(level, price);
-                            } else if(entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
-                                book.delete_bid_from(level);
-                            } else if(entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
-                                book.delete_bid_thru(level);
-                            }
+                    if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
+                        if (entry.mDUpdateAction() == MDUpdateAction::New) {
+                            book.add_bid(level, price, volume);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::Change) {
+                            book.update_bid(level, price, volume);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::Delete) {
+                            book.delete_bid(level, price);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
+                            book.delete_bid_from(level);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
+                            book.delete_bid_thru(level);
                         }
-                        else if(entry.mDEntryType() == MDEntryTypeBook::Offer) {
-                            if (entry.mDUpdateAction() == MDUpdateAction::New) {
-                                book.add_ask(level, price, volume);
-                            } else if (entry.mDUpdateAction() == MDUpdateAction::Change) {
-                                book.update_ask(level, price, volume);
-                            } else if (entry.mDUpdateAction() == MDUpdateAction::Delete) {
-                                book.delete_ask(level, price);
-                            } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
-                                book.delete_ask_from(level);
-                            } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
-                                book.delete_ask_thru(level);
-                            }
+                    } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
+                        if (entry.mDUpdateAction() == MDUpdateAction::New) {
+                            book.add_ask(level, price, volume);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::Change) {
+                            book.update_ask(level, price, volume);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::Delete) {
+                            book.delete_ask(level, price);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteFrom) {
+                            book.delete_ask_from(level);
+                        } else if (entry.mDUpdateAction() == MDUpdateAction::DeleteThru) {
+                            book.delete_ask_thru(level);
                         }
+                    }
 
-                        std::cout << book << '\n' ;
-                        std::cout << "SecurityId" << entry.securityID()
-                                  << ", MDEntryType: " << entry.mDEntryType() // needs to be converted to CME type
-                                  << ", RptSeq: " << entry.rptSeq()
-                                  << ", Server TS: " << ns_timestamp
-                                  << ", CME TS: " << incr.transactTime() << '\n';
+                    std::cout << book << '\n';
+                    std::cout << "SecurityId" << entry.securityID()
+                              << ", MDEntryType: " << entry.mDEntryType() // needs to be converted to CME type
+                              << ", RptSeq: " << entry.rptSeq()
+                              << ", Server TS: " << ns_timestamp
+                              << ", CME TS: " << incr.transactTime() << '\n';
                 }
             }
+        }
 //        }
         return incr.encodedLength();
     }
