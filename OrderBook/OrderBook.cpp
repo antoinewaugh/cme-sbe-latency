@@ -16,6 +16,10 @@ void OrderBook::add_bid(int level, float price, int quantity) {
 }
 
 void OrderBook::update_bid(int level, float price, int quantity) {
+
+    if(level > bids_.size())
+        return;
+
     auto& price_level = bids_[level-1];
     if(price_level.price == price)
         price_level.quantity = quantity;
@@ -47,6 +51,10 @@ void OrderBook::add_ask(int level, float price, int quantity) {
 }
 
 void OrderBook::update_ask(int level, float price, int quantity) {
+
+    if(level > bids_.size())
+        return;
+
     auto& price_level = asks_[level-1];
     if(price_level.price == price)
         price_level.quantity = quantity;
