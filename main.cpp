@@ -89,11 +89,11 @@ public:
                         next_seqnum_++;
                         entry.next();
 
-                        int level = entry.MDPriceLevel();
-                        float price = entry.mDEntryPx();
+                        int level = entry.mDPriceLevel();
+                        float price = entry.mDEntryPx().mantissa() * 10^entry.mDEntryPx().exponent();
                         int volume = entry.mDEntrySize();
 
-                        if(entry.mDEntryType() == MDEntryType::Bid) {
+                        if(entry.mDEntryType() == MDEntryTypeBook::Bid) {
                             if(entry.mDUpdateAction() == MDUpdateAction::New) {
                                 book.add_bid(level, price, volume);
                             } else if(entry.mDUpdateAction() == MDUpdateAction::Change) {
@@ -106,7 +106,7 @@ public:
                                 book.delete_bid_thru(level);
                             }
                         }
-                        else if(entry.mDEntryType() == MDEntryType::Offer) {
+                        else if(entry.mDEntryType() == MDEntryTypeBook::Offer) {
                             if (entry.mDUpdateAction() == MDUpdateAction::New) {
                                 book.add_ask(level, price, volume);
                             } else if (entry.mDUpdateAction() == MDUpdateAction::Change) {
@@ -170,28 +170,31 @@ public:
                         incr_, data_, bytesProcessed + MSG_SIZE + decodeMessageLength,
                         hdr_.blockLength(), hdr_.version(), sizeof(data_));
 
-                } else if (hdr_.templateId() == sbe::MDIncrementalRefreshVolume37::sbeTemplateId()) {
-
-                    std::size_t d = decodeMDIncremental<sbe::MDIncrementalRefreshVolume37>(
-                        incrVol_, data_,
-                        bytesProcessed + MSG_SIZE + decodeMessageLength,
-                        hdr_.blockLength(), hdr_.version(), sizeof(data_));
-                } else if (hdr_.templateId() == sbe::MDIncrementalRefreshTradeSummary42::sbeTemplateId()) {
-
-                    std::size_t d = decodeMDIncremental<sbe::MDIncrementalRefreshTradeSummary42>(
-                        incrTrade_, data_,
-                        bytesProcessed + MSG_SIZE + decodeMessageLength,
-                        hdr_.blockLength(), hdr_.version(), sizeof(data_));
-                } else if (hdr_.templateId() == sbe::MDIncrementalRefreshOrderBook43::sbeTemplateId()) {
+                }
+//                else if (hdr_.templateId() == sbe::MDIncrementalRefreshVolume37::sbeTemplateId()) {
+//
+//                    std::size_t d = decodeMDIncremental<sbe::MDIncrementalRefreshVolume37>(
+//                        incrVol_, data_,
+//                        bytesProcessed + MSG_SIZE + decodeMessageLength,
+//                        hdr_.blockLength(), hdr_.version(), sizeof(data_));
+//                } else if (hdr_.templateId() == sbe::MDIncrementalRefreshTradeSummary42::sbeTemplateId()) {
+//
+//                    std::size_t d = decodeMDIncremental<sbe::MDIncrementalRefreshTradeSummary42>(
+//                        incrTrade_, data_,
+//                        bytesProcessed + MSG_SIZE + decodeMessageLength,
+//                        hdr_.blockLength(), hdr_.version(), sizeof(data_));
+//                }
+                else if (hdr_.templateId() == sbe::MDIncrementalRefreshOrderBook43::sbeTemplateId()) {
 
                     std::size_t d = decodeMDIncrementalNoEntries<sbe::MDIncrementalRefreshOrderBook43>(
                         incrOB_, data_, bytesProcessed + MSG_SIZE + decodeMessageLength,
                         hdr_.blockLength(), hdr_.version(), sizeof(data_));
-                } else {
-                    std::cout << "Unknown message type, templateId: " << hdr_.templateId()
-                              << std::endl;
-                    break;
                 }
+//                else {
+//                    std::cout << "Unknown message type, templateId: " << hdr_.templateId()
+//                              << std::endl;
+//                    break;
+//                }
                 // as encodeLength() uses position() which changes depending on what has been accessed,
                 // totalMessageLength is much more reliable for pushing offset forwards
                 bytesProcessed += totalMessageLength;
