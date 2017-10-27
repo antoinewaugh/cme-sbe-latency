@@ -3,10 +3,6 @@ project(cme_sbe_latency)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# imported library
-add_library(sbe STATIC IMPORTED)
-set_property(TARGET sbe PROPERTY IMPORTED_LOCATION /usr/local/lib/libsbe.a)
-set_property(TARGET sbe PROPERTY INTERFACE_INCLUDE_DIRECTORIES /usr/local/include/sbe)
 
 set(BOOST_ROOT /usr/local/boost_1_63_0)
 set(BOOST_INCLUDEDIR /usr/include)
@@ -25,4 +21,7 @@ add_executable(cme_sbe_latency ${SOURCE_FILES})
 include_directories(OrderBook)
 add_subdirectory(OrderBook)
 
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe OrderBook)
+include_directories(Subscriber)
+add_subdirectory(Subscriber)
+
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe OrderBook Subscriber)
