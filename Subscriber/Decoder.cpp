@@ -1,10 +1,21 @@
 #include "Decoder.h"
+#include <iostream>
 
-size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh, char *buffer,
-                                uint64_t offset, uint64_t block_length,
-                                uint64_t version, uint64_t buffer_length) {
 
-  refresh.wrapForDecode(buffer, offset, block_length, version, buffer_length);
+size_t Decoder::decode_incremental_refresh_volume(MDIncrementalRefreshVolume37& refresh,
+                                                  Decoder::Message message) {}
+
+size_t Decoder::decode_incremental_refresh_trade(MDIncrementalRefreshTradeSummary42& refresh,
+                                                      Decoder::Message message) {}
+
+size_t Decoder::decode_incremental_refresh_order_book(MDIncrementalRefreshOrderBook43&refresh,
+                                Decoder::Message message) {}
+
+size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
+                                Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
 
   auto &entry = refresh.noMDEntries();
 
@@ -25,10 +36,11 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh, char *buffer,
       book_.add_ask(level, price, volume);
     }
   }
+  std::cout << book_ << '\n';
 }
 
-void Decoder::ask_entry(MDUpdateAction::Value action, int level, float price,
-                        int volume) {
+void Decoder::handle_ask_entry(MDUpdateAction::Value action, int level,
+                               float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
     book_.add_ask(level, price, volume);
@@ -48,8 +60,8 @@ void Decoder::ask_entry(MDUpdateAction::Value action, int level, float price,
   }
 }
 
-void Decoder::bid_entry(MDUpdateAction::Value action, int level, float price,
-                        int volume) {
+void Decoder::handle_bid_entry(MDUpdateAction::Value action, int level,
+                               float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
     book_.add_bid(level, price, volume);
@@ -69,11 +81,12 @@ void Decoder::bid_entry(MDUpdateAction::Value action, int level, float price,
   }
 }
 
-size_t Decoder::decode_incremental_refresh_book(
-    MDIncrementalRefreshBook32 &refresh, char *buffer, uint64_t offset,
-    uint64_t block_length, uint64_t version, uint64_t buffer_length) {
+size_t
+Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
+                                         Decoder::Message message) {
 
-  refresh.wrapForDecode(buffer, offset, block_length, version, buffer_length);
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
 
   auto &entry = refresh.noMDEntries();
 
@@ -89,14 +102,14 @@ size_t Decoder::decode_incremental_refresh_book(
     int volume = entry.mDEntrySize();
 
     if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
-      bid_entry(entry.mDUpdateAction(), level, price, volume);
+      handle_bid_entry(entry.mDUpdateAction(), level, price, volume);
     } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
-      ask_entry(entry.mDUpdateAction(), level, price, volume);
+      handle_ask_entry(entry.mDUpdateAction(), level, price, volume);
     }
   }
 }
 
-size_t Decoder::decode_message_length(char *buffer, uint64_t offset) {
+size_t Decoder::decode_message_length(char *buffer, size_t offset) {
   return SBE_LITTLE_ENDIAN_ENCODE_16(*((std::uint16_t *)(buffer + offset)));
 }
 
@@ -119,30 +132,38 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
   switch (header_.templateId()) {
 
   case MDIncrementalRefreshBook32::sbeTemplateId():
-    decode_incremental_refresh_book(incremental_refresh_book_, buffer,
-                                    msg_offset, header_.blockLength(),
-                                    header_.version(), sizeof(buffer));
+    decode_incremental_refresh_book(incremental_refresh_book_,
+                                    Message{buffer, msg_offset,
+                                            header_.blockLength(),
+                                            header_.version(), sizeof(buffer)});
     break;
 
   case SnapshotFullRefresh38::sbeTemplateId():
-    decode_snapshot(snapshot_full_, buffer, msg_offset, header_.blockLength(),
-                    header_.version(), sizeof(buffer);
+    decode_snapshot(snapshot_full_,
+                    Message{buffer, msg_offset, header_.blockLength(),
+                            header_.version(), sizeof(buffer)});
     break;
 
-
   case MDIncrementalRefreshVolume37::sbeTemplateId():
-      decode_incremental_refresh_volume();
-      break;
+    decode_incremental_refresh_volume(
+        incremental_volume_, {buffer, msg_offset, header_.blockLength(),
+                              header_.version(), sizeof(buffer)});
+    break;
 
   case MDIncrementalRefreshTradeSummary42::sbeTemplateId():
-      decode_incremental_refresh_trade();
-      break;
+    decode_incremental_refresh_trade(incremental_trade_,
+                                     {buffer, msg_offset, header_.blockLength(),
+                                      header_.version(), sizeof(buffer)});
+    break;
 
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
-      decode_incremental_refresh_book();
-      break;
+    decode_incremental_refresh_order_book(
+        incremental_order_book_, {buffer, msg_offset, header_.blockLength(),
+                                  header_.version(), sizeof(buffer)});
+    break;
   default:
-      std::cout << "Unknown message type, templateId: " << header_.templateId() << '\n';
+    std::cout << "Unknown message type, templateId: " << header_.templateId()
+              << '\n';
     break;
   }
   return message_length;

@@ -17,20 +17,34 @@ constexpr int kMsgHeaderVersion = 0;
 using namespace sbe;
 
 class Decoder {
-  size_t decode_incremental_refresh_book(MDIncrementalRefreshBook32 &, char *,
-                                         uint64_t, std::uint64_t, std::uint64_t,
-                                         std::uint64_t);
-  size_t decode_incremental_refresh_volume();
-  size_t decode_incremental_refresh_trade();
-  size_t decode_incremental_refresh_order_book();
-  size_t decode_snapshot(SnapshotFullRefresh38 &, char *, uint64_t,
-                         std::uint64_t, std::uint64_t, std::uint64_t);
-  size_t decode_message(char *, uint64_t);
-  size_t decode_message_length(char *, uint64_t);
+public:
+
+  struct Message {
+    char *buffer;
+    uint16_t offset;
+    uint16_t block_length;
+    uint16_t version;
+    uint16_t buffer_length;
+  };
+  size_t decode_packet(char *, size_t);
+
+private:
+  size_t decode_incremental_refresh_book(MDIncrementalRefreshBook32 &,
+                                         Decoder::Message);
+  size_t decode_incremental_refresh_volume(MDIncrementalRefreshVolume37 &,
+                                           Decoder::Message);
+  size_t decode_incremental_refresh_trade(MDIncrementalRefreshTradeSummary42 &,
+                                          Decoder::Message);
+  size_t
+  decode_incremental_refresh_order_book(MDIncrementalRefreshOrderBook43 &,
+                                        Decoder::Message);
+  size_t decode_snapshot(SnapshotFullRefresh38 &, Decoder::Message);
+  size_t decode_message(char *, size_t);
+  size_t decode_message_length(char *, size_t);
   size_t decode_header(MessageHeader &, char *, uint64_t, uint64_t);
 
-  void bid_entry(MDUpdateAction::Value, int, float, int);
-  void ask_entry(MDUpdateAction::Value, int, float, int);
+  void handle_bid_entry(MDUpdateAction::Value, int, float, int);
+  void handle_ask_entry(MDUpdateAction::Value, int, float, int);
 
   MessageHeader header_;
   SnapshotFullRefresh38 snapshot_full_;
@@ -43,6 +57,4 @@ class Decoder {
   // Book being populated by decoder
   OrderBook book_;
 
-public:
-  size_t decode_packet(char *, size_t);
 };

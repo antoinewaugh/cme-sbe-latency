@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include "Subscriber.h"
 
 int main(int argc, char* argv[])
 {
@@ -20,10 +20,10 @@ int main(int argc, char* argv[])
                   << argv[3]
                   << '\n';
 
-//        boost::asio::io_service io_service;
-//        receiver r(io_service, boost::asio::ip::address::from_string(argv[1]),
-//            boost::asio::ip::address::from_string(argv[2]), atoi(argv[3]));
-//        io_service.run();
+        boost::asio::io_service io_service;
+        Subscriber r(io_service, boost::asio::ip::address::from_string(argv[1]),
+            boost::asio::ip::address::from_string(argv[2]), atoi(argv[3]));
+        io_service.run();
 
     } catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << "\n";
