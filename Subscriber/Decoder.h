@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/asio.hpp>
-#include "boost/bind.hpp"
-
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshOrderBook43.h"
 #include "sbe/MDIncrementalRefreshTradeSummary42.h"
@@ -26,18 +23,14 @@ class Decoder {
   size_t decode_incremental_refresh_volume();
   size_t decode_incremental_refresh_trade();
   size_t decode_incremental_refresh_order_book();
-  size_t decode_snapshot(SnapshotFullRefresh38&, char *,
-                                         uint64_t, std::uint64_t, std::uint64_t,
-                                         std::uint64_t);
-  size_t decode_message(uint64_t);
-  size_t decode_packet(size_t);
+  size_t decode_snapshot(SnapshotFullRefresh38 &, char *, uint64_t,
+                         std::uint64_t, std::uint64_t, std::uint64_t);
+  size_t decode_message(char *, uint64_t);
+  size_t decode_message_length(char *, uint64_t);
   size_t decode_header(MessageHeader &, char *, uint64_t, uint64_t);
 
-  boost::asio::ip::udp::socket socket_;
-  boost::asio::ip::udp::endpoint sender_endpoint_;
-
-  enum { max_length = 4096 };
-  char data_[max_length];
+  void bid_entry(MDUpdateAction::Value, int, float, int);
+  void ask_entry(MDUpdateAction::Value, int, float, int);
 
   MessageHeader header_;
   SnapshotFullRefresh38 snapshot_full_;
@@ -47,8 +40,9 @@ class Decoder {
   MDIncrementalRefreshTradeSummary42 incremental_trade_;
   MDIncrementalRefreshOrderBook43 incremental_order_book_;
 
+  // Book being populated by decoder
   OrderBook book_;
 
- public:
-  void handle_packet(const boost::system::error_code &, size_t);
+public:
+  size_t decode_packet(char *, size_t);
 };
