@@ -51,5 +51,5 @@ RUN mkdir build \
 	&& mv cme_sbe_latency /usr/local/bin
 
 
-ENTRYPOINT ["/usr/local/bin/cme_sbe_latency"]
-CMD ["0.0.0.0", "224.0.32.1", "15310"]
+#ENTRYPOINT ["/usr/local/bin/cme_sbe_latency"]
+#CMD ["0.0.0.0", "224.0.32.1", "15310"]

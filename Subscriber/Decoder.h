@@ -7,7 +7,7 @@
 #include "sbe/MessageHeader.h"
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
-
+#include <cmath>
 #include "OrderBook.h"
 
 constexpr int kMsgSize = 2;
@@ -21,10 +21,10 @@ public:
 
   struct Message {
     char *buffer;
-    uint16_t offset;
-    uint16_t block_length;
-    uint16_t version;
-    uint16_t buffer_length;
+    uint64_t offset;
+    uint64_t block_length;
+    uint64_t version;
+    uint64_t buffer_length;
   };
   size_t decode_packet(char *, size_t);
 

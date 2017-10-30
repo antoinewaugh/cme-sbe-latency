@@ -15,6 +15,7 @@ class OrderBook {
 public:
     OrderBook();
     inline bool empty() const;
+    void clear();
     void add_bid(int level, float price, int quantity);
     void update_bid(int level, float price, int quantity);
     void delete_bid(int level, float price);

@@ -13,7 +13,7 @@ bool OrderBook::empty() const {
 
 void OrderBook::add_bid(int level, float price, int quantity) {
 
-    if(level > bids_.size())
+    if(level-1 > bids_.size())
         return;
 
     bids_.insert(bids_.begin()+level-1, {price, quantity});
@@ -56,7 +56,7 @@ void OrderBook::delete_bid_thru(int level) {
 }
 
 void OrderBook::add_ask(int level, float price, int quantity) {
-    if(level > asks_.size())
+    if(level-1 > asks_.size())
         return;
     asks_.insert(asks_.begin()+level-1, {price, quantity});
 }
@@ -119,4 +119,9 @@ std::ostream& operator<<(std::ostream &os, const OrderBook &book) {
     }
 
     return os;
+}
+
+void OrderBook::clear() {
+	bids_.clear();
+	asks_.clear();
 }
