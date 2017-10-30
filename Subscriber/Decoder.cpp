@@ -1,15 +1,14 @@
 #include "Decoder.h"
 #include <iostream>
 
+size_t Decoder::decode_incremental_refresh_volume(
+    MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {}
 
-size_t Decoder::decode_incremental_refresh_volume(MDIncrementalRefreshVolume37& refresh,
-                                                  Decoder::Message message) {}
+size_t Decoder::decode_incremental_refresh_trade(
+    MDIncrementalRefreshTradeSummary42 &refresh, Decoder::Message message) {}
 
-size_t Decoder::decode_incremental_refresh_trade(MDIncrementalRefreshTradeSummary42& refresh,
-                                                      Decoder::Message message) {}
-
-size_t Decoder::decode_incremental_refresh_order_book(MDIncrementalRefreshOrderBook43&refresh,
-                                Decoder::Message message) {}
+size_t Decoder::decode_incremental_refresh_order_book(
+    MDIncrementalRefreshOrderBook43 &refresh, Decoder::Message message) {}
 
 size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
                                 Decoder::Message message) {
