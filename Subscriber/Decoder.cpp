@@ -1,4 +1,5 @@
 #include "Decoder.h"
+#include "SymbolFeed.h"
 #include <iostream>
 
 size_t Decoder::decode_incremental_refresh_volume(
@@ -15,7 +16,7 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-
+  feed_.OnMDSnapshotFullRefresh38(refresh);
   // symbolfeed.OnMDIncrementalRefreshBook32(refresh);
 }
 

@@ -1,7 +1,8 @@
 #pragma once
+#include "SymbolFeed.h"
 
-#include "Decoder.fwd.h"
-#include "SymbolFeed.fwd.h"
+
+//#include "Decoder.fwd.h"
 
 #include "Handler.h"
 #include "Receiver.h"
@@ -28,7 +29,7 @@ class SymbolFeed {
   void StopRecovery();
 
   Handler &handler_; // = nullptr;
-  Decoder &decoder_; // = nullptr;
+//  Decoder &decoder_; // = nullptr;
 
   OrderBook book_;
 
@@ -38,7 +39,8 @@ class SymbolFeed {
   Receiver snapshotB_;
 
 public:
-  SymbolFeed(uint64_t, Handler &, Decoder &);
+ // SymbolFeed(uint64_t, Handler &, Decoder &);
+  SymbolFeed(uint64_t, Handler &);
   //  SymbolFeed() = default;
   ~SymbolFeed();
   void OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &);

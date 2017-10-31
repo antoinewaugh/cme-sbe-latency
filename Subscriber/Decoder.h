@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Decoder.fwd.h"
 #include "SymbolFeed.fwd.h"
+#include "Decoder.fwd.h"
 
 #include "OrderBook.h"
 

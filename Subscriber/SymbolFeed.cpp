@@ -1,7 +1,10 @@
 #include "SymbolFeed.h"
 
-SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder)
-    : securityid_(securityid), handler_(handler), decoder_(decoder) {
+#include <cmath>
+
+//SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder)
+SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler)
+    : securityid_(securityid), handler_(handler) {
   incrementalA_.join();
   incrementalB_.join();
   StartRecovery();
