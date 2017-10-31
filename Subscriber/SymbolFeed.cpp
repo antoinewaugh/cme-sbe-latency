@@ -56,9 +56,9 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
         book_.add_ask(level, price, volume);
       }
     }
+    handler_.OnQuote(book_);
   }
 
-  handler_.OnQuote(book_);
 }
 
 void SymbolFeed::OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &) {}
