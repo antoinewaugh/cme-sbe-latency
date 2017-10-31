@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-//SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder)
+// SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
+// &decoder)
 SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler)
     : securityid_(securityid), handler_(handler) {
   incrementalA_.join();
@@ -18,15 +19,23 @@ SymbolFeed::~SymbolFeed() {
 }
 
 void SymbolFeed::StartRecovery() {
+
+  std::cout << "Starting Recovery";
+
   if (!recoverymode_) {
     recoverymode_ = true;
     book_.clear();
+    seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
+                 // alignment
     snapshotA_.join();
     snapshotB_.join();
   }
 }
 
 void SymbolFeed::StopRecovery() {
+
+  std::cout << "Stopping Recovery";
+
   if (recoverymode_) {
     recoverymode_ = false;
     snapshotA_.leave();
@@ -36,29 +45,104 @@ void SymbolFeed::StopRecovery() {
 
 void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
 
+  if (!recoverymode_)
+    return;
+
+  if (refresh.securityID() != securityid_)
+    return;
+
   auto &entry = refresh.noMDEntries();
 
-  if (refresh.securityID() == securityid_) {
-    book_.clear(); // Confirm blatent clearing of book okay in this instance,
-                   // race conditions??
-    while (entry.hasNext()) {
+  book_.clear();
+  seqnum_ = refresh.lastMsgSeqNumProcessed(); // fast forward seqnum for
+                                              // incremental feed alignment
 
-      entry.next();
+  while (entry.hasNext()) {
+    entry.next();
 
-      int level = entry.mDPriceLevel();
-      float price = entry.mDEntryPx().mantissa() *
-                    std::pow(10, entry.mDEntryPx().exponent());
-      int volume = entry.mDEntrySize();
+    int level = entry.mDPriceLevel();
+    float price = entry.mDEntryPx().mantissa() *
+                  std::pow(10, entry.mDEntryPx().exponent());
+    int volume = entry.mDEntrySize();
 
-      if (entry.mDEntryType() == MDEntryType::Bid) {
-        book_.add_bid(level, price, volume);
-      } else if (entry.mDEntryType() == MDEntryType::Offer) {
-        book_.add_ask(level, price, volume);
-      }
+    if (entry.mDEntryType() == MDEntryType::Bid) {
+      book_.add_bid(level, price, volume);
+    } else if (entry.mDEntryType() == MDEntryType::Offer) {
+      book_.add_ask(level, price, volume);
     }
-    handler_.OnQuote(book_);
   }
-
+  handler_.OnQuote(book_);
 }
 
-void SymbolFeed::OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &) {}
+void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
+                                float price, int volume) {
+  switch (action) {
+  case MDUpdateAction::New:
+    book_.add_ask(level, price, volume);
+    break;
+  case MDUpdateAction::Change:
+    book_.update_ask(level, price, volume);
+    break;
+  case MDUpdateAction::Delete:
+    book_.delete_ask(level, price);
+    break;
+  case MDUpdateAction::DeleteFrom:
+    book_.delete_ask_from(level);
+    break;
+  case MDUpdateAction::DeleteThru:
+    book_.delete_ask_thru(level);
+    break;
+  }
+}
+void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
+                                float price, int volume) {
+  switch (action) {
+  case MDUpdateAction::New:
+    book_.add_bid(level, price, volume);
+    break;
+  case MDUpdateAction::Change:
+    book_.update_bid(level, price, volume);
+    break;
+  case MDUpdateAction::Delete:
+    book_.delete_bid(level, price);
+    break;
+  case MDUpdateAction::DeleteFrom:
+    book_.delete_bid_from(level);
+    break;
+  case MDUpdateAction::DeleteThru:
+    book_.delete_bid_thru(level);
+    break;
+  }
+}
+
+void SymbolFeed::OnMDIncrementalRefreshBook32(
+    MDIncrementalRefreshBook32 &refresh) {
+
+  auto &entry = refresh.noMDEntries();
+
+  while (entry.hasNext()) {
+
+    entry.next();
+
+    if (entry.securityID() != securityid_)
+      continue;
+    if (entry.rptSeq() == seqnum_ + 1)
+      continue;
+
+    if (recoverymode_)
+      StopRecovery();
+
+    int level = entry.mDPriceLevel();
+    float price = entry.mDEntryPx().mantissa() *
+                  std::pow(10, entry.mDEntryPx().exponent());
+    int volume = entry.mDEntrySize();
+
+    if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
+      HandleBidEntry(entry.mDUpdateAction(), level, price, volume);
+    } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
+      HandleAskEntry(entry.mDUpdateAction(), level, price, volume);
+    }
+
+    ++seqnum_;
+  }
+}

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SymbolFeed.fwd.h"
 #include "Decoder.fwd.h"
+#include "SymbolFeed.fwd.h"
 
 #include "OrderBook.h"
 
@@ -25,10 +25,10 @@ class Decoder {
 public:
   struct Message {
     char *buffer;
-    uint64_t offset;
-    uint64_t block_length;
-    uint64_t version;
-    uint64_t buffer_length;
+    uint16_t offset;
+    uint16_t block_length;
+    uint16_t version;
+    uint16_t buffer_length;
   };
 
   size_t decode_packet(char *, size_t);
