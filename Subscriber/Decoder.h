@@ -1,5 +1,6 @@
 #pragma once
 
+#include "OrderBook.h"
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshOrderBook43.h"
 #include "sbe/MDIncrementalRefreshTradeSummary42.h"
@@ -8,7 +9,6 @@
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
 #include <cmath>
-#include "OrderBook.h"
 
 constexpr int kMsgSize = 2;
 constexpr int kByteOffest = 12;
@@ -18,7 +18,6 @@ using namespace sbe;
 
 class Decoder {
 public:
-
   struct Message {
     char *buffer;
     uint64_t offset;
@@ -56,5 +55,4 @@ private:
 
   // Book being populated by decoder
   OrderBook book_;
-
 };

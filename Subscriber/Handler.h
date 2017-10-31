@@ -4,9 +4,8 @@
 #include "SymbolFeed.h"
 
 class Handler {
-//  SymbolFeed& feed_;
+  //  SymbolFeed& feed_;
 public:
-//  Handler(SymbolFeed);
-  void OnQuote(OrderBook& book);
+  //  Handler(SymbolFeed);
+  void OnQuote(OrderBook &book);
 };
-

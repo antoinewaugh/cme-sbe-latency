@@ -14,27 +14,28 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
                                 Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
-                     message.version, message.buffer_length);
+                        message.version, message.buffer_length);
   auto &entry = refresh.noMDEntries();
   book_.clear();
-	if (refresh.securityID() == 23936 ) {
-  while (entry.hasNext()) {
-    entry.next();
-    // validate securityID
-    // validate seqnum
+  if (refresh.securityID() == 23936) {
+    while (entry.hasNext()) {
+      entry.next();
+      // validate securityID
+      // validate seqnum
 
-    int level = entry.mDPriceLevel();
-    float price = entry.mDEntryPx().mantissa() *
-                  std::pow(10, entry.mDEntryPx().exponent());
-    int volume = entry.mDEntrySize();
-    if (entry.mDEntryType() == MDEntryType::Bid) {
-	std::cout<<level << " " << price << " " << volume << " - " << entry.mDEntryType() << '\n';
-    } else if (entry.mDEntryType() == MDEntryType::Offer) {
-      book_.add_ask(level, price, volume);
+      int level = entry.mDPriceLevel();
+      float price = entry.mDEntryPx().mantissa() *
+                    std::pow(10, entry.mDEntryPx().exponent());
+      int volume = entry.mDEntrySize();
+      if (entry.mDEntryType() == MDEntryType::Bid) {
+        std::cout << level << " " << price << " " << volume << " - "
+                  << entry.mDEntryType() << '\n';
+      } else if (entry.mDEntryType() == MDEntryType::Offer) {
+        book_.add_ask(level, price, volume);
+      }
     }
+    std::cout << book_ << '\n';
   }
-  std::cout << book_ << '\n';
-}
 }
 
 void Decoder::handle_ask_entry(MDUpdateAction::Value action, int level,
@@ -145,19 +146,20 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
   case MDIncrementalRefreshVolume37::sbeTemplateId():
     decode_incremental_refresh_volume(
         incremental_volume_, Message{buffer, msg_offset, header_.blockLength(),
-                              header_.version(), 4096});
+                                     header_.version(), 4096});
     break;
 
   case MDIncrementalRefreshTradeSummary42::sbeTemplateId():
-    decode_incremental_refresh_trade(incremental_trade_,
-                                     Message{buffer, msg_offset, header_.blockLength(),
-                                      header_.version(), 4096});
+    decode_incremental_refresh_trade(
+        incremental_trade_, Message{buffer, msg_offset, header_.blockLength(),
+                                    header_.version(), 4096});
     break;
 
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
-    decode_incremental_refresh_order_book(
-        incremental_order_book_, Message{buffer, msg_offset, header_.blockLength(),
-                                  header_.version(), 4096});
+    decode_incremental_refresh_order_book(incremental_order_book_,
+                                          Message{buffer, msg_offset,
+                                                  header_.blockLength(),
+                                                  header_.version(), 4096});
     break;
   default:
     std::cout << "Unknown message type, templateId: " << header_.templateId()
