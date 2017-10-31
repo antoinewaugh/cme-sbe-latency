@@ -102,7 +102,7 @@ std::ostream& operator<<(std::ostream &os, const OrderBook &book) {
     os << "--------------------------------------" << '\n';
 
     for(auto it = book.asks_.rbegin(); it != book.asks_.rend(); ++it) {
-        os << "\t\t\t"
+        os << "\t\t"
            << it->price
            << "\t\t"
            << it->quantity
@@ -113,7 +113,7 @@ std::ostream& operator<<(std::ostream &os, const OrderBook &book) {
 
     for(auto it = book.bids_.begin(); it != book.bids_.end(); ++it) {
         os << it->quantity
-           << "\t\t\t"
+           << "\t\t"
            << it->price
            << '\n';
     }
