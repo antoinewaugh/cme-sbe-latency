@@ -128,6 +128,10 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
       continue;
     if (entry.rptSeq() != seqnum_ + 1)
       continue;
+    if (entry.rptSeq() > seqnum_ + 1) {
+      StartRecovery();
+      break;
+    }
 
     if (recoverymode_)
       StopRecovery();
