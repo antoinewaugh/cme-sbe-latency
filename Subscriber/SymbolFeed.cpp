@@ -126,7 +126,7 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     if (entry.securityID() != securityid_)
       continue;
-    if (entry.rptSeq() == seqnum_ + 1)
+    if (entry.rptSeq() != seqnum_ + 1)
       continue;
 
     if (recoverymode_)
