@@ -24,4 +24,4 @@ add_subdirectory(OrderBook)
 include_directories(Subscriber)
 add_subdirectory(Subscriber)
 
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe OrderBook Subscriber)
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Subscriber OrderBook )

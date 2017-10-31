@@ -15,70 +15,51 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-  auto &entry = refresh.noMDEntries();
-  book_.clear();
-  if (refresh.securityID() == 23936) {
-    while (entry.hasNext()) {
-      entry.next();
-      // validate securityID
-      // validate seqnum
 
-      int level = entry.mDPriceLevel();
-      float price = entry.mDEntryPx().mantissa() *
-                    std::pow(10, entry.mDEntryPx().exponent());
-      int volume = entry.mDEntrySize();
-      if (entry.mDEntryType() == MDEntryType::Bid) {
-        std::cout << level << " " << price << " " << volume << " - "
-                  << entry.mDEntryType() << '\n';
-      } else if (entry.mDEntryType() == MDEntryType::Offer) {
-        book_.add_ask(level, price, volume);
-      }
-    }
-    std::cout << book_ << '\n';
-  }
+  // symbolfeed.OnMDIncrementalRefreshBook32(refresh);
 }
 
-void Decoder::handle_ask_entry(MDUpdateAction::Value action, int level,
-                               float price, int volume) {
-  switch (action) {
-  case MDUpdateAction::New:
-    book_.add_ask(level, price, volume);
-    break;
-  case MDUpdateAction::Change:
-    book_.update_ask(level, price, volume);
-    break;
-  case MDUpdateAction::Delete:
-    book_.delete_ask(level, price);
-    break;
-  case MDUpdateAction::DeleteFrom:
-    book_.delete_ask_from(level);
-    break;
-  case MDUpdateAction::DeleteThru:
-    book_.delete_ask_thru(level);
-    break;
-  }
-}
-
-void Decoder::handle_bid_entry(MDUpdateAction::Value action, int level,
-                               float price, int volume) {
-  switch (action) {
-  case MDUpdateAction::New:
-    book_.add_bid(level, price, volume);
-    break;
-  case MDUpdateAction::Change:
-    book_.update_bid(level, price, volume);
-    break;
-  case MDUpdateAction::Delete:
-    book_.delete_bid(level, price);
-    break;
-  case MDUpdateAction::DeleteFrom:
-    book_.delete_bid_from(level);
-    break;
-  case MDUpdateAction::DeleteThru:
-    book_.delete_bid_thru(level);
-    break;
-  }
-}
+// void Decoder::handle_ask_entry(MDUpdateAction::Value action, int level,
+//                               float price, int volume) {
+//  switch (action) {
+//  case MDUpdateAction::New:
+//    book_.add_ask(level, price, volume);
+//    break;
+//  case MDUpdateAction::Change:
+//    book_.update_ask(level, price, volume);
+//    break;
+//  case MDUpdateAction::Delete:
+//    book_.delete_ask(level, price);
+//    break;
+//  case MDUpdateAction::DeleteFrom:
+//    book_.delete_ask_from(level);
+//    break;
+//  case MDUpdateAction::DeleteThru:
+//    book_.delete_ask_thru(level);
+//    break;
+//  }
+//}
+//
+// void Decoder::handle_bid_entry(MDUpdateAction::Value action, int level,
+//                               float price, int volume) {
+//  switch (action) {
+//  case MDUpdateAction::New:
+//    book_.add_bid(level, price, volume);
+//    break;
+//  case MDUpdateAction::Change:
+//    book_.update_bid(level, price, volume);
+//    break;
+//  case MDUpdateAction::Delete:
+//    book_.delete_bid(level, price);
+//    break;
+//  case MDUpdateAction::DeleteFrom:
+//    book_.delete_bid_from(level);
+//    break;
+//  case MDUpdateAction::DeleteThru:
+//    book_.delete_bid_thru(level);
+//    break;
+//  }
+//}
 
 size_t
 Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
@@ -101,9 +82,9 @@ Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
     int volume = entry.mDEntrySize();
 
     if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
-      handle_bid_entry(entry.mDUpdateAction(), level, price, volume);
+      //      handle_bid_entry(entry.mDUpdateAction(), level, price, volume);
     } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
-      handle_ask_entry(entry.mDUpdateAction(), level, price, volume);
+      //      handle_ask_entry(entry.mDUpdateAction(), level, price, volume);
     }
   }
 }
@@ -175,3 +156,5 @@ size_t Decoder::decode_packet(char *buffer, size_t received) {
     processed += decode_message(buffer, processed);
   }
 }
+
+Decoder::Decoder(SymbolFeed &feed) : feed_(feed) {}

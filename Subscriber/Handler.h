@@ -1,7 +1,6 @@
 #pragma once
 
 #include "OrderBook.h"
-#include "SymbolFeed.h"
 
 class Handler {
   //  SymbolFeed& feed_;

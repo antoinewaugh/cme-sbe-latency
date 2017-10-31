@@ -4,6 +4,8 @@
 #include <boost/asio.hpp>
 
 #include "Decoder.h"
+#include "Handler.h"
+#include "SymbolFeed.h"
 
 class Subscriber {
 
@@ -13,14 +15,16 @@ class Subscriber {
   enum { max_length = 4096 };
   char data_[max_length];
 
-  Decoder decoder;
+  Handler handler_;
+  SymbolFeed feed_;
+  Decoder decoder_;
 
   void handle_receive_from(const boost::system::error_code &error,
                            size_t received) {
     if (!error) {
 
       // decode
-      decoder.decode_packet(data_, received);
+      decoder_.decode_packet(data_, received);
 
       // pull next message
       socket_.async_receive_from(
@@ -36,7 +40,7 @@ public:
              const boost::asio::ip::address &listen_address,
              const boost::asio::ip::address &multicast_address,
              const short multicast_port)
-      : socket_(io_service) {
+      : socket_(io_service), feed_(1, handler_, decoder_), decoder_(feed_) {
 
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),
                                                    multicast_port);

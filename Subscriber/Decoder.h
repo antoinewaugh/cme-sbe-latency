@@ -1,6 +1,10 @@
 #pragma once
 
+#include "Decoder.fwd.h"
+#include "SymbolFeed.fwd.h"
+
 #include "OrderBook.h"
+
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshOrderBook43.h"
 #include "sbe/MDIncrementalRefreshTradeSummary42.h"
@@ -8,6 +12,7 @@
 #include "sbe/MessageHeader.h"
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
+
 #include <cmath>
 
 constexpr int kMsgSize = 2;
@@ -25,7 +30,9 @@ public:
     uint64_t version;
     uint64_t buffer_length;
   };
+
   size_t decode_packet(char *, size_t);
+  Decoder(SymbolFeed &);
 
 private:
   size_t decode_incremental_refresh_book(MDIncrementalRefreshBook32 &,
@@ -42,9 +49,6 @@ private:
   size_t decode_message_length(char *, size_t);
   size_t decode_header(MessageHeader &, char *, uint64_t, uint64_t);
 
-  void handle_bid_entry(MDUpdateAction::Value, int, float, int);
-  void handle_ask_entry(MDUpdateAction::Value, int, float, int);
-
   MessageHeader header_;
   SnapshotFullRefresh38 snapshot_full_;
   SnapshotFullRefreshOrderBook44 snapshot_full_order_book_;
@@ -53,6 +57,5 @@ private:
   MDIncrementalRefreshTradeSummary42 incremental_trade_;
   MDIncrementalRefreshOrderBook43 incremental_order_book_;
 
-  // Book being populated by decoder
-  OrderBook book_;
+  SymbolFeed &feed_;
 };
