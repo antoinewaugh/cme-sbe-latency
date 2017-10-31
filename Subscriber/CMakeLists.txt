@@ -8,8 +8,8 @@ add_library(sbe STATIC IMPORTED)
 set_property(TARGET sbe PROPERTY IMPORTED_LOCATION /usr/local/lib/libsbe.a)
 set_property(TARGET sbe PROPERTY INTERFACE_INCLUDE_DIRECTORIES /usr/local/include/sbe)
 
-set(HEADER_FILES Subscriber.h Decoder.h)
-set(SOURCE_FILES Subscriber.cpp Decoder.cpp)
+set(HEADER_FILES Subscriber.h Decoder.h Receiver.h SymbolFeed.h)
+set(SOURCE_FILES Subscriber.cpp Decoder.cpp Receiver.cpp SymbolFeed.cpp)
 
 add_library(Subscriber STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(Subscriber sbe)
