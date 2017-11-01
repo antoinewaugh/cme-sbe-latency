@@ -6,16 +6,16 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
  &decoder) : securityid_(securityid), handler_(handler), decoder_(decoder) {
 
   decoder.RegisterCallbacks(
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshBook32, this, std::placeholders::_1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshDailyStatistics33, this, std::placeholders::_2),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshLimitsBanding34, this, std::placeholders::_3),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshSessionStatistics35, this, std::placeholders::_4),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshTrade36, this, std::placeholders::_5),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshVolume37, this, std::placeholders::_6),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshTradeSummary42, this, std::placeholders::_7),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshOrderBook43, this, std::placeholders::_8),
-   std::bind(&SymbolFeed::OnMDSnapshotFullRefresh38, this, std::placeholders::_9),
-   std::bind(&SymbolFeed::OnMDSnapshotFullRefreshOrderBook44, this, std::placeholders::_10)
+      [this](auto&& val){this->OnMDIncrementalRefreshBook32(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshDailyStatistics33(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshLimitsBanding34(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshSessionStatistics35(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshTrade36(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshVolume37(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshTradeSummary42(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshOrderBook43(val);},
+      [this](auto&& val){this->OnMDSnapshotFullRefresh38(val);},
+      [this](auto&& val){this->OnMDSnapshotFullRefreshOrderBook44(val);}
   );
 
   incrementalA_.join();

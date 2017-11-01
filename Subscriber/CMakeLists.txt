@@ -1,7 +1,7 @@
 
 project(Subscriber)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 
 # imported library
 add_library(sbe STATIC IMPORTED)
