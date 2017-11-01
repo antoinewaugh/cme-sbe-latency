@@ -7,16 +7,16 @@ OrderBook::OrderBook() {
   asks_.reserve(MAX_BOOK_SIZE);
 }
 
-bool OrderBook::empty() const { return bids_.empty() and asks_.empty(); }
+bool OrderBook::Empty() const { return bids_.empty() and asks_.empty(); }
 
-void OrderBook::add_bid(int level, float price, int quantity) {
+void OrderBook::AddBid(int level, float price, int quantity) {
   if (level - 1 <= bids_.size())
     bids_.insert(bids_.begin() + level - 1, {price, quantity});
   else
     std::cerr << "Add bid out of range." << '\n';
 }
 
-void OrderBook::update_bid(int level, float price, int quantity) {
+void OrderBook::UpdateBid(int level, float price, int quantity) {
   if (level - 1 < bids_.size()) {
     auto &price_level = bids_[level - 1];
     if (price_level.price == price)
@@ -29,7 +29,7 @@ void OrderBook::update_bid(int level, float price, int quantity) {
   }
 }
 
-void OrderBook::delete_bid(int level, float price) {
+void OrderBook::DeleteBid(int level, float price) {
   if (level - 1 < bids_.size()) {
 
     auto it = bids_.begin() + level - 1;
@@ -42,28 +42,28 @@ void OrderBook::delete_bid(int level, float price) {
   }
 }
 
-void OrderBook::delete_bid_from(int level) {
+void OrderBook::DeleteBidFrom(int level) {
   if (level - 1 < bids_.size())
     bids_.erase(bids_.begin() + level - 1, bids_.end());
   else
     std::cerr << "Delete bid from level out of range." << '\n';
 }
 
-void OrderBook::delete_bid_thru(int level) {
+void OrderBook::DeleteBidThru(int level) {
   if (level == 1)
     bids_.clear();
   else
     std::cerr << "Delete thru expects level = 1";
 }
 
-void OrderBook::add_ask(int level, float price, int quantity) {
+void OrderBook::AddAsk(int level, float price, int quantity) {
   if (level - 1 <= asks_.size())
     asks_.insert(asks_.begin() + level - 1, {price, quantity});
   else
     std::cerr << "Add ask level out of range." << '\n';
 }
 
-void OrderBook::update_ask(int level, float price, int quantity) {
+void OrderBook::UpdateAsk(int level, float price, int quantity) {
 
   if (level - 1 < asks_.size()) {
 
@@ -77,7 +77,7 @@ void OrderBook::update_ask(int level, float price, int quantity) {
   }
 }
 
-void OrderBook::delete_ask(int level, float price) {
+void OrderBook::DeleteAsk(int level, float price) {
   if (level - 1 < asks_.size()) {
     auto it = asks_.begin() + level - 1;
     if (it->price == price)
@@ -89,14 +89,14 @@ void OrderBook::delete_ask(int level, float price) {
   }
 }
 
-void OrderBook::delete_ask_from(int level) {
+void OrderBook::DeleteAskFrom(int level) {
   if (level - 1 < asks_.size())
     asks_.erase(asks_.begin() + level - 1, asks_.end());
   else
     std::cerr << "Delete ask from out of range." << '\n';
 }
 
-void OrderBook::delete_ask_thru(int level) {
+void OrderBook::DeleteAskThru(int level) {
   if (level == 1)
     asks_.clear();
   else
@@ -121,7 +121,7 @@ std::ostream &operator<<(std::ostream &os, const OrderBook &book) {
   return os;
 }
 
-void OrderBook::clear() {
+void OrderBook::Clear() {
   bids_.clear();
   asks_.clear();
 }

@@ -24,7 +24,7 @@ class Subscriber {
     if (!error) {
 
       // decode
-      decoder_.decode_packet(data_, received);
+      decoder_.DecodePacket(data_, received);
 
       // pull next message
       socket_.async_receive_from(
@@ -40,7 +40,7 @@ public:
              const boost::asio::ip::address &listen_address,
              const boost::asio::ip::address &multicast_address,
              const short multicast_port)
-      : socket_(io_service), feed_(23936, handler_), decoder_(feed_) {
+      : socket_(io_service), feed_(23936, handler_, decoder_) {
     //: socket_(io_service), feed_(1, handler_, decoder_), decoder_(feed_) {
 
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),

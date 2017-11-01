@@ -1,8 +1,7 @@
 #pragma once
+
 #include "SymbolFeed.h"
-
-//#include "Decoder.fwd.h"
-
+#include "Decoder.h"
 #include "Handler.h"
 #include "Receiver.h"
 
@@ -30,8 +29,8 @@ class SymbolFeed {
                       int volume);
   void HandleAskEntry(MDUpdateAction::Value action, int level, float price,
                       int volume);
-  Handler &handler_; // = nullptr;
-                     //  Decoder &decoder_; // = nullptr;
+  Handler &handler_;
+  Decoder &decoder_;
 
   OrderBook book_;
 
@@ -41,9 +40,7 @@ class SymbolFeed {
   Receiver snapshotB_;
 
 public:
-  // SymbolFeed(uint64_t, Handler &, Decoder &);
-  SymbolFeed(uint64_t, Handler &);
-  //  SymbolFeed() = default;
+  SymbolFeed(uint64_t, Handler &, Decoder&);
   ~SymbolFeed();
   void OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &);
   void OnMDIncrementalRefreshDailyStatistics33(

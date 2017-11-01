@@ -14,17 +14,17 @@ class OrderBook {
 
 public:
   OrderBook();
-  inline bool empty() const;
-  void clear();
-  void add_bid(int level, float price, int quantity);
-  void update_bid(int level, float price, int quantity);
-  void delete_bid(int level, float price);
-  void delete_bid_from(int level);
-  void delete_bid_thru(int level);
-  void add_ask(int level, float price, int quantity);
-  void update_ask(int level, float price, int quantity);
-  void delete_ask(int level, float price);
-  void delete_ask_from(int level);
-  void delete_ask_thru(int level);
+  inline bool Empty() const;
+  void Clear();
+  void AddBid(int level, float price, int quantity);
+  void UpdateBid(int level, float price, int quantity);
+  void DeleteBid(int level, float price);
+  void DeleteBidFrom(int level);
+  void DeleteBidThru(int level);
+  void AddAsk(int level, float price, int quantity);
+  void UpdateAsk(int level, float price, int quantity);
+  void DeleteAsk(int level, float price);
+  void DeleteAskFrom(int level);
+  void DeleteAskThru(int level);
   friend std::ostream &operator<<(std::ostream &os, const OrderBook &book);
 };

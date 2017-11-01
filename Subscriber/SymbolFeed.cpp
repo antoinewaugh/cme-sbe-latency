@@ -2,10 +2,24 @@
 
 #include <cmath>
 
-// SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
-// &decoder)
-SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler)
-    : securityid_(securityid), handler_(handler) {
+SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
+ &decoder) : securityid_(securityid), handler_(handler), decoder_(decoder) {
+
+  using std::placeholders::_1;
+
+  decoder.RegisterCallbacks(
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshBook32, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshDailyStatistics33, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshLimitsBanding34, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshSessionStatistics35, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshTrade36, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshVolume37, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshTradeSummary42, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshOrderBook43, this, _1),
+   std::bind(&SymbolFeed::OnMDSnapshotFullRefresh38, this, _1),
+   std::bind(&SymbolFeed::OnMDSnapshotFullRefreshOrderBook44, this, _1)
+  );
+
   incrementalA_.join();
   incrementalB_.join();
   StartRecovery();
@@ -24,7 +38,7 @@ void SymbolFeed::StartRecovery() {
 
   if (!recoverymode_) {
     recoverymode_ = true;
-    book_.clear();
+    book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
     snapshotA_.join();
@@ -53,7 +67,7 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
 
   auto &entry = refresh.noMDEntries();
 
-  book_.clear();
+  book_.Clear();
   seqnum_ = refresh.lastMsgSeqNumProcessed(); // fast forward seqnum for
                                               // incremental feed alignment
 
@@ -66,9 +80,9 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
     int volume = entry.mDEntrySize();
 
     if (entry.mDEntryType() == MDEntryType::Bid) {
-      book_.add_bid(level, price, volume);
+      book_.AddBid(level, price, volume);
     } else if (entry.mDEntryType() == MDEntryType::Offer) {
-      book_.add_ask(level, price, volume);
+      book_.AddAsk(level, price, volume);
     }
   }
   handler_.OnQuote(book_);
@@ -78,19 +92,19 @@ void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
                                 float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
-    book_.add_ask(level, price, volume);
+    book_.AddAsk(level, price, volume);
     break;
   case MDUpdateAction::Change:
-    book_.update_ask(level, price, volume);
+    book_.UpdateAsk(level, price, volume);
     break;
   case MDUpdateAction::Delete:
-    book_.delete_ask(level, price);
+    book_.DeleteAsk(level, price);
     break;
   case MDUpdateAction::DeleteFrom:
-    book_.delete_ask_from(level);
+    book_.DeleteAskFrom(level);
     break;
   case MDUpdateAction::DeleteThru:
-    book_.delete_ask_thru(level);
+    book_.DeleteAskThru(level);
     break;
   }
 }
@@ -98,19 +112,19 @@ void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
                                 float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
-    book_.add_bid(level, price, volume);
+    book_.AddBid(level, price, volume);
     break;
   case MDUpdateAction::Change:
-    book_.update_bid(level, price, volume);
+    book_.UpdateBid(level, price, volume);
     break;
   case MDUpdateAction::Delete:
-    book_.delete_bid(level, price);
+    book_.DeleteBid(level, price);
     break;
   case MDUpdateAction::DeleteFrom:
-    book_.delete_bid_from(level);
+    book_.DeleteBidFrom(level);
     break;
   case MDUpdateAction::DeleteThru:
-    book_.delete_bid_thru(level);
+    book_.DeleteBidThru(level);
     break;
   }
 }
@@ -149,4 +163,36 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     ++seqnum_;
   }
+}
+
+void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(SnapshotFullRefreshOrderBook44 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshOrderBook43(MDIncrementalRefreshOrderBook43 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(MDIncrementalRefreshDailyStatistics33 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(MDIncrementalRefreshLimitsBanding34 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(MDIncrementalRefreshSessionStatistics35 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshVolume37(MDIncrementalRefreshVolume37 &) {
+
+}
+
+void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(MDIncrementalRefreshTradeSummary42 &) {
+
 }

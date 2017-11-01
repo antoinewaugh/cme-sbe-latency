@@ -16,7 +16,8 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-  feed_.OnMDSnapshotFullRefresh38(refresh);
+
+  cb_snapshotfull_(refresh);
 }
 
 size_t
@@ -26,7 +27,7 @@ Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
 
-  feed_.OnMDIncrementalRefreshBook32(refresh);
+  cb_book_(refresh);
 }
 
 size_t Decoder::decode_message_length(char *buffer, size_t offset) {
@@ -90,11 +91,36 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
   return message_length;
 }
 
-size_t Decoder::decode_packet(char *buffer, size_t received) {
+int Decoder::RegisterCallbacks(
+
+    std::function<void(MDIncrementalRefreshBook32&)> cb_book,
+    std::function<void(MDIncrementalRefreshDailyStatistics33&)> cb_dailystatistics,
+    std::function<void(MDIncrementalRefreshLimitsBanding34&)> cb_limitsbanding,
+    std::function<void(MDIncrementalRefreshSessionStatistics35&)> cb_sessionstatistics,
+    std::function<void(MDIncrementalRefreshTrade36&)> cb_trade,
+    std::function<void(MDIncrementalRefreshVolume37&)> cb_volume,
+    std::function<void(MDIncrementalRefreshTradeSummary42&)> cb_tradesummary,
+    std::function<void(MDIncrementalRefreshOrderBook43&)> cb_orderbook,
+    std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull,
+    std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook
+) {
+  cb_book_ = cb_book;
+  cb_dailystatistics_ = cb_dailystatistics;
+  cb_limitsbanding_ = cb_limitsbanding;
+  cb_sessionstatistics_ = cb_sessionstatistics;
+  cb_trade_ = cb_trade;
+  cb_volume_ = cb_volume;
+  cb_tradesummary_ = cb_tradesummary;
+  cb_orderbook_ = cb_orderbook;
+  cb_snapshotfull_ = cb_snapshotfull;
+  cb_snapshotorderbook_ = cb_snapshotorderbook;
+
+}
+
+size_t Decoder::DecodePacket(char *buffer, size_t received) {
   size_t processed = kByteOffest;
   while (processed < received) {
     processed += decode_message(buffer, processed);
   }
 }
 
-Decoder::Decoder(SymbolFeed &feed) : feed_(feed) {}
