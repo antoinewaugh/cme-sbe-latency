@@ -8,16 +8,16 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
   using std::placeholders::_1;
 
   decoder.RegisterCallbacks(
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshBook32, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshDailyStatistics33, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshLimitsBanding34, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshSessionStatistics35, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshTrade36, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshVolume37, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshTradeSummary42, this, _1),
-   std::bind(&SymbolFeed::OnMDIncrementalRefreshOrderBook43, this, _1),
-   std::bind(&SymbolFeed::OnMDSnapshotFullRefresh38, this, _1),
-   std::bind(&SymbolFeed::OnMDSnapshotFullRefreshOrderBook44, this, _1)
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshBook32&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshDailyStatistics33&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshLimitsBanding34&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshSessionStatistics35&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshTrade36&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshVolume37&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshTradeSummary42&, this, _1),
+   std::bind(&SymbolFeed::OnMDIncrementalRefreshOrderBook43&, this, _1),
+   std::bind(&SymbolFeed::OnMDSnapshotFullRefresh38&, this, _1),
+   std::bind(&SymbolFeed::OnMDSnapshotFullRefreshOrderBook44&, this, _1)
   );
 
   incrementalA_.join();

@@ -16,7 +16,6 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-
   cb_snapshotfull_(refresh);
 }
 
@@ -104,6 +103,7 @@ int Decoder::RegisterCallbacks(
     std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull,
     std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook
 ) {
+  registered_ = true;
   cb_book_ = cb_book;
   cb_dailystatistics_ = cb_dailystatistics;
   cb_limitsbanding_ = cb_limitsbanding;

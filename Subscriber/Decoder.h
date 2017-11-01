@@ -80,5 +80,5 @@ private:
   std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull_;
   std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook_;
 
-
+  bool registered_= false;
 };
