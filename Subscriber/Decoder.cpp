@@ -16,7 +16,9 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-  cb_snapshotfull_(refresh);
+  if (registered_) {
+    cb_snapshotfull_(refresh);
+  }
 }
 
 size_t
@@ -25,8 +27,9 @@ Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
-
-  cb_book_(refresh);
+  if (registered_) {
+    cb_book_(refresh);
+  }
 }
 
 size_t Decoder::decode_message_length(char *buffer, size_t offset) {
