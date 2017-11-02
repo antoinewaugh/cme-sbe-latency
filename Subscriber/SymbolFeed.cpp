@@ -74,7 +74,7 @@ void SymbolFeed::StopRecovery() {
 }
 
 void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
-  std::cout << "OnMDSnapshotFullRefresh";
+
   if (!recoverymode_)
     return;
 
@@ -182,24 +182,99 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 }
 
 void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(
-    SnapshotFullRefreshOrderBook44 &) {}
+    SnapshotFullRefreshOrderBook44 &refresh) {
+
+}
 
 void SymbolFeed::OnMDIncrementalRefreshOrderBook43(
-    MDIncrementalRefreshOrderBook43 &) {}
+    MDIncrementalRefreshOrderBook43 &refresh) {
+
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+    if (entry.securityID() != securityid_)
+      continue;
+    // handle
+  }
+}
 
 void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
-    MDIncrementalRefreshDailyStatistics33 &) {}
+    MDIncrementalRefreshDailyStatistics33 &refresh) {
+  auto &entry = refresh.noMDEntries();
+}
 
 void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(
-    MDIncrementalRefreshLimitsBanding34 &) {}
+    MDIncrementalRefreshLimitsBanding34 &refresh) {}
 
 void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(
-    MDIncrementalRefreshSessionStatistics35 &) {}
+    MDIncrementalRefreshSessionStatistics35 &refresh) {}
 
-void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &) {}
+void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &refresh) {
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if (entry.securityID() != securityid_)
+      continue;
+    if (entry.rptSeq() != seqnum_ + 1)
+      continue;
+    if (entry.rptSeq() > seqnum_ + 1) {
+      StartRecovery();
+      break;
+    }
+
+    if (recoverymode_)
+      StopRecovery();
+
+    seqnum_++;
+  }
+}
 
 void SymbolFeed::OnMDIncrementalRefreshVolume37(
-    MDIncrementalRefreshVolume37 &) {}
+    MDIncrementalRefreshVolume37 &refresh) {
+
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if (entry.securityID() != securityid_)
+      continue;
+    if (entry.rptSeq() != seqnum_ + 1)
+      continue;
+    if (entry.rptSeq() > seqnum_ + 1) {
+      StartRecovery();
+      break;
+    }
+
+    if (recoverymode_)
+      StopRecovery();
+
+    seqnum_++;
+  }
+}
 
 void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(
-    MDIncrementalRefreshTradeSummary42 &) {}
+    MDIncrementalRefreshTradeSummary42 &refresh) {
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if (entry.securityID() != securityid_)
+      continue;
+    if (entry.rptSeq() != seqnum_ + 1)
+      continue;
+    if (entry.rptSeq() > seqnum_ + 1) {
+      StartRecovery();
+      break;
+    }
+
+    if (recoverymode_)
+      StopRecovery();
+
+    seqnum_++;
+  }
+}
