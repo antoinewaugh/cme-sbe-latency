@@ -8,11 +8,11 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler,
                    const boost::asio::ip::address &multicast_address,
                    const short multicast_port)
     : securityid_(securityid), handler_(handler), decoder_(decoder),
-      incrementalA_(decoder, io_service, listen_address, multicast_address, multicast_port),
-      incrementalB_(decoder, io_service, listen_address, multicast_address, multicast_port),
-      snapshotA_(decoder, io_service, listen_address, multicast_address, multicast_port),
-      snapshotB_(decoder, io_service, listen_address, multicast_address, multicast_port) {
-
+      incrementalA_(decoder, io_service, listen_address, multicast_address, multicast_port)
+//      incrementalB_(decoder, io_service, listen_address, multicast_address, multicast_port),
+//      snapshotA_(decoder, io_service, listen_address, multicast_address, multicast_port),
+//      snapshotB_(decoder, io_service, listen_address, multicast_address, multicast_port) {
+{
   decoder.RegisterCallbacks(
       [this](auto &&val) { this->OnMDIncrementalRefreshBook32(val); },
       [this](auto &&val) {
@@ -30,15 +30,15 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler,
       [this](auto &&val) { this->OnMDSnapshotFullRefreshOrderBook44(val); });
 
   incrementalA_.Join();
-  incrementalB_.Join();
+//  incrementalB_.Join();
   StartRecovery();
 }
 
 SymbolFeed::~SymbolFeed() {
   incrementalA_.Leave();
-  incrementalB_.Leave();
-  snapshotA_.Leave();
-  snapshotB_.Leave();
+//  incrementalB_.Leave();
+//  snapshotA_.Leave();
+//  snapshotB_.Leave();
 }
 
 void SymbolFeed::StartRecovery() {
@@ -50,8 +50,8 @@ void SymbolFeed::StartRecovery() {
     book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
-    snapshotA_.Join();
-    snapshotB_.Join();
+//    snapshotA_.Join();
+//    snapshotB_.Join();
   }
 }
 
@@ -61,8 +61,8 @@ void SymbolFeed::StopRecovery() {
 
   if (recoverymode_) {
     recoverymode_ = false;
-    snapshotA_.Leave();
-    snapshotB_.Leave();
+//    snapshotA_.Leave();
+//    snapshotB_.Leave();
   }
 }
 

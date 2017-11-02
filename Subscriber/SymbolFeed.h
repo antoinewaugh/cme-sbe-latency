@@ -35,9 +35,9 @@ class SymbolFeed {
   OrderBook book_;
 
   Receiver incrementalA_;
-  Receiver incrementalB_;
-  Receiver snapshotA_;
-  Receiver snapshotB_;
+//  Receiver incrementalB_;
+//  Receiver snapshotA_;
+//  Receiver snapshotB_;
 
 public:
   SymbolFeed(uint64_t securityid, Handler &handler,
