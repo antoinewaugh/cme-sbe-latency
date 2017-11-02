@@ -7,15 +7,15 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
 
   decoder.RegisterCallbacks(
       [this](auto&& val){this->OnMDIncrementalRefreshBook32(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshDailyStatistics33(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshLimitsBanding34(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshSessionStatistics35(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshTrade36(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshVolume37(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshTradeSummary42(val);},
-//      [this](auto&& val){this->OnMDIncrementalRefreshOrderBook43(val);},
-      [this](auto&& val){this->OnMDSnapshotFullRefresh38(val);}
-//      [this](auto&& val){this->OnMDSnapshotFullRefreshOrderBook44(val);}
+      [this](auto&& val){this->OnMDIncrementalRefreshDailyStatistics33(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshLimitsBanding34(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshSessionStatistics35(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshTrade36(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshVolume37(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshTradeSummary42(val);},
+      [this](auto&& val){this->OnMDIncrementalRefreshOrderBook43(val);},
+      [this](auto&& val){this->OnMDSnapshotFullRefresh38(val);},
+      [this](auto&& val){this->OnMDSnapshotFullRefreshOrderBook44(val);}
   );
 
   incrementalA_.join();

@@ -35,15 +35,15 @@ public:
   size_t DecodePacket(char *, size_t);
   int RegisterCallbacks(
       std::function<void(MDIncrementalRefreshBook32&)>,
-//      std::function<void(MDIncrementalRefreshDailyStatistics33&)>,
-//      std::function<void(MDIncrementalRefreshLimitsBanding34&)>,
-//      std::function<void(MDIncrementalRefreshSessionStatistics35&)>,
-//      std::function<void(MDIncrementalRefreshTrade36&)>,
-//      std::function<void(MDIncrementalRefreshVolume37&)>,
-//      std::function<void(MDIncrementalRefreshTradeSummary42&)>,
-//      std::function<void(MDIncrementalRefreshOrderBook43&)>,
-      std::function<void(SnapshotFullRefresh38&)>
-//      std::function<void(SnapshotFullRefreshOrderBook44&)>
+      std::function<void(MDIncrementalRefreshDailyStatistics33&)>,
+      std::function<void(MDIncrementalRefreshLimitsBanding34&)>,
+      std::function<void(MDIncrementalRefreshSessionStatistics35&)>,
+      std::function<void(MDIncrementalRefreshTrade36&)>,
+      std::function<void(MDIncrementalRefreshVolume37&)>,
+      std::function<void(MDIncrementalRefreshTradeSummary42&)>,
+      std::function<void(MDIncrementalRefreshOrderBook43&)>,
+      std::function<void(SnapshotFullRefresh38&)>,
+      std::function<void(SnapshotFullRefreshOrderBook44&)>
   );
 
 private:
@@ -70,15 +70,15 @@ private:
   MDIncrementalRefreshOrderBook43 incremental_order_book_;
 
   std::function<void(MDIncrementalRefreshBook32&)> cb_book_;
-//  std::function<void(MDIncrementalRefreshDailyStatistics33&)> cb_dailystatistics_;
-//  std::function<void(MDIncrementalRefreshLimitsBanding34&)> cb_limitsbanding_;
-//  std::function<void(MDIncrementalRefreshSessionStatistics35&)> cb_sessionstatistics_;
-//  std::function<void(MDIncrementalRefreshTrade36&)> cb_trade_;
-//  std::function<void(MDIncrementalRefreshVolume37&)> cb_volume_;
-//  std::function<void(MDIncrementalRefreshTradeSummary42&)> cb_tradesummary_;
-//  std::function<void(MDIncrementalRefreshOrderBook43&)> cb_orderbook_;
+  std::function<void(MDIncrementalRefreshDailyStatistics33&)> cb_dailystatistics_;
+  std::function<void(MDIncrementalRefreshLimitsBanding34&)> cb_limitsbanding_;
+  std::function<void(MDIncrementalRefreshSessionStatistics35&)> cb_sessionstatistics_;
+  std::function<void(MDIncrementalRefreshTrade36&)> cb_trade_;
+  std::function<void(MDIncrementalRefreshVolume37&)> cb_volume_;
+  std::function<void(MDIncrementalRefreshTradeSummary42&)> cb_tradesummary_;
+  std::function<void(MDIncrementalRefreshOrderBook43&)> cb_orderbook_;
   std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull_;
-//  std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook_;
+  std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook_;
 
   bool registered_= false;
 };
