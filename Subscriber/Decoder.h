@@ -23,6 +23,7 @@ constexpr int kMsgHeaderVersion = 0;
 using namespace sbe;
 
 class Decoder {
+
 public:
   struct Message {
     char *buffer;
@@ -80,6 +81,4 @@ private:
   std::function<void(MDIncrementalRefreshOrderBook43 &)> cb_orderbook_;
   std::function<void(SnapshotFullRefresh38 &)> cb_snapshotfull_;
   std::function<void(SnapshotFullRefreshOrderBook44 &)> cb_snapshotorderbook_;
-
-  bool registered_ = false;
 };

@@ -13,7 +13,7 @@ class Receiver {
   boost::asio::ip::address multicast_address_;
   short multicast_port_;
 
-  Decoder decoder_;
+  Decoder& decoder_;
 
   enum { max_length = 4096 };
   char data_[max_length];

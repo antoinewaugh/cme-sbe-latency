@@ -12,7 +12,7 @@ class Subscriber {
 
 public:
   Subscriber(boost::asio::io_service &io_service,
-                      const boost::asio::ip::address &listen_address,
-                      const boost::asio::ip::address &multicast_address,
-                      const short multicast_port);
+             const boost::asio::ip::address &listen_address,
+             const boost::asio::ip::address &multicast_address,
+             const short multicast_port);
 };
