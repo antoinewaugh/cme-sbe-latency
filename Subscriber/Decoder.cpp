@@ -47,6 +47,8 @@ size_t Decoder::decode_header(MessageHeader &header, char *buffer,
 
 size_t Decoder::decode_message(char *buffer, uint64_t offset) {
 
+  std::cout << "Decoding message" << '\n';
+
   size_t message_length = decode_message_length(buffer, offset);
   size_t header_length =
       decode_header(header_, buffer, offset + kMsgSize, 4096);
@@ -124,6 +126,9 @@ int Decoder::RegisterCallbacks(
 }
 
 size_t Decoder::DecodePacket(char *buffer, size_t received) {
+
+  std::cout << "Decoding packet" << '\n';
+
   size_t processed = kByteOffest;
   while (processed < received) {
     processed += decode_message(buffer, processed);

@@ -33,8 +33,6 @@ void Receiver::Leave() { socket_.close(); }
 void Receiver::HandleReceiveFrom(const boost::system::error_code &error,
                                  size_t received) {
 
-  std::cout << "Received packet.";
-
   if (!error) {
 
     // trigger callbacks registered with decoder
