@@ -3,6 +3,7 @@ project(Subscriber)
 
 add_definitions(-std=c++14)
 
+
 # imported library
 add_library(sbe STATIC IMPORTED)
 set_property(TARGET sbe PROPERTY IMPORTED_LOCATION /usr/local/lib/libsbe.a)
