@@ -34,8 +34,7 @@ public:
 
   size_t DecodePacket(char *, size_t);
   int RegisterCallbacks(
-      std::function<void(MDIncrementalRefreshBook32&)>
-//      std::function<void(MDIncrementalRefreshBook32&)>,
+      std::function<void(MDIncrementalRefreshBook32&)>,
 //      std::function<void(MDIncrementalRefreshDailyStatistics33&)>,
 //      std::function<void(MDIncrementalRefreshLimitsBanding34&)>,
 //      std::function<void(MDIncrementalRefreshSessionStatistics35&)>,
@@ -43,7 +42,7 @@ public:
 //      std::function<void(MDIncrementalRefreshVolume37&)>,
 //      std::function<void(MDIncrementalRefreshTradeSummary42&)>,
 //      std::function<void(MDIncrementalRefreshOrderBook43&)>,
-//      std::function<void(SnapshotFullRefresh38&)>,
+      std::function<void(SnapshotFullRefresh38&)>
 //      std::function<void(SnapshotFullRefreshOrderBook44&)>
   );
 
@@ -78,7 +77,7 @@ private:
 //  std::function<void(MDIncrementalRefreshVolume37&)> cb_volume_;
 //  std::function<void(MDIncrementalRefreshTradeSummary42&)> cb_tradesummary_;
 //  std::function<void(MDIncrementalRefreshOrderBook43&)> cb_orderbook_;
-//  std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull_;
+  std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull_;
 //  std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook_;
 
   bool registered_= false;

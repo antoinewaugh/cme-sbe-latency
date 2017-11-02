@@ -16,8 +16,8 @@ class Subscriber {
   char data_[max_length];
 
   Handler handler_;
-  SymbolFeed feed_;
   Decoder decoder_;
+  SymbolFeed feed_;
 
   void handle_receive_from(const boost::system::error_code &error,
                            size_t received) {
