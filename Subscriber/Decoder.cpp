@@ -3,13 +3,28 @@
 #include <iostream>
 
 size_t Decoder::decode_incremental_refresh_volume(
-    MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {}
+    MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {
+
+ refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+ cb_volume_(refresh);
+}
 
 size_t Decoder::decode_incremental_refresh_trade(
-    MDIncrementalRefreshTradeSummary42 &refresh, Decoder::Message message) {}
+    MDIncrementalRefreshTradeSummary42 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+  cb_tradesummary_(refresh);
+}
 
 size_t Decoder::decode_incremental_refresh_order_book(
-    MDIncrementalRefreshOrderBook43 &refresh, Decoder::Message message) {}
+    MDIncrementalRefreshOrderBook43 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+  cb_orderbook_(refresh);
+}
 
 size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
                                 Decoder::Message message) {
