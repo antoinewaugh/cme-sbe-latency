@@ -156,11 +156,12 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     if (entry.securityID() != securityid_)
       continue;
-    if (entry.rptSeq() != seqnum_ + 1)
-      continue;
     if (entry.rptSeq() > seqnum_ + 1) {
       StartRecovery();
       break;
+    if (entry.rptSeq() < seqnum_ + 1)
+      std::cout << "RptSeq: " << entry.rptSeq() << "ExRptSeq: " << seqnum_ << '\n';
+      continue;
     }
 
     if (recoverymode_)
