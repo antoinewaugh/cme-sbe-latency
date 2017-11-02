@@ -50,9 +50,11 @@ SymbolFeed::~SymbolFeed() {
 
 void SymbolFeed::StartRecovery() {
 
-  std::cout << "Starting Recovery";
 
   if (!recoverymode_) {
+
+    std::cout << "Starting Recovery";
+
     recoverymode_ = true;
     book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
@@ -64,9 +66,8 @@ void SymbolFeed::StartRecovery() {
 
 void SymbolFeed::StopRecovery() {
 
-  std::cout << "Stopping Recovery";
-
   if (recoverymode_) {
+    std::cout << "Stopping Recovery";
     recoverymode_ = false;
     snapshotA_.Leave();
     snapshotB_.Leave();
