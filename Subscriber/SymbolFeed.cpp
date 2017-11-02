@@ -67,7 +67,7 @@ void SymbolFeed::StopRecovery() {
 }
 
 void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
-
+  std::cout<<"OnMDSnapshotFullRefresh";
   if (!recoverymode_)
     return;
 
