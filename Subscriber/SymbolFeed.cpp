@@ -2,32 +2,43 @@
 
 #include <cmath>
 
-SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder
- &decoder) : securityid_(securityid), handler_(handler), decoder_(decoder) {
+SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler,
+                       Decoder &decoder, boost::asio::io_service &io_service,
+                   const boost::asio::ip::address &listen_address,
+                   const boost::asio::ip::address &multicast_address,
+                   const short multicast_port)
+    : securityid_(securityid), handler_(handler), decoder_(decoder),
+      incrementalA_(decoder, io_service, listen_address, multicast_address, multicast_port),
+      incrementalB_(decoder, io_service, listen_address, multicast_address, multicast_port),
+      snapshotA_(decoder, io_service, listen_address, multicast_address, multicast_port),
+      snapshotB_(decoder, io_service, listen_address, multicast_address, multicast_port) {
 
   decoder.RegisterCallbacks(
-      [this](auto&& val){this->OnMDIncrementalRefreshBook32(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshDailyStatistics33(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshLimitsBanding34(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshSessionStatistics35(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshTrade36(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshVolume37(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshTradeSummary42(val);},
-      [this](auto&& val){this->OnMDIncrementalRefreshOrderBook43(val);},
-      [this](auto&& val){this->OnMDSnapshotFullRefresh38(val);},
-      [this](auto&& val){this->OnMDSnapshotFullRefreshOrderBook44(val);}
-  );
+      [this](auto &&val) { this->OnMDIncrementalRefreshBook32(val); },
+      [this](auto &&val) {
+        this->OnMDIncrementalRefreshDailyStatistics33(val);
+      },
+      [this](auto &&val) { this->OnMDIncrementalRefreshLimitsBanding34(val); },
+      [this](auto &&val) {
+        this->OnMDIncrementalRefreshSessionStatistics35(val);
+      },
+      [this](auto &&val) { this->OnMDIncrementalRefreshTrade36(val); },
+      [this](auto &&val) { this->OnMDIncrementalRefreshVolume37(val); },
+      [this](auto &&val) { this->OnMDIncrementalRefreshTradeSummary42(val); },
+      [this](auto &&val) { this->OnMDIncrementalRefreshOrderBook43(val); },
+      [this](auto &&val) { this->OnMDSnapshotFullRefresh38(val); },
+      [this](auto &&val) { this->OnMDSnapshotFullRefreshOrderBook44(val); });
 
-  incrementalA_.join();
-  incrementalB_.join();
+  incrementalA_.Join();
+  incrementalB_.Join();
   StartRecovery();
 }
 
 SymbolFeed::~SymbolFeed() {
-  incrementalA_.leave();
-  incrementalB_.leave();
-  snapshotA_.leave();
-  snapshotB_.leave();
+  incrementalA_.Leave();
+  incrementalB_.Leave();
+  snapshotA_.Leave();
+  snapshotB_.Leave();
 }
 
 void SymbolFeed::StartRecovery() {
@@ -39,8 +50,8 @@ void SymbolFeed::StartRecovery() {
     book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
-    snapshotA_.join();
-    snapshotB_.join();
+    snapshotA_.Join();
+    snapshotB_.Join();
   }
 }
 
@@ -50,8 +61,8 @@ void SymbolFeed::StopRecovery() {
 
   if (recoverymode_) {
     recoverymode_ = false;
-    snapshotA_.leave();
-    snapshotB_.leave();
+    snapshotA_.Leave();
+    snapshotB_.Leave();
   }
 }
 
@@ -163,34 +174,25 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
   }
 }
 
-void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(SnapshotFullRefreshOrderBook44 &) {
+void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(
+    SnapshotFullRefreshOrderBook44 &) {}
 
-}
+void SymbolFeed::OnMDIncrementalRefreshOrderBook43(
+    MDIncrementalRefreshOrderBook43 &) {}
 
-void SymbolFeed::OnMDIncrementalRefreshOrderBook43(MDIncrementalRefreshOrderBook43 &) {
+void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
+    MDIncrementalRefreshDailyStatistics33 &) {}
 
-}
+void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(
+    MDIncrementalRefreshLimitsBanding34 &) {}
 
-void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(MDIncrementalRefreshDailyStatistics33 &) {
+void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(
+    MDIncrementalRefreshSessionStatistics35 &) {}
 
-}
+void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &) {}
 
-void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(MDIncrementalRefreshLimitsBanding34 &) {
+void SymbolFeed::OnMDIncrementalRefreshVolume37(
+    MDIncrementalRefreshVolume37 &) {}
 
-}
-
-void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(MDIncrementalRefreshSessionStatistics35 &) {
-
-}
-
-void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &) {
-
-}
-
-void SymbolFeed::OnMDIncrementalRefreshVolume37(MDIncrementalRefreshVolume37 &) {
-
-}
-
-void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(MDIncrementalRefreshTradeSummary42 &) {
-
-}
+void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(
+    MDIncrementalRefreshTradeSummary42 &) {}

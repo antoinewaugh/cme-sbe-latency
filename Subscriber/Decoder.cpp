@@ -96,17 +96,20 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
 
 int Decoder::RegisterCallbacks(
 
-    std::function<void(MDIncrementalRefreshBook32&)> cb_book,
-    std::function<void(MDIncrementalRefreshDailyStatistics33&)> cb_dailystatistics,
-    std::function<void(MDIncrementalRefreshLimitsBanding34&)> cb_limitsbanding,
-    std::function<void(MDIncrementalRefreshSessionStatistics35&)> cb_sessionstatistics,
-    std::function<void(MDIncrementalRefreshTrade36&)> cb_trade,
-    std::function<void(MDIncrementalRefreshVolume37&)> cb_volume,
-    std::function<void(MDIncrementalRefreshTradeSummary42&)> cb_tradesummary,
-    std::function<void(MDIncrementalRefreshOrderBook43&)> cb_orderbook,
-    std::function<void(SnapshotFullRefresh38&)> cb_snapshotfull,
-    std::function<void(SnapshotFullRefreshOrderBook44&)> cb_snapshotorderbook
-) {
+    std::function<void(MDIncrementalRefreshBook32 &)> cb_book,
+    std::function<void(MDIncrementalRefreshDailyStatistics33 &)>
+        cb_dailystatistics,
+    std::function<void(MDIncrementalRefreshLimitsBanding34 &)> cb_limitsbanding,
+    std::function<void(MDIncrementalRefreshSessionStatistics35 &)>
+        cb_sessionstatistics,
+    std::function<void(MDIncrementalRefreshTrade36 &)> cb_trade,
+    std::function<void(MDIncrementalRefreshVolume37 &)> cb_volume,
+    std::function<void(MDIncrementalRefreshTradeSummary42 &)> cb_tradesummary,
+    std::function<void(MDIncrementalRefreshOrderBook43 &)> cb_orderbook,
+    std::function<void(SnapshotFullRefresh38 &)> cb_snapshotfull,
+    std::function<void(SnapshotFullRefreshOrderBook44 &)>
+        cb_snapshotorderbook) {
+
   registered_ = true;
   cb_book_ = cb_book;
   cb_dailystatistics_ = cb_dailystatistics;
@@ -118,7 +121,6 @@ int Decoder::RegisterCallbacks(
   cb_orderbook_ = cb_orderbook;
   cb_snapshotfull_ = cb_snapshotfull;
   cb_snapshotorderbook_ = cb_snapshotorderbook;
-
 }
 
 size_t Decoder::DecodePacket(char *buffer, size_t received) {
@@ -127,4 +129,3 @@ size_t Decoder::DecodePacket(char *buffer, size_t received) {
     processed += decode_message(buffer, processed);
   }
 }
-

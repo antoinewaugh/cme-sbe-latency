@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SymbolFeed.h"
 #include "Decoder.h"
 #include "Handler.h"
 #include "Receiver.h"
+#include "SymbolFeed.h"
 
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshDailyStatistics33.h"
@@ -40,7 +40,11 @@ class SymbolFeed {
   Receiver snapshotB_;
 
 public:
-  SymbolFeed(uint64_t, Handler &, Decoder&);
+  SymbolFeed(uint64_t securityid, Handler &handler,
+                       Decoder &decoder, boost::asio::io_service &io_service,
+                   const boost::asio::ip::address &listen_address,
+                   const boost::asio::ip::address &multicast_address,
+                   const short multicast_port);
   ~SymbolFeed();
   void OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &);
   void OnMDIncrementalRefreshDailyStatistics33(

@@ -1,4 +1,5 @@
 #include "Subscriber.h"
+
 #include <iostream>
 
 int main(int argc, char *argv[]) {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[]) {
               << '\n';
 
     boost::asio::io_service io_service;
+
     Subscriber r(io_service, boost::asio::ip::address::from_string(argv[1]),
                  boost::asio::ip::address::from_string(argv[2]), atoi(argv[3]));
     io_service.run();
