@@ -35,16 +35,22 @@ class SymbolFeed {
   OrderBook book_;
 
   Receiver incrementalA_;
-  //  Receiver incrementalB_;
-  //  Receiver snapshotA_;
-  //  Receiver snapshotB_;
+  Receiver incrementalB_;
+  Receiver snapshotA_;
+  Receiver snapshotB_;
 
 public:
   SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder,
              boost::asio::io_service &io_service,
              const boost::asio::ip::address &listen_address,
-             const boost::asio::ip::address &multicast_address,
-             const short multicast_port);
+             const boost::asio::ip::address &multicast_address_incrementala,
+             const short multicast_port_incrementala,
+             const boost::asio::ip::address &multicast_address_incrementalb,
+             const short multicast_port_incrementalb,
+             const boost::asio::ip::address &multicast_address_shapshota,
+             const short multicast_port_snapshota,
+             const boost::asio::ip::address &multicast_address_shapshotb,
+             const short multicast_port_snapshotb);
   ~SymbolFeed();
   void OnMDIncrementalRefreshBook32(MDIncrementalRefreshBook32 &);
   void OnMDIncrementalRefreshDailyStatistics33(

@@ -5,18 +5,21 @@
 SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder,
                        boost::asio::io_service &io_service,
                        const boost::asio::ip::address &listen_address,
-                       const boost::asio::ip::address &multicast_address,
-                       const short multicast_port)
+                       const boost::asio::ip::address &multicast_address_incrementala,
+                       const short multicast_port_incrementala,
+                       const boost::asio::ip::address &multicast_address_incrementalb,
+                       const short multicast_port_incrementalb,
+                       const boost::asio::ip::address &multicast_address_snapshota,
+                       const short multicast_port_snapshota,
+                       const boost::asio::ip::address &multicast_address_snapshotb,
+                       const short multicast_port_snapshotb
+)
     : securityid_(securityid), handler_(handler), decoder_(decoder),
-      incrementalA_(decoder_, io_service, listen_address, multicast_address,
-                    multicast_port)
-//      incrementalB_(decoder, io_service, listen_address, multicast_address,
-//      multicast_port),
-//      snapshotA_(decoder, io_service, listen_address, multicast_address,
-//      multicast_port),
-//      snapshotB_(decoder, io_service, listen_address, multicast_address,
-//      multicast_port) {
-{
+      incrementalA_(decoder_, io_service, listen_address, multicast_address_incrementala, multicast_port_incrementala),
+      incrementalB_(decoder_, io_service, listen_address, multicast_address_incrementalb, multicast_port_incrementalb),
+      snapshotA_(decoder_, io_service, listen_address, multicast_address_snapshota, multicast_port_snapshota),
+      snapshotB_(decoder_, io_service, listen_address, multicast_address_snapshotb, multicast_port_snapshotb) {
+
   decoder_.RegisterCallbacks(
       [this](auto &&val) { this->OnMDIncrementalRefreshBook32(val); },
       [this](auto &&val) {
@@ -34,15 +37,15 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder,
       [this](auto &&val) { this->OnMDSnapshotFullRefreshOrderBook44(val); });
 
   incrementalA_.Join();
-  //  incrementalB_.Join();
+  incrementalB_.Join();
   StartRecovery();
 }
 
 SymbolFeed::~SymbolFeed() {
   incrementalA_.Leave();
-  //  incrementalB_.Leave();
-  //  snapshotA_.Leave();
-  //  snapshotB_.Leave();
+  incrementalB_.Leave();
+  snapshotA_.Leave();
+  snapshotB_.Leave();
 }
 
 void SymbolFeed::StartRecovery() {
@@ -53,9 +56,9 @@ void SymbolFeed::StartRecovery() {
     recoverymode_ = true;
     book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
-                 // alignment
-                 //    snapshotA_.Join();
-                 //    snapshotB_.Join();
+                 // alignmen
+    snapshotA_.Join();
+    snapshotB_.Join();
   }
 }
 
@@ -65,8 +68,8 @@ void SymbolFeed::StopRecovery() {
 
   if (recoverymode_) {
     recoverymode_ = false;
-    //    snapshotA_.Leave();
-    //    snapshotB_.Leave();
+    snapshotA_.Leave();
+    snapshotB_.Leave();
   }
 }
 
