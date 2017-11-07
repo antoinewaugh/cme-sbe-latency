@@ -38,18 +38,20 @@ SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder,
 
   incrementalA_.Join();
   incrementalB_.Join();
+
   StartRecovery();
 }
 
 SymbolFeed::~SymbolFeed() {
+
   incrementalA_.Leave();
   incrementalB_.Leave();
+
   snapshotA_.Leave();
   snapshotB_.Leave();
 }
 
 void SymbolFeed::StartRecovery() {
-
 
   if (!recoverymode_) {
 
@@ -157,10 +159,14 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     if (entry.securityID() != securityid_)
       continue;
+
     if (entry.rptSeq() > seqnum_ + 1) {
+      std::cout << "RptSeq: " << entry.rptSeq() << "ExRptSeq: " << seqnum_ << '\n';
       StartRecovery();
       break;
-    if (entry.rptSeq() < seqnum_ + 1)
+    }
+
+    if (entry.rptSeq() < seqnum_ + 1) {
       std::cout << "RptSeq: " << entry.rptSeq() << "ExRptSeq: " << seqnum_ << '\n';
       continue;
     }
