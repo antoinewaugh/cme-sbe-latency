@@ -111,20 +111,15 @@ void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
                                 float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
-    book_.AddAsk(level, price, volume);
-    break;
+    book_.AddAsk(level, price, volume); break;
   case MDUpdateAction::Change:
-    book_.UpdateAsk(level, price, volume);
-    break;
+    book_.UpdateAsk(level, price, volume); break;
   case MDUpdateAction::Delete:
-    book_.DeleteAsk(level, price);
-    break;
+    book_.DeleteAsk(level, price); break;
   case MDUpdateAction::DeleteFrom:
-    book_.DeleteAskFrom(level);
-    break;
+    book_.DeleteAskFrom(level); break;
   case MDUpdateAction::DeleteThru:
-    book_.DeleteAskThru(level);
-    break;
+    book_.DeleteAskThru(level); break;
   }
 }
 void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
