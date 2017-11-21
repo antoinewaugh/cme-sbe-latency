@@ -55,12 +55,12 @@ void SymbolFeed::StartRecovery() {
 
   if (!recoverymode_) {
 
-    std::cout << "Starting Recovery";
+    std::cout << "\nStarting Recovery";
 
     recoverymode_ = true;
     book_.Clear();
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
-                 // alignmen
+                 // alignment
     snapshotA_.Join();
     snapshotB_.Join();
   }
@@ -69,7 +69,7 @@ void SymbolFeed::StartRecovery() {
 void SymbolFeed::StopRecovery() {
 
   if (recoverymode_) {
-    std::cout << "Stopping Recovery";
+    std::cout << "\nStopping Recovery";
     recoverymode_ = false;
     snapshotA_.Leave();
     snapshotB_.Leave();
@@ -87,7 +87,7 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
   auto &entry = refresh.noMDEntries();
 
   book_.Clear();
-  seqnum_ = refresh.lastMsgSeqNumProcessed(); // fast forward seqnum for
+  seqnum_ = refresh.rptSeq(); // fast forward seqnum for
                                               // incremental feed alignment
 
   while (entry.hasNext()) {
@@ -186,6 +186,9 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
     }
 
     ++seqnum_;
+
+    handler_.OnQuote(book_);
+
   }
 }
 

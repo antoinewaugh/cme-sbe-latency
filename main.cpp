@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) {
   try {
-    if (argc != 4) {
+    if (argc != 10) {
       std::cerr << "Usage: receiver <listen_address> <multicast_address> "
                    "<multicast_port>\n";
       std::cerr << "  For IPv4, try:\n";
