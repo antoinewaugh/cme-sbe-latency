@@ -3,8 +3,9 @@
 constexpr int MAX_BOOK_SIZE = 10;
 
 OrderBook::OrderBook() {
-  bids_.reserve(MAX_BOOK_SIZE);
-  asks_.reserve(MAX_BOOK_SIZE);
+  // MAX_BOOK + 1 used to allow for add at level 1 when we have a full book
+  bids_.reserve(MAX_BOOK_SIZE+1);
+  asks_.reserve(MAX_BOOK_SIZE+1);
 }
 
 bool OrderBook::Empty() const { return bids_.empty() and asks_.empty(); }
