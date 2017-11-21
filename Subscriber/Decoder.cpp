@@ -59,45 +59,38 @@ size_t Decoder::decode_header(MessageHeader &header, char *buffer,
 
 size_t Decoder::decode_message(char *buffer, uint64_t offset) {
 
-  size_t message_length = decode_message_length(buffer, offset);
-  size_t header_length =
+  auto message_length = decode_message_length(buffer, offset);
+  auto header_length =
       decode_header(header_, buffer, offset + kMsgSize, 4096);
 
   uint64_t msg_offset = offset + kMsgSize + header_length;
-
+  
+  auto message =  Message{buffer, msg_offset,
+                          header_.blockLength(),
+                          header_.version(), 4096};
+      
   switch (header_.templateId()) {
 
   case MDIncrementalRefreshBook32::sbeTemplateId():
-    decode_incremental_refresh_book(incremental_refresh_book_,
-                                    Message{buffer, msg_offset,
-                                            header_.blockLength(),
-                                            header_.version(), 4096});
+    decode_incremental_refresh_book(incremental_refresh_book_, message);
     break;
 
   case SnapshotFullRefresh38::sbeTemplateId():
-    decode_snapshot(snapshot_full_,
-                    Message{buffer, msg_offset, header_.blockLength(),
-                            header_.version(), 4096});
+    decode_snapshot(snapshot_full_, message);
     break;
 
   case MDIncrementalRefreshVolume37::sbeTemplateId():
-    decode_incremental_refresh_volume(
-        incremental_volume_, Message{buffer, msg_offset, header_.blockLength(),
-                                     header_.version(), 4096});
+    decode_incremental_refresh_volume(incremental_volume_, message);
     break;
 
   case MDIncrementalRefreshTradeSummary42::sbeTemplateId():
-    decode_incremental_refresh_trade(
-        incremental_trade_, Message{buffer, msg_offset, header_.blockLength(),
-                                    header_.version(), 4096});
+    decode_incremental_refresh_trade(incremental_trade_, message);
     break;
 
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
-    decode_incremental_refresh_order_book(incremental_order_book_,
-                                          Message{buffer, msg_offset,
-                                                  header_.blockLength(),
-                                                  header_.version(), 4096});
+    decode_incremental_refresh_order_book(incremental_order_book_, message);
     break;
+          
   default:
     std::cout << "Unknown message type, templateId: " << header_.templateId()
               << '\n';
