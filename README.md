@@ -54,7 +54,3 @@ BidV		Price		AskV
 
 ```
 
-# Todo:
-
-* Orderbook Tests
-* Recover Mode
