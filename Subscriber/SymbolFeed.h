@@ -25,6 +25,9 @@ class SymbolFeed {
 
   void StartRecovery();
   void StopRecovery();
+
+  template<class T> bool ValidateEntry(T);
+
   void HandleBidEntry(MDUpdateAction::Value action, int level, float price,
                       int volume);
   void HandleAskEntry(MDUpdateAction::Value action, int level, float price,

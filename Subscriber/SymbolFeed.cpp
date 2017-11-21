@@ -87,8 +87,8 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
   auto &entry = refresh.noMDEntries();
 
   book_.Clear();
-  seqnum_ = refresh.rptSeq(); // fast forward seqnum for
-                                              // incremental feed alignment
+
+  seqnum_ = refresh.rptSeq();
 
   while (entry.hasNext()) {
     entry.next();
@@ -104,7 +104,7 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
       book_.AddAsk(level, price, volume);
     }
   }
-  handler_.OnQuote(book_);
+  handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
 }
 
 void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
@@ -143,6 +143,31 @@ void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
   }
 }
 
+template<class T>
+bool SymbolFeed::ValidateEntry(T entry) {
+
+  if (entry.securityID() != securityid_) {
+    return false;
+  }
+
+  if (entry.rptSeq() < seqnum_ + 1) {
+    return false;                   // redundant packet
+  }
+
+  if (entry.rptSeq() > seqnum_ + 1) {
+    std::cout << "Missing SeqNum identified, recovering. RptSeq: " << entry.rptSeq() << ", ExRptSeq: " << seqnum_ << '\n';
+    StartRecovery();
+    return false;
+  }
+
+  if (recoverymode_)
+    StopRecovery();
+
+  ++seqnum_;
+
+  return true;
+}
+
 void SymbolFeed::OnMDIncrementalRefreshBook32(
     MDIncrementalRefreshBook32 &refresh) {
 
@@ -152,69 +177,68 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     entry.next();
 
-    if (entry.securityID() != securityid_)
-      continue;
+    if(ValidateEntry(entry)) {
 
-    if (entry.rptSeq() > seqnum_ + 1) {
-      std::cout << "RptSeq: " << entry.rptSeq() << "ExRptSeq: " << seqnum_ << '\n';
-      StartRecovery();
-      break;
+      int level = entry.mDPriceLevel();
+      float price = entry.mDEntryPx().mantissa() *
+                    std::pow(10, entry.mDEntryPx().exponent());
+      int volume = entry.mDEntrySize();
+
+      if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
+        HandleBidEntry(entry.mDUpdateAction(), level, price, volume);
+      } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
+        HandleAskEntry(entry.mDUpdateAction(), level, price, volume);
+      }
+
     }
 
-    if (entry.rptSeq() < seqnum_ + 1) {
-      std::cout << "RptSeq: " << entry.rptSeq() << "ExRptSeq: " << seqnum_ << '\n';
-      continue;
-    }
-
-    if (recoverymode_)
-      StopRecovery();
-
-    int level = entry.mDPriceLevel();
-    float price = entry.mDEntryPx().mantissa() *
-                  std::pow(10, entry.mDEntryPx().exponent());
-    int volume = entry.mDEntrySize();
-
-    if (entry.mDEntryType() == MDEntryTypeBook::Bid) {
-      HandleBidEntry(entry.mDUpdateAction(), level, price, volume);
-    } else if (entry.mDEntryType() == MDEntryTypeBook::Offer) {
-      HandleAskEntry(entry.mDUpdateAction(), level, price, volume);
-    }
-
-    ++seqnum_;
-
-    handler_.OnQuote(book_);
+    handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
+    //handler_.OnQuote(book_);
 
   }
 }
 
 void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(
     SnapshotFullRefreshOrderBook44 &refresh) {
-
 }
 
 void SymbolFeed::OnMDIncrementalRefreshOrderBook43(
     MDIncrementalRefreshOrderBook43 &refresh) {
-
-
-  auto &entry = refresh.noMDEntries();
-  while (entry.hasNext()) {
-    entry.next();
-    if (entry.securityID() != securityid_)
-      continue;
-    // handle
-  }
 }
 
 void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
     MDIncrementalRefreshDailyStatistics33 &refresh) {
+
   auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if(ValidateEntry(entry)) {}
+  }
 }
 
 void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(
-    MDIncrementalRefreshLimitsBanding34 &refresh) {}
+    MDIncrementalRefreshLimitsBanding34 &refresh) {
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if(ValidateEntry(entry)) {}
+  }
+}
 
 void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(
-    MDIncrementalRefreshSessionStatistics35 &refresh) {}
+    MDIncrementalRefreshSessionStatistics35 &refresh) {
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if(ValidateEntry(entry)) {}
+  }
+
+}
 
 void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &refresh) {
 
@@ -222,43 +246,19 @@ void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &refr
   while (entry.hasNext()) {
     entry.next();
 
-    if (entry.securityID() != securityid_)
-      continue;
-    if (entry.rptSeq() != seqnum_ + 1)
-      continue;
-    if (entry.rptSeq() > seqnum_ + 1) {
-      StartRecovery();
-      break;
-    }
-
-    if (recoverymode_)
-      StopRecovery();
-
-    seqnum_++;
+    if(ValidateEntry(entry)) {}
   }
 }
 
 void SymbolFeed::OnMDIncrementalRefreshVolume37(
     MDIncrementalRefreshVolume37 &refresh) {
 
-
   auto &entry = refresh.noMDEntries();
+
   while (entry.hasNext()) {
     entry.next();
 
-    if (entry.securityID() != securityid_)
-      continue;
-    if (entry.rptSeq() != seqnum_ + 1)
-      continue;
-    if (entry.rptSeq() > seqnum_ + 1) {
-      StartRecovery();
-      break;
-    }
-
-    if (recoverymode_)
-      StopRecovery();
-
-    seqnum_++;
+    if (ValidateEntry(entry)) {}
   }
 }
 
@@ -269,18 +269,8 @@ void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(
   while (entry.hasNext()) {
     entry.next();
 
-    if (entry.securityID() != securityid_)
-      continue;
-    if (entry.rptSeq() != seqnum_ + 1)
-      continue;
-    if (entry.rptSeq() > seqnum_ + 1) {
-      StartRecovery();
-      break;
-    }
+    if (ValidateEntry(entry)) {}
 
-    if (recoverymode_)
-      StopRecovery();
-
-    seqnum_++;
   }
 }
+
