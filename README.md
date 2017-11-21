@@ -20,13 +20,14 @@ docker run cme-sbe-latency 0.0.0.0 \
 	<multicast_port_snapshotA> \
 	<multicast_ip_shapshotB> \
 	<multicast_port_snapshotB> 
-
+```
 # Sample
 
 ```
 docker run --net=host cme-sbe-latency  0.0.0.0 224.0.31.1 14310 224.0.32.1 15310 224.0.31.22 14310 224.0.32.22 15310 
 
-Security: 23936, Recovering: 0, LastSeqNum: 2541935
+ Security 23936, Recovering 0, LastSeqNum 2541935
+
 BidV		Price		AskV
 --------------------------------------
 		258475		364
