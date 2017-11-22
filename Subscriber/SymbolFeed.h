@@ -26,7 +26,7 @@ class SymbolFeed {
   void StartRecovery();
   void StopRecovery();
 
-  template <class T> bool ValidateEntry(T);
+  template <class T> bool CheckStream(T);
 
   void HandleBidEntry(MDUpdateAction::Value action, int level, float price,
                       int volume);
@@ -35,7 +35,7 @@ class SymbolFeed {
   Handler &handler_;
   Decoder &decoder_;
 
-  OrderBook book_;
+  DepthBook book_;
 
   Receiver incrementalA_;
   Receiver incrementalB_;

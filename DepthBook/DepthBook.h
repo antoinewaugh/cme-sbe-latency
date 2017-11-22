@@ -1,20 +1,17 @@
 #pragma once
 
+#include "DepthList.h"
 #include <iostream>
-#include <vector>
 
-class OrderBook {
+class DepthBook {
 
-  struct PriceLevel {
-    float price;
-    int quantity;
-  };
-
-  std::vector<PriceLevel> bids_, asks_;
+  DepthList bids_, asks_;
 
 public:
-  OrderBook();
-  inline bool Empty() const;
+  DepthBook();
+  const DepthList Bids() const;
+  const DepthList Asks() const;
+  inline bool Empty() const { return bids_.Empty() && asks_.Empty(); }
   void Clear();
   void AddBid(int level, float price, int quantity);
   void UpdateBid(int level, float price, int quantity);
@@ -25,6 +22,6 @@ public:
   void UpdateAsk(int level, float price, int quantity);
   void DeleteAsk(int level, float price);
   void DeleteAskFrom(int level);
-  void DeleteAskThru(int level);
-  friend std::ostream &operator<<(std::ostream &os, const OrderBook &book);
+  void DeleteAskThru();
+  friend std::ostream &operator<<(std::ostream &os, const DepthBook &book);
 };

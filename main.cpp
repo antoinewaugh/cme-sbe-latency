@@ -12,15 +12,17 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "Starting : " << argv[1] << " " << argv[2] << " " << argv[3]
+            << argv[4] << " " << argv[5] << " " << argv[6]
+            << argv[7] << " " << argv[8] << " " << argv[9]
             << '\n';
 
   boost::asio::io_service io_service;
 
   Subscriber r(io_service, boost::asio::ip::address::from_string(argv[1]),
-               Connection(Connection::FeedType::Incremental, Connection::Feed::A, argv[2], atoi(argv[3])),
-               Connection(Connection::FeedType::Incremental, Connection::Feed::B, argv[4], atoi(argv[5])),
-               Connection(Connection::FeedType::Snapshot, Connection::Feed::A, argv[6], atoi(argv[7])),
-               Connection(Connection::FeedType::Snapshot, Connection::Feed::B, argv[8], atoi(argv[9]))
+               Connection(Connection::Type::Incremental, Connection::Feed::Primary, argv[2], atoi(argv[3])),
+               Connection(Connection::Type::Incremental, Connection::Feed::Secondary, argv[4], atoi(argv[5])),
+               Connection(Connection::Type::Snapshot, Connection::Feed::Primary, argv[6], atoi(argv[7])),
+               Connection(Connection::Type::Snapshot, Connection::Feed::Secondary, argv[8], atoi(argv[9]))
   );
 
   io_service.run();

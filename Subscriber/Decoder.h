@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OrderBook.h"
+#include "DepthBook.h"
 
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshDailyStatistics33.h"
@@ -47,19 +47,18 @@ public:
       std::function<void(SnapshotFullRefreshOrderBook44 &)>);
 
 private:
-  size_t decode_incremental_refresh_book(MDIncrementalRefreshBook32 &,
-                                         Decoder::Message);
-  size_t decode_incremental_refresh_volume(MDIncrementalRefreshVolume37 &,
-                                           Decoder::Message);
-  size_t decode_incremental_refresh_trade(MDIncrementalRefreshTradeSummary42 &,
-                                          Decoder::Message);
-  size_t
-  decode_incremental_refresh_order_book(MDIncrementalRefreshOrderBook43 &,
+  size_t DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &,
+                                      Decoder::Message);
+  size_t DecodeIncrementalRefreshVolume(MDIncrementalRefreshVolume37 &,
                                         Decoder::Message);
-  size_t decode_snapshot(SnapshotFullRefresh38 &, Decoder::Message);
-  size_t decode_message(char *, size_t);
-  size_t decode_message_length(char *, size_t);
-  size_t decode_header(MessageHeader &, char *, uint64_t, uint64_t);
+  size_t DecodeIncrementalRefreshTrade(MDIncrementalRefreshTradeSummary42 &,
+                                       Decoder::Message);
+  size_t DecodeIncrementalRefreshOrderBook(MDIncrementalRefreshOrderBook43 &,
+                                           Decoder::Message);
+  size_t DecodeSnapshot(SnapshotFullRefresh38 &, Decoder::Message);
+  size_t DecodeMessage(char *, size_t);
+  size_t DecodeMessageLength(char *, size_t);
+  size_t DecodeHeader(MessageHeader &, char *, uint64_t, uint64_t);
 
   MessageHeader header_;
   SnapshotFullRefresh38 snapshot_full_;

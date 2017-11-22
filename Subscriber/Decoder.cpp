@@ -2,15 +2,16 @@
 #include "SymbolFeed.h"
 #include <iostream>
 
-size_t Decoder::decode_incremental_refresh_volume(
-    MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {
+size_t
+Decoder::DecodeIncrementalRefreshVolume(MDIncrementalRefreshVolume37 &refresh,
+                                        Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
   cb_volume_(refresh);
 }
 
-size_t Decoder::decode_incremental_refresh_trade(
+size_t Decoder::DecodeIncrementalRefreshTrade(
     MDIncrementalRefreshTradeSummary42 &refresh, Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
@@ -18,7 +19,7 @@ size_t Decoder::decode_incremental_refresh_trade(
   cb_tradesummary_(refresh);
 }
 
-size_t Decoder::decode_incremental_refresh_order_book(
+size_t Decoder::DecodeIncrementalRefreshOrderBook(
     MDIncrementalRefreshOrderBook43 &refresh, Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
@@ -26,8 +27,8 @@ size_t Decoder::decode_incremental_refresh_order_book(
   cb_orderbook_(refresh);
 }
 
-size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
-                                Decoder::Message message) {
+size_t Decoder::DecodeSnapshot(SnapshotFullRefresh38 &refresh,
+                               Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
@@ -36,8 +37,8 @@ size_t Decoder::decode_snapshot(SnapshotFullRefresh38 &refresh,
 }
 
 size_t
-Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
-                                         Decoder::Message message) {
+Decoder::DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &refresh,
+                                      Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
@@ -45,22 +46,22 @@ Decoder::decode_incremental_refresh_book(MDIncrementalRefreshBook32 &refresh,
   cb_book_(refresh);
 }
 
-size_t Decoder::decode_message_length(char *buffer, size_t offset) {
+size_t Decoder::DecodeMessageLength(char *buffer, size_t offset) {
   return SBE_LITTLE_ENDIAN_ENCODE_16(*((std::uint16_t *)(buffer + offset)));
 }
 
-size_t Decoder::decode_header(MessageHeader &header, char *buffer,
-                              std::uint64_t offset,
-                              std::uint64_t buffer_length) {
+size_t Decoder::DecodeHeader(MessageHeader &header, char *buffer,
+                             std::uint64_t offset,
+                             std::uint64_t buffer_length) {
 
   header.wrap(buffer, offset, kMsgHeaderVersion, buffer_length);
   return header.encodedLength();
 }
 
-size_t Decoder::decode_message(char *buffer, uint64_t offset) {
+size_t Decoder::DecodeMessage(char *buffer, uint64_t offset) {
 
-  auto message_length = decode_message_length(buffer, offset);
-  auto header_length = decode_header(header_, buffer, offset + kMsgSize, 4096);
+  auto message_length = DecodeMessageLength(buffer, offset);
+  auto header_length = DecodeHeader(header_, buffer, offset + kMsgSize, 4096);
 
   uint64_t msg_offset = offset + kMsgSize + header_length;
 
@@ -70,23 +71,23 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
   switch (header_.templateId()) {
 
   case MDIncrementalRefreshBook32::sbeTemplateId():
-    decode_incremental_refresh_book(incremental_refresh_book_, message);
+    DecodeIncrementalRefreshBook(incremental_refresh_book_, message);
     break;
 
   case SnapshotFullRefresh38::sbeTemplateId():
-    decode_snapshot(snapshot_full_, message);
+    DecodeSnapshot(snapshot_full_, message);
     break;
 
   case MDIncrementalRefreshVolume37::sbeTemplateId():
-    decode_incremental_refresh_volume(incremental_volume_, message);
+    DecodeIncrementalRefreshVolume(incremental_volume_, message);
     break;
 
   case MDIncrementalRefreshTradeSummary42::sbeTemplateId():
-    decode_incremental_refresh_trade(incremental_trade_, message);
+    DecodeIncrementalRefreshTrade(incremental_trade_, message);
     break;
 
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
-    decode_incremental_refresh_order_book(incremental_order_book_, message);
+    DecodeIncrementalRefreshOrderBook(incremental_order_book_, message);
     break;
 
   default:
@@ -129,6 +130,6 @@ size_t Decoder::DecodePacket(char *buffer, size_t received) {
 
   size_t processed = kByteOffest;
   while (processed < received) {
-    processed += decode_message(buffer, processed);
+    processed += DecodeMessage(buffer, processed);
   }
 }

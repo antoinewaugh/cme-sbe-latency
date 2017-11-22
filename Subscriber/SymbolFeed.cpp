@@ -117,7 +117,7 @@ void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
     book_.DeleteAskFrom(level);
     break;
   case MDUpdateAction::DeleteThru:
-    book_.DeleteAskThru(level);
+    book_.DeleteAskThru();
     break;
   }
 }
@@ -142,7 +142,7 @@ void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
   }
 }
 
-template <class T> bool SymbolFeed::ValidateEntry(T entry) {
+template <class T> bool SymbolFeed::CheckStream(T entry) {
 
   if (entry.securityID() != securityid_) {
     return false;
@@ -176,7 +176,7 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
 
       int level = entry.mDPriceLevel();
       float price = entry.mDEntryPx().mantissa() *
@@ -190,7 +190,6 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
       }
 
       handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
-      // handler_.OnQuote(book_);
     }
   }
 }
@@ -208,7 +207,7 @@ void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
@@ -220,7 +219,7 @@ void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
@@ -232,7 +231,7 @@ void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
@@ -244,7 +243,7 @@ void SymbolFeed::OnMDIncrementalRefreshTrade36(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
@@ -257,7 +256,7 @@ void SymbolFeed::OnMDIncrementalRefreshVolume37(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
@@ -269,7 +268,7 @@ void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {
+    if (CheckStream(entry)) {
     }
   }
 }
