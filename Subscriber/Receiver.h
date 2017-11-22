@@ -3,6 +3,7 @@
 #include "boost/bind.hpp"
 #include <boost/asio.hpp>
 
+#include "Connection.h"
 #include "Decoder.h"
 
 class Receiver {
@@ -10,10 +11,9 @@ class Receiver {
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
   boost::asio::ip::address listen_address_;
-  boost::asio::ip::address multicast_address_;
-  short multicast_port_;
+  Connection connection_;
 
-  Decoder& decoder_;
+  Decoder &decoder_;
 
   enum { max_length = 4096 };
   char data_[max_length];
@@ -24,8 +24,7 @@ class Receiver {
 public:
   Receiver(Decoder &decoder, boost::asio::io_service &io_service,
            const boost::asio::ip::address &listen_address,
-           const boost::asio::ip::address &multicast_address,
-           const short multicast_port);
+           Connection connection);
   void Join();
   void Leave();
 };

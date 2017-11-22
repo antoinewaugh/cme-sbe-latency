@@ -5,20 +5,13 @@
 SymbolFeed::SymbolFeed(uint64_t securityid, Handler &handler, Decoder &decoder,
                        boost::asio::io_service &io_service,
                        const boost::asio::ip::address &listen_address,
-                       const boost::asio::ip::address &multicast_address_incrementala,
-                       const short multicast_port_incrementala,
-                       const boost::asio::ip::address &multicast_address_incrementalb,
-                       const short multicast_port_incrementalb,
-                       const boost::asio::ip::address &multicast_address_snapshota,
-                       const short multicast_port_snapshota,
-                       const boost::asio::ip::address &multicast_address_snapshotb,
-                       const short multicast_port_snapshotb
-)
+                       Connection incremental_a, Connection incremental_b,
+                       Connection snapshot_a, Connection snapshot_b)
     : securityid_(securityid), handler_(handler), decoder_(decoder),
-      incrementalA_(decoder_, io_service, listen_address, multicast_address_incrementala, multicast_port_incrementala),
-      incrementalB_(decoder_, io_service, listen_address, multicast_address_incrementalb, multicast_port_incrementalb),
-      snapshotA_(decoder_, io_service, listen_address, multicast_address_snapshota, multicast_port_snapshota),
-      snapshotB_(decoder_, io_service, listen_address, multicast_address_snapshotb, multicast_port_snapshotb) {
+      incrementalA_(decoder_, io_service, listen_address, incremental_a),
+      incrementalB_(decoder_, io_service, listen_address, incremental_b),
+      snapshotA_(decoder_, io_service, listen_address, snapshot_a),
+      snapshotB_(decoder_, io_service, listen_address, snapshot_b) {
 
   decoder_.RegisterCallbacks(
       [this](auto &&val) { this->OnMDIncrementalRefreshBook32(val); },
@@ -104,6 +97,7 @@ void SymbolFeed::OnMDSnapshotFullRefresh38(SnapshotFullRefresh38 &refresh) {
       book_.AddAsk(level, price, volume);
     }
   }
+
   handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
 }
 
@@ -111,15 +105,20 @@ void SymbolFeed::HandleAskEntry(MDUpdateAction::Value action, int level,
                                 float price, int volume) {
   switch (action) {
   case MDUpdateAction::New:
-    book_.AddAsk(level, price, volume); break;
+    book_.AddAsk(level, price, volume);
+    break;
   case MDUpdateAction::Change:
-    book_.UpdateAsk(level, price, volume); break;
+    book_.UpdateAsk(level, price, volume);
+    break;
   case MDUpdateAction::Delete:
-    book_.DeleteAsk(level, price); break;
+    book_.DeleteAsk(level, price);
+    break;
   case MDUpdateAction::DeleteFrom:
-    book_.DeleteAskFrom(level); break;
+    book_.DeleteAskFrom(level);
+    break;
   case MDUpdateAction::DeleteThru:
-    book_.DeleteAskThru(level); break;
+    book_.DeleteAskThru(level);
+    break;
   }
 }
 void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
@@ -143,19 +142,19 @@ void SymbolFeed::HandleBidEntry(MDUpdateAction::Value action, int level,
   }
 }
 
-template<class T>
-bool SymbolFeed::ValidateEntry(T entry) {
+template <class T> bool SymbolFeed::ValidateEntry(T entry) {
 
   if (entry.securityID() != securityid_) {
     return false;
   }
 
   if (entry.rptSeq() < seqnum_ + 1) {
-    return false;                   // redundant packet
+    return false; // redundant packet
   }
 
   if (entry.rptSeq() > seqnum_ + 1) {
-    std::cout << "Missing SeqNum identified, recovering. RptSeq: " << entry.rptSeq() << ", ExRptSeq: " << seqnum_ << '\n';
+    std::cout << "Missing SeqNum identified, recovering. RptSeq: "
+              << entry.rptSeq() << ", ExRptSeq: " << seqnum_ << '\n';
     StartRecovery();
     return false;
   }
@@ -177,7 +176,7 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
 
     entry.next();
 
-    if(ValidateEntry(entry)) {
+    if (ValidateEntry(entry)) {
 
       int level = entry.mDPriceLevel();
       float price = entry.mDEntryPx().mantissa() *
@@ -190,21 +189,17 @@ void SymbolFeed::OnMDIncrementalRefreshBook32(
         HandleAskEntry(entry.mDUpdateAction(), level, price, volume);
       }
 
+      handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
+      // handler_.OnQuote(book_);
     }
-
-    handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
-    //handler_.OnQuote(book_);
-
   }
 }
 
 void SymbolFeed::OnMDSnapshotFullRefreshOrderBook44(
-    SnapshotFullRefreshOrderBook44 &refresh) {
-}
+    SnapshotFullRefreshOrderBook44 &refresh) {}
 
 void SymbolFeed::OnMDIncrementalRefreshOrderBook43(
-    MDIncrementalRefreshOrderBook43 &refresh) {
-}
+    MDIncrementalRefreshOrderBook43 &refresh) {}
 
 void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
     MDIncrementalRefreshDailyStatistics33 &refresh) {
@@ -213,7 +208,8 @@ void SymbolFeed::OnMDIncrementalRefreshDailyStatistics33(
   while (entry.hasNext()) {
     entry.next();
 
-    if(ValidateEntry(entry)) {}
+    if (ValidateEntry(entry)) {
+    }
   }
 }
 
@@ -224,7 +220,8 @@ void SymbolFeed::OnMDIncrementalRefreshLimitsBanding34(
   while (entry.hasNext()) {
     entry.next();
 
-    if(ValidateEntry(entry)) {}
+    if (ValidateEntry(entry)) {
+    }
   }
 }
 
@@ -235,18 +232,20 @@ void SymbolFeed::OnMDIncrementalRefreshSessionStatistics35(
   while (entry.hasNext()) {
     entry.next();
 
-    if(ValidateEntry(entry)) {}
+    if (ValidateEntry(entry)) {
+    }
   }
-
 }
 
-void SymbolFeed::OnMDIncrementalRefreshTrade36(MDIncrementalRefreshTrade36 &refresh) {
+void SymbolFeed::OnMDIncrementalRefreshTrade36(
+    MDIncrementalRefreshTrade36 &refresh) {
 
   auto &entry = refresh.noMDEntries();
   while (entry.hasNext()) {
     entry.next();
 
-    if(ValidateEntry(entry)) {}
+    if (ValidateEntry(entry)) {
+    }
   }
 }
 
@@ -258,7 +257,8 @@ void SymbolFeed::OnMDIncrementalRefreshVolume37(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {}
+    if (ValidateEntry(entry)) {
+    }
   }
 }
 
@@ -269,8 +269,7 @@ void SymbolFeed::OnMDIncrementalRefreshTradeSummary42(
   while (entry.hasNext()) {
     entry.next();
 
-    if (ValidateEntry(entry)) {}
-
+    if (ValidateEntry(entry)) {
+    }
   }
 }
-

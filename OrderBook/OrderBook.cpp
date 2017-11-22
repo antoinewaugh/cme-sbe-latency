@@ -4,8 +4,8 @@ constexpr int MAX_BOOK_SIZE = 10;
 
 OrderBook::OrderBook() {
   // MAX_BOOK + 1 used to allow for add at level 1 when we have a full book
-  bids_.reserve(MAX_BOOK_SIZE+1);
-  asks_.reserve(MAX_BOOK_SIZE+1);
+  bids_.reserve(MAX_BOOK_SIZE + 1);
+  asks_.reserve(MAX_BOOK_SIZE + 1);
 }
 
 bool OrderBook::Empty() const { return bids_.empty() and asks_.empty(); }
@@ -14,8 +14,8 @@ void OrderBook::AddBid(int level, float price, int quantity) {
   if (level - 1 <= bids_.size())
     bids_.insert(bids_.begin() + level - 1, {price, quantity});
 
-    if(bids_.size() > MAX_BOOK_SIZE)
-      bids_.erase(bids_.begin()+MAX_BOOK_SIZE);
+  if (bids_.size() > MAX_BOOK_SIZE)
+    bids_.erase(bids_.begin() + MAX_BOOK_SIZE);
 
   else
     std::cerr << "Add bid out of range." << '\n';
@@ -65,8 +65,8 @@ void OrderBook::AddAsk(int level, float price, int quantity) {
   if (level - 1 <= asks_.size())
     asks_.insert(asks_.begin() + level - 1, {price, quantity});
 
-    if(asks_.size() > MAX_BOOK_SIZE)
-      asks_.erase(asks_.begin()+MAX_BOOK_SIZE);
+  if (asks_.size() > MAX_BOOK_SIZE)
+    asks_.erase(asks_.begin() + MAX_BOOK_SIZE);
 
   else
     std::cerr << "Add ask level out of range." << '\n';

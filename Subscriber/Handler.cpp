@@ -6,10 +6,12 @@ void clear() {
   std::cout << "\x1B[2J\x1B[H";
 }
 
-void Handler::OnQuote(OrderBook &book, bool recovering, uint64_t securityid, uint64_t seqnum) {
+void Handler::OnQuote(OrderBook &book, bool recovering, uint64_t securityid,
+                      uint64_t seqnum) {
   clear();
 
-  std::cout << "Security: " << securityid << ", Recovering: " << recovering << ", LastSeqNum: " << seqnum << '\n';
+  std::cout << "Security: " << securityid << ", Recovering: " << recovering
+            << ", LastSeqNum: " << seqnum << '\n';
 
   std::cout << book << '\n';
 }

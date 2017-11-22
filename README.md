@@ -54,4 +54,22 @@ BidV		Price		AskV
 
 
 ```
+# Todo
 
+* Testing:
+    0. Add Catch2 support
+    1. OrderBook
+    2. Decoder
+    3. SymbolFeed
+    
+* Refactor:
+    1. Decoder - naming consistency
+    2. Parameter list objects (ip/port combinations)
+    3. Incorporate dascandy feedback
+    
+
+* Functionality
+    1. XML file load
+    2. Provide apama event based protocol for subscribing 
+   
+* Record latency range for sample subscription to ES, compare to SBE adapter

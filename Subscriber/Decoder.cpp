@@ -5,9 +5,9 @@
 size_t Decoder::decode_incremental_refresh_volume(
     MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {
 
- refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
- cb_volume_(refresh);
+  cb_volume_(refresh);
 }
 
 size_t Decoder::decode_incremental_refresh_trade(
@@ -60,15 +60,13 @@ size_t Decoder::decode_header(MessageHeader &header, char *buffer,
 size_t Decoder::decode_message(char *buffer, uint64_t offset) {
 
   auto message_length = decode_message_length(buffer, offset);
-  auto header_length =
-      decode_header(header_, buffer, offset + kMsgSize, 4096);
+  auto header_length = decode_header(header_, buffer, offset + kMsgSize, 4096);
 
   uint64_t msg_offset = offset + kMsgSize + header_length;
-  
-  auto message =  Message{buffer, msg_offset,
-                          header_.blockLength(),
-                          header_.version(), 4096};
-      
+
+  auto message = Message{buffer, msg_offset, header_.blockLength(),
+                         header_.version(), 4096};
+
   switch (header_.templateId()) {
 
   case MDIncrementalRefreshBook32::sbeTemplateId():
@@ -90,7 +88,7 @@ size_t Decoder::decode_message(char *buffer, uint64_t offset) {
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
     decode_incremental_refresh_order_book(incremental_order_book_, message);
     break;
-          
+
   default:
     std::cout << "Unknown message type, templateId: " << header_.templateId()
               << '\n';
