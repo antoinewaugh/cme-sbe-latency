@@ -39,7 +39,7 @@ public:
                  [this](auto &&val) { this->OnSeqNumStatus(val); }),
         io_service_(io_service), listen_address_(listen_address),
         incremental_feed_(
-            io_service, listen_address, config.incremental,
+            io_service_, listen_address, config.incremental,
             [this](char *data, size_t bytes) { this->OnData(data, bytes); }) {
 
     snapshot_feed_ = std::unique_ptr<DataSource>(new DataSource(

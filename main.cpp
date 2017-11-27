@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
       std::make_pair(Connection(argv[6], atoi(argv[7])),Connection(argv[8], atoi(argv[9])))
   );
 
-  Subscriber(io_service,boost::asio::ip::address::from_string(argv[1]), ESZ7, config, handler);
+  Subscriber subscriber(io_service,boost::asio::ip::address::from_string(argv[1]), ESZ7, config, handler);
 
   io_service.run();
 
