@@ -5,15 +5,15 @@
 #include <boost/asio.hpp>
 
 struct Connection {
-
-  enum Type { Incremental, Snapshot };
-  enum Feed { Primary, Secondary };
-
-  Type type;
-  Feed feed;
-
   boost::asio::ip::address host;
-  short port;
+  int port;
+  Connection(std::string, int);
+};
 
-  Connection(Type type, Feed feed, std::string host, short port);
+struct Config {
+  std::pair<Connection, Connection> incremental;
+  std::pair<Connection, Connection> snapshot;
+  Config(std::pair<Connection, Connection> incremental,
+         std::pair<Connection, Connection> snapshot)
+      : incremental(incremental), snapshot(snapshot) {}
 };

@@ -3,6 +3,7 @@
 //
 
 #include "DepthList.h"
+#include <numeric>
 
 DepthList::DepthList(bool isbid) : isbid_(isbid) {
   levels_.reserve(MAX_BOOK_SIZE + 1); // +1 allows for add to occur at level 1
@@ -56,6 +57,41 @@ void DepthList::DeleteFrom(int level) {
 void DepthList::DeleteThru() { levels_.clear(); }
 
 void DepthList::Clear() { levels_.clear(); }
+
+std::string DepthList::ToString() {
+
+  std::string prices = std::accumulate(
+      std::next(levels_.begin()), levels_.end(),
+      std::to_string(levels_[0].price), // start with first element
+      [](std::string a, PriceLevel b) {
+        return a + ',' + std::to_string(b.price);
+      });
+
+  std::string quantities = std::accumulate(
+      std::next(levels_.begin()), levels_.end(),
+      std::to_string(levels_[0].quantity), // start with first element
+      [](std::string a, PriceLevel b) {
+        return a + ',' + std::to_string(b.quantity);
+      });
+
+  return "[" + prices + "],[" + quantities + "]";
+}
+/*
+struct object
+{
+  int a;
+  int b;
+};
+
+constexpr char ListSize = 12;
+std::array<object, ListSize> list;
+std::array<std::pair<std::string, std::string>, ListSize> strings;
+std::transform(std::begin(list), std::end(list), std::begin(strings), [](const
+object& input)
+{
+return { std::to_string(input.a),  std::to_string(input.b) };
+});
+*/
 
 std::ostream &operator<<(std::ostream &os, const DepthList &list) {
   if (list.isbid_) {

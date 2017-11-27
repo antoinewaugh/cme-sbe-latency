@@ -1,12 +1,11 @@
 #include "Receiver.h"
 
-Receiver::Receiver(Decoder &decoder, boost::asio::io_service &io_service,
+Receiver::Receiver(boost::asio::io_service &io_service,
                    const boost::asio::ip::address &listen_address,
-                   Connection connection)
+                   const Connection &connection,
+                   std::function<void(char *, size_t)> callback)
     : socket_(io_service), listen_address_(listen_address),
-      connection_(connection), decoder_(decoder) {}
-
-void Receiver::Join() {
+      connection_(connection), callback_(callback) {
 
   boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),
                                                  connection_.port);
@@ -26,15 +25,15 @@ void Receiver::Join() {
                   boost::asio::placeholders::bytes_transferred));
 }
 
-void Receiver::Leave() { socket_.close(); }
+Receiver::~Receiver() { socket_.close(); }
 
 void Receiver::HandleReceiveFrom(const boost::system::error_code &error,
                                  size_t received) {
 
   if (!error) {
 
-    // trigger callbacks registered with decoder
-    decoder_.DecodePacket(data_, received);
+    // perform callback to user
+    callback_(data_, received);
 
     // pull next message
     socket_.async_receive_from(

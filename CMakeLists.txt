@@ -3,7 +3,6 @@ project(cme_sbe_latency)
 
 set(CMAKE_CXX_STANDARD 14)
 
-
 set(BOOST_ROOT /usr/local/boost_1_63_0)
 set(BOOST_INCLUDEDIR /usr/include)
 

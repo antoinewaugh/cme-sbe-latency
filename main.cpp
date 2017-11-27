@@ -18,12 +18,15 @@ int main(int argc, char *argv[]) {
 
   boost::asio::io_service io_service;
 
-  Subscriber r(io_service, boost::asio::ip::address::from_string(argv[1]),
-               Connection(Connection::Type::Incremental, Connection::Feed::Primary, argv[2], atoi(argv[3])),
-               Connection(Connection::Type::Incremental, Connection::Feed::Secondary, argv[4], atoi(argv[5])),
-               Connection(Connection::Type::Snapshot, Connection::Feed::Primary, argv[6], atoi(argv[7])),
-               Connection(Connection::Type::Snapshot, Connection::Feed::Secondary, argv[8], atoi(argv[9]))
+  uint64_t ESZ7 = 23936; // ESZ7;
+
+  Handler handler;
+  Config config = Config(
+      std::make_pair(Connection(argv[2], atoi(argv[3])),Connection(argv[2], atoi(argv[3]))),
+      std::make_pair(Connection(argv[2], atoi(argv[3])),Connection(argv[2], atoi(argv[3])))
   );
+
+  Subscriber(io_service,boost::asio::ip::address::from_string(argv[1]), ESZ7, config, handler);
 
   io_service.run();
 

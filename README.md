@@ -58,7 +58,7 @@ BidV		Price		AskV
 
 * Testing:
     0. Add Catch2 support
-    1. DepthBook
+    1. DepthBook, DepthList
     2. Decoder
     3. SymbolFeed
     

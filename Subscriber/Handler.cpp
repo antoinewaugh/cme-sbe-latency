@@ -15,4 +15,6 @@ void Handler::OnQuote(DepthBook &book, bool recovering, uint64_t securityid,
             << ", LastSeqNum: " << seqnum << '\n';
 
   std::cout << book << '\n';
+
+  // book.ToString()
 }

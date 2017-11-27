@@ -25,5 +25,6 @@ public:
   void Delete(int level, float price);
   void DeleteFrom(int level);
   void DeleteThru();
+  std::string ToString();
   friend std::ostream &operator<<(std::ostream &os, const DepthList &book);
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "boost/bind.hpp"
 #include <boost/asio.hpp>
 
@@ -13,18 +15,18 @@ class Receiver {
   boost::asio::ip::address listen_address_;
   Connection connection_;
 
-  Decoder &decoder_;
+  std::function<void(char *, size_t)> callback_;
 
-  enum { max_length = 4096 };
+  static constexpr int max_length = 4096;
   char data_[max_length];
 
   void HandleReceiveFrom(const boost::system::error_code &error,
                          size_t received);
 
 public:
-  Receiver(Decoder &decoder, boost::asio::io_service &io_service,
+  Receiver(boost::asio::io_service &io_service,
            const boost::asio::ip::address &listen_address,
-           Connection connection);
-  void Join();
-  void Leave();
+           const Connection &connection,
+           std::function<void(char *, size_t)> callback);
+  ~Receiver();
 };

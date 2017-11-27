@@ -1,6 +1,9 @@
 #pragma once
 
 #include "DepthBook.h"
+#include "Handler.h"
+
+#include <functional>
 
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshDailyStatistics33.h"
@@ -14,13 +17,13 @@
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
 
-#include <functional>
+using namespace sbe;
 
 constexpr int kMsgSize = 2;
 constexpr int kByteOffest = 12;
 constexpr int kMsgHeaderVersion = 0;
 
-using namespace sbe;
+enum SeqNumStatus { Synchronized, Unsynchronised };
 
 class Decoder {
 
@@ -34,28 +37,46 @@ public:
   };
 
   size_t DecodePacket(char *, size_t);
-  int RegisterCallbacks(
-      std::function<void(MDIncrementalRefreshBook32 &)>,
-      std::function<void(MDIncrementalRefreshDailyStatistics33 &)>,
-      std::function<void(MDIncrementalRefreshLimitsBanding34 &)>,
-      std::function<void(MDIncrementalRefreshSessionStatistics35 &)>,
-      std::function<void(MDIncrementalRefreshTrade36 &)>,
-      std::function<void(MDIncrementalRefreshVolume37 &)>,
-      std::function<void(MDIncrementalRefreshTradeSummary42 &)>,
-      std::function<void(MDIncrementalRefreshOrderBook43 &)>,
-      std::function<void(SnapshotFullRefresh38 &)>,
-      std::function<void(SnapshotFullRefreshOrderBook44 &)>);
+  Decoder(uint64_t securityid, const Handler &handler,
+          std::function<void(SeqNumStatus)> OnSeqNumStatus);
 
 private:
-  size_t DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &,
+  bool recoverymode_ = false;
+  int seqnum_ = 0;
+  uint64_t securityid_;
+
+  Handler handler_;
+  DepthBook book_;
+
+  std::function<void(SeqNumStatus)> cb_seqnumstatus_;
+
+  void StartRecovery();
+  void StopRecovery();
+
+  template <class T> bool CheckStream(T);
+
+  void HandleBidEntry(MDUpdateAction::Value action, int level, float price,
+                      int volume);
+  void HandleAskEntry(MDUpdateAction::Value action, int level, float price,
+                      int volume);
+
+  bool DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &,
+                                    Decoder::Message);
+  bool DecodeIncrementalRefreshVolume(MDIncrementalRefreshVolume37 &,
                                       Decoder::Message);
-  size_t DecodeIncrementalRefreshVolume(MDIncrementalRefreshVolume37 &,
+  bool DecodeIncrementalRefreshTrade(MDIncrementalRefreshTradeSummary42 &,
+                                     Decoder::Message);
+  bool DecodeIncrementalRefreshOrderBook(MDIncrementalRefreshOrderBook43 &,
+                                         Decoder::Message);
+  bool DecodeIncrementalRefreshDailyStatistics(
+      MDIncrementalRefreshDailyStatistics33 &, Decoder::Message);
+  bool
+  DecodeIncrementalRefreshLimitsBanding(MDIncrementalRefreshLimitsBanding34 &,
                                         Decoder::Message);
-  size_t DecodeIncrementalRefreshTrade(MDIncrementalRefreshTradeSummary42 &,
-                                       Decoder::Message);
-  size_t DecodeIncrementalRefreshOrderBook(MDIncrementalRefreshOrderBook43 &,
-                                           Decoder::Message);
-  size_t DecodeSnapshot(SnapshotFullRefresh38 &, Decoder::Message);
+  bool DecodeIncrementalRefreshSessionStatistics(
+      MDIncrementalRefreshSessionStatistics35 &refresh, Decoder::Message);
+  bool DecodeSnapshot(SnapshotFullRefresh38 &, Decoder::Message);
+
   size_t DecodeMessage(char *, size_t);
   size_t DecodeMessageLength(char *, size_t);
   size_t DecodeHeader(MessageHeader &, char *, uint64_t, uint64_t);
@@ -67,17 +88,4 @@ private:
   MDIncrementalRefreshVolume37 incremental_volume_;
   MDIncrementalRefreshTradeSummary42 incremental_trade_;
   MDIncrementalRefreshOrderBook43 incremental_order_book_;
-
-  std::function<void(MDIncrementalRefreshBook32 &)> cb_book_;
-  std::function<void(MDIncrementalRefreshDailyStatistics33 &)>
-      cb_dailystatistics_;
-  std::function<void(MDIncrementalRefreshLimitsBanding34 &)> cb_limitsbanding_;
-  std::function<void(MDIncrementalRefreshSessionStatistics35 &)>
-      cb_sessionstatistics_;
-  std::function<void(MDIncrementalRefreshTrade36 &)> cb_trade_;
-  std::function<void(MDIncrementalRefreshVolume37 &)> cb_volume_;
-  std::function<void(MDIncrementalRefreshTradeSummary42 &)> cb_tradesummary_;
-  std::function<void(MDIncrementalRefreshOrderBook43 &)> cb_orderbook_;
-  std::function<void(SnapshotFullRefresh38 &)> cb_snapshotfull_;
-  std::function<void(SnapshotFullRefreshOrderBook44 &)> cb_snapshotorderbook_;
 };
