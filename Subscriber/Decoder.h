@@ -25,9 +25,8 @@ constexpr int kMsgHeaderVersion = 0;
 
 enum SeqNumStatus { Synchronized, Unsynchronised };
 
-class Decoder {
+struct Decoder {
 
-public:
   struct Message {
     char *buffer;
     uint16_t offset;
@@ -41,6 +40,7 @@ public:
           std::function<void(SeqNumStatus)> OnSeqNumStatus);
 
 private:
+
   bool recoverymode_ = false;
   int seqnum_ = 0;
   uint64_t securityid_;

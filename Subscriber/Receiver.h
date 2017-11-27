@@ -8,7 +8,15 @@
 #include "Connection.h"
 #include "Decoder.h"
 
-class Receiver {
+struct Receiver {
+
+  Receiver(boost::asio::io_service &io_service,
+           const boost::asio::ip::address &listen_address,
+           const Connection &connection,
+           std::function<void(char *, size_t)> callback);
+  ~Receiver();
+
+private:
 
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
@@ -23,10 +31,4 @@ class Receiver {
   void HandleReceiveFrom(const boost::system::error_code &error,
                          size_t received);
 
-public:
-  Receiver(boost::asio::io_service &io_service,
-           const boost::asio::ip::address &listen_address,
-           const Connection &connection,
-           std::function<void(char *, size_t)> callback);
-  ~Receiver();
 };

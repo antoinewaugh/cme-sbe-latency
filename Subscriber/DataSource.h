@@ -12,5 +12,5 @@ struct DataSource {
   DataSource(boost::asio::io_service &io_service,
              const boost::asio::ip::address &listen_address,
              std::pair<Connection, Connection> conn,
-             std::function<void(char *, size_t)> OnData);
+             std::function<void(char *, size_t)> callback);
 };

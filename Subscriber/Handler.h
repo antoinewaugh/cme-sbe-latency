@@ -2,8 +2,7 @@
 
 #include "DepthBook.h"
 
-class Handler {
-public:
+struct Handler {
   void OnQuote(DepthBook &book, bool recovering, uint64_t securityid,
                uint64_t seqnum);
 };
