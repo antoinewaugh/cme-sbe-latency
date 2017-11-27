@@ -1,5 +1,7 @@
 #include "Decoder.h"
 
+#include <cmath>
+
 Decoder::Decoder(uint64_t securityid, const Handler &handler,
                  std::function<void(SeqNumStatus)> OnSeqNumStatus)
     : securityid_(securityid), handler_(handler),
