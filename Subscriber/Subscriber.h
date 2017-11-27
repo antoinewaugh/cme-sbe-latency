@@ -33,7 +33,7 @@ class Subscriber {
 public:
   Subscriber(boost::asio::io_service &io_service,
              const boost::asio::ip::address &listen_address, uint64_t symbolid,
-             Config config, Handler handler)
+             Config config, Handler& handler)
       : config_(config),
         decoder_(symbolid, handler,
                  [this](auto &&val) { this->OnSeqNumStatus(val); }),
