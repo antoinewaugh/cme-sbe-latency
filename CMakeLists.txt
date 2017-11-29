@@ -17,10 +17,13 @@ include_directories( ${Boost_INCLUDE_DIRS})
 set(SOURCE_FILES main.cpp)
 add_executable(cme_sbe_latency ${SOURCE_FILES})
 
+include_directories(Config)
+add_subdirectory(Config)
+
 include_directories(DepthBook)
 add_subdirectory(DepthBook)
 
 include_directories(Subscriber)
 add_subdirectory(Subscriber)
 
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Subscriber DepthBook)
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Config Subscriber DepthBook)

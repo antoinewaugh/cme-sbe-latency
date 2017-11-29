@@ -63,13 +63,33 @@ BidV		Price		AskV
     3. SymbolFeed
     
 * Refactor:
-    1. Decoder - naming consistency
-    2. Parameter list objects (ip/port combinations)
-    3. Incorporate dascandy feedback
-    
+    1. DI
+    2. xml file load
+   
+* Performance:
+    1. Valgrind
 
 * Functionality
     1. XML file load
     2. Provide apama event based protocol for subscribing 
    
 * Record latency range for sample subscription to ES, compare to SBE adapter
+
+* Recovery:
+
+    1. Download all securities on startup from instrument replay feed
+    2. Upon a specific subscription
+    
+        * download latest instrument contract information (market phase etc included in this)
+        * download snapshot
+        * download incremental
+            * On Instrument contract download complete -> leave instrument channel()
+            * On Incremental matching snapshot-> leave incremental channel()
+           
+    3. Remain on incremental feed
+        * if seq gap identified -> join snapshot
+                                -> join instrument
+                                
+            repeat until recovery()
+                                
+     

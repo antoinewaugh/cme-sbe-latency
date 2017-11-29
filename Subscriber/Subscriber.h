@@ -1,39 +1,30 @@
 #pragma once
 
-#include "Connection.h"
+#include "Config.h"
 #include "DataSource.h"
 #include "Decoder.h"
 #include "Handler.h"
 
 struct Subscriber {
 
-  Subscriber(boost::asio::io_service &io_service,
-             const boost::asio::ip::address &listen_address, uint64_t symbolid,
-             Config config, Handler& handler);
+  Subscriber(uint64_t symbolid, std::unique_ptr<DataSource> incremental_feed,
+             std::unique_ptr<DataSource> snapshot_feed,
+             std::unique_ptr<DataSource> instrument_feed, Handler &handler);
+
+  ~Subscriber();
+
+  std::unique_ptr<Subscriber>
+  make_subscriber(uint64_t securityid, std::string channelid, Config &config,
+                  boost::asio::io_service &io_service,
+                  boost::asio::ip::address &listen_address, Handler &handler);
 
 private:
+  std::unique_ptr<DataSource> incremental_feed_;
+  std::unique_ptr<DataSource> snapshot_feed_;
+  std::unique_ptr<DataSource> instrument_feed_;
 
-  Config config_;
   Decoder decoder_;
 
-  boost::asio::io_service &io_service_;
-  const boost::asio::ip::address &listen_address_;
-
-  DataSource incremental_feed_;
-  std::unique_ptr<DataSource> snapshot_feed_;
-
-  void OnData(char *data, size_t bytes) { decoder_.DecodePacket(data, bytes); }
-
-  void OnSeqNumStatus(SeqNumStatus status) {
-
-    if (status == Synchronized && snapshot_feed_) {
-      snapshot_feed_.reset(nullptr); // leave recovery channel
-    } else if (status == Unsynchronised && !snapshot_feed_) {
-      snapshot_feed_ = std::unique_ptr<DataSource>(new DataSource(
-          io_service_, listen_address_,
-          config_.snapshot, // join recovery channel
-          [this](char *data, size_t bytes) { this->OnData(data, bytes); }));
-    }
-  }
-
+  void OnData(char *data, size_t bytes);
+  void OnSeqNumStatus(SeqNumStatus status);
 };

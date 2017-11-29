@@ -24,6 +24,7 @@ constexpr int kByteOffest = 12;
 constexpr int kMsgHeaderVersion = 0;
 
 enum SeqNumStatus { Synchronized, Unsynchronised };
+enum InstrumentStatus { Downloading, Downloaded };
 
 struct Decoder {
 
@@ -40,7 +41,6 @@ struct Decoder {
           std::function<void(SeqNumStatus)> OnSeqNumStatus);
 
 private:
-
   bool recoverymode_ = false;
   int seqnum_ = 0;
   uint64_t securityid_;

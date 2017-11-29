@@ -13,5 +13,4 @@ private:
 
   void StartRecovery();
   void StopRecovery();
-
 };

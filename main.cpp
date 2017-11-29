@@ -1,7 +1,23 @@
 #include "Subscriber.h"
 #include <iostream>
+#include "ConfigGenerator.h"
 
 int main(int argc, char *argv[]) {
+
+  auto channels = {311, 809, 789};
+  auto configs = ChannelConfig::load("../Config/config.xml");
+
+  SubscriptionManger subscriber = Subscriber::builder
+      .setConfig(configs)
+      .setReceiver()
+      .
+
+  subscriber.subscribe()
+
+
+  // auto instruments = InstrumentDiscovery(config).fetch(channels); // asynchronous download of all instrument data
+  // subscriptionService.subscribe(instruments["ESZ7"]);
+
 
   if (argc != 10) {
     std::cerr << "Usage: receiver <listen_address> <multicast_address> "
@@ -21,14 +37,15 @@ int main(int argc, char *argv[]) {
   uint64_t ESZ7 = 23936; // ESZ7;
 
   Handler handler;
-  Config config = Config(
-      std::make_pair(Connection(argv[2], atoi(argv[3])),Connection(argv[4], atoi(argv[5]))),
-      std::make_pair(Connection(argv[6], atoi(argv[7])),Connection(argv[8], atoi(argv[9])))
-  );
+//  Config config = Config(
+//      std::make_pair(Connection(argv[2], atoi(argv[3])),Connection(argv[4], atoi(argv[5]))),
+//      std::make_pair(Connection(argv[6], atoi(argv[7])),Connection(argv[8], atoi(argv[9])))
+//  );
 
-  Subscriber subscriber(io_service,boost::asio::ip::address::from_string(argv[1]), ESZ7, config, handler);
+//  Subscriber subscriber(io_service,boost::asio::ip::address::from_string(argv[1]), ESZ7, config, handler);
 
-  io_service.run();
+//  io_service.run();
+
 
   return 0;
 }

@@ -8,16 +8,17 @@
 #include "Connection.h"
 #include "Decoder.h"
 
-struct Receiver {
+struct MulticastReceiver {
 
-  Receiver(boost::asio::io_service &io_service,
-           const boost::asio::ip::address &listen_address,
-           const Connection &connection,
-           std::function<void(char *, size_t)> callback);
-  ~Receiver();
+  MulticastReceiver(boost::asio::io_service &io_service,
+                    const boost::asio::ip::address &listen_address,
+                    const Connection &connection);
+  ~MulticastReceiver();
+  void Register(std::function<void(char *, size_t)> callback);
+  void Join();
+  void Leave();
 
 private:
-
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
   boost::asio::ip::address listen_address_;
@@ -30,5 +31,4 @@ private:
 
   void HandleReceiveFrom(const boost::system::error_code &error,
                          size_t received);
-
 };
