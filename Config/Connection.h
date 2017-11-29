@@ -12,7 +12,7 @@ enum Feed { A, B };
 
 static Type get_type(std::string const &type) {
   static std::map<std::string, Type> const conversion = {
-      {"Instrument", Type::Instrument},
+      {"Instrument Replay", Type::Instrument},
       {"Incremental", Type::Incremental},
       {"Snapshot", Type::Snapshot},
   };
