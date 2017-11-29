@@ -4,6 +4,7 @@
 
 #include "boost/bind.hpp"
 #include <boost/asio.hpp>
+#include <ostream>
 
 #include "Connection.h"
 #include "Decoder.h"
@@ -30,6 +31,11 @@ private:
   static constexpr int max_length = 4096;
   char data_[max_length];
 
+  bool joined_ = false;
+
   void HandleReceiveFrom(const boost::system::error_code &error,
                          size_t received);
+
+public:
+  friend std::ostream &operator<<(std::ostream &os, const MulticastReceiver &receiver);
 };

@@ -13,3 +13,8 @@ void DataSource::Leave() {
   primary.Leave();
   secondary.Leave();
 }
+
+std::ostream &operator<<(std::ostream &os, const DataSource &source) {
+  os << "primary: " << source.primary << " secondary: " << source.secondary;
+  return os;
+}

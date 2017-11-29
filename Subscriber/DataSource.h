@@ -4,6 +4,7 @@
 #include "MulticastReceiver.h"
 
 #include <functional>
+#include <ostream>
 
 struct DataSource {
   MulticastReceiver primary, secondary;
@@ -11,4 +12,6 @@ struct DataSource {
              MulticastReceiver secondary);
   void Join();
   void Leave();
+
+  friend std::ostream &operator<<(std::ostream &os, const DataSource &source);
 };

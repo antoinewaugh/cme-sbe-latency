@@ -14,6 +14,5 @@ int main(int argc, char *argv[]) {
 
   io_service.run();
 
-
   return 0;
 }

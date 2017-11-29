@@ -26,9 +26,18 @@ void MulticastReceiver::HandleReceiveFrom(
   }
 }
 
-void MulticastReceiver::Leave() { socket_.close(); }
+void MulticastReceiver::Leave() {
+  if(joined_) {
 
+    joined_ = false;
+    socket_.close(); }
+
+  }
 void MulticastReceiver::Join() {
+
+  if(joined_) { return;}
+
+  joined_ = true;
 
   boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),
                                                  connection_.port);
@@ -50,4 +59,9 @@ void MulticastReceiver::Join() {
 
 void MulticastReceiver::Register(std::function<void(char *, size_t)> callback) {
   callback_ = callback;
+}
+
+std::ostream &operator<<(std::ostream &os, const MulticastReceiver &receiver) {
+  os << "connection_: " << receiver.connection_;
+  return os;
 }

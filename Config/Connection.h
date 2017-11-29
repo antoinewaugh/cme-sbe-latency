@@ -8,6 +8,7 @@ enum Type { Snapshot, Incremental, Instrument, Other };
 enum Feed { A, B };
 
 #include <map>
+#include <ostream>
 
 static Type get_type(std::string const &type) {
   static std::map<std::string, Type> const conversion = {
@@ -37,4 +38,6 @@ struct Connection {
 
   Connection() = default;
   Connection(std::string id, Type type, Feed feed, std::string host, int port);
+
+  friend std::ostream &operator<<(std::ostream &os, const Connection &connection);
 };

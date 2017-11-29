@@ -21,11 +21,16 @@ Subscriber::Subscriber(uint64_t symbolid,
   instrument_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
   instrument_feed_.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
 
+  std::cout << incremental_feed_ << '\n';
+  std::cout << snapshot_feed_ << '\n';
+  std::cout << instrument_feed_ << '\n';
 
   incremental_feed_.Join();
   snapshot_feed_.Join();
-  instrument_feed_.Join();
+//  instrument_feed_.Join();
 }
+
+
 
 void Subscriber::OnData(char *data, size_t bytes) {
   decoder_.DecodePacket(data, bytes);
@@ -35,10 +40,10 @@ void Subscriber::OnSeqNumStatus(SeqNumStatus status) {
 
   if (status == Synchronized) {
     snapshot_feed_.Leave(); // leave recovery channel
-    instrument_feed_.Leave(); // leave recovery channel
+ //   instrument_feed_.Leave(); // leave recovery channel
   } else if (status == Unsynchronised) {
     snapshot_feed_.Join();   // join instrument recovery
-    instrument_feed_.Join(); // join snapshot recovery
+  //  instrument_feed_.Join(); // join snapshot recovery
   }
 }
 
