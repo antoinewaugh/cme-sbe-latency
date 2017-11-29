@@ -15,7 +15,7 @@ struct Subscriber {
   ~Subscriber();
 
   Subscriber
-  make_subscriber(uint64_t securityid, std::string channelid, Config &config,
+  static make_subscriber(uint64_t securityid, std::string channelid, Config &config,
                   boost::asio::io_service &io_service,
                   boost::asio::ip::address &listen_address, Handler &handler);
 

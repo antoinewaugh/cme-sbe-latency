@@ -35,9 +35,10 @@ void Subscriber::OnSeqNumStatus(SeqNumStatus status) {
 
   if (status == Synchronized) {
     snapshot_feed_.Leave(); // leave recovery channel
+    instrument_feed_.Leave(); // leave recovery channel
   } else if (status == Unsynchronised) {
-    snapshot_feed_.Join();   // join recovery
-    instrument_feed_.Join(); // join recovery
+    snapshot_feed_.Join();   // join instrument recovery
+    instrument_feed_.Join(); // join snapshot recovery
   }
 }
 
