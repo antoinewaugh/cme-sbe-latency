@@ -4,15 +4,15 @@
 
 int main(int argc, char *argv[]) {
 
-  auto channels = {311, 809, 789};
-  auto configs = ChannelConfig::load("../Config/config.xml");
+  //auto channels = {311, 809, 789};
+  //auto configs = ChannelConfig::load("../Config/config.xml");
 
-  SubscriptionManger subscriber = Subscriber::builder
-      .setConfig(configs)
-      .setReceiver()
-      .
+  //SubscriptionManger subscriber = Subscriber::builder
+   //   .setConfig(configs)
+    //  .setReceiver()
+     // .
 
-  subscriber.subscribe()
+//  subscriber.subscribe()
 
 
   // auto instruments = InstrumentDiscovery(config).fetch(channels); // asynchronous download of all instrument data

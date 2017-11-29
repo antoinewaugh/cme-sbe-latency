@@ -14,6 +14,7 @@ struct MulticastReceiver {
                     const boost::asio::ip::address &listen_address,
                     const Connection &connection);
   ~MulticastReceiver();
+  MulticastReceiver(MulticastReceiver&& ) = default;
   void Register(std::function<void(char *, size_t)> callback);
   void Join();
   void Leave();

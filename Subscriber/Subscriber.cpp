@@ -1,9 +1,9 @@
 #include "Subscriber.h"
 
 Subscriber::Subscriber(uint64_t symbolid,
-                       std::unique_ptr<DataSource> incremental_feed,
-                       std::unique_ptr<DataSource> snapshot_feed,
-                       std::unique_ptr<DataSource> instrument_feed,
+                       DataSource incremental_feed,
+                       DataSource snapshot_feed,
+                       DataSource instrument_feed,
                        Handler &handler)
 
     : incremental_feed_(std::move(incremental_feed)),
@@ -12,9 +12,19 @@ Subscriber::Subscriber(uint64_t symbolid,
       decoder_(symbolid, handler,
                [this](auto &&val) { this->OnSeqNumStatus(val); }) {
 
-  incremental_feed_->Join();
-  snapshot_feed_->Join();
-  instrument_feed_->Join();
+
+  // wish i could remove this - dependency injection has caused it? at least move it to be available at the DataSource level..
+  incremental_feed.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  incremental_feed.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  snapshot_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  snapshot_feed_.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  instrument_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  instrument_feed_.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+
+
+  incremental_feed_.Join();
+  snapshot_feed_.Join();
+  instrument_feed_.Join();
 }
 
 void Subscriber::OnData(char *data, size_t bytes) {
@@ -24,49 +34,49 @@ void Subscriber::OnData(char *data, size_t bytes) {
 void Subscriber::OnSeqNumStatus(SeqNumStatus status) {
 
   if (status == Synchronized) {
-    snapshot_feed_->Leave(); // leave recovery channel
+    snapshot_feed_.Leave(); // leave recovery channel
   } else if (status == Unsynchronised) {
-    snapshot_feed_->Join();   // join recovery
-    instrument_feed_->Join(); // join recovery
+    snapshot_feed_.Join();   // join recovery
+    instrument_feed_.Join(); // join recovery
   }
 }
 
 Subscriber::~Subscriber() {
-  incremental_feed_->Leave();
-  snapshot_feed_->Leave();
-  instrument_feed_->Leave();
+  incremental_feed_.Leave();
+  snapshot_feed_.Leave();
+  instrument_feed_.Leave();
 }
 
-std::unique_ptr<Subscriber>
+Subscriber
 Subscriber::make_subscriber(uint64_t securityid, std::string channelid,
                             Config &config, boost::asio::io_service &io_service,
                             boost::asio::ip::address &listen_address,
                             Handler &handler) {
 
-  auto incremental = std::make_unique<DataSource>(
-      std::make_unique<MulticastReceiver>(
+  auto incremental = DataSource(
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Incremental, Feed::A)),
-      std::make_unique<MulticastReceiver>(
+          config.GetConnection(channelid, Type::Incremental, Feed::A))),
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Incremental, Feed::B)));
+          config.GetConnection(channelid, Type::Incremental, Feed::B))));
 
-  auto snapshot = std::make_unique<DataSource>(
-      std::make_unique<MulticastReceiver>(
+  auto snapshot = DataSource(
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Snapshot, Feed::A)),
-      std::make_unique<MulticastReceiver>(
+          config.GetConnection(channelid, Type::Snapshot, Feed::A))),
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Snapshot, Feed::B)));
+          config.GetConnection(channelid, Type::Snapshot, Feed::B))));
 
-  auto instrument = std::make_unique<DataSource>(
-      std::make_unique<MulticastReceiver>(
+  auto instrument = DataSource(
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Instrument, Feed::A)),
-      std::make_unique<MulticastReceiver>(
+          config.GetConnection(channelid, Type::Instrument, Feed::A))),
+      std::move(MulticastReceiver(
           io_service, listen_address,
-          config.GetConnection(channelid, Type::Instrument, Feed::B)));
+          config.GetConnection(channelid, Type::Instrument, Feed::B))));
 
-  return std::make_unique<Subscriber>(securityid, incremental, snapshot,
-                                      instrument, handler);
+  return Subscriber(securityid, std::move(incremental), std::move(snapshot),
+                                      std::move(instrument), handler);
 }

@@ -6,9 +6,9 @@
 #include <functional>
 
 struct DataSource {
-  std::unique_ptr<MulticastReceiver> primary, secondary;
-  DataSource(std::unique_ptr<MulticastReceiver> primary,
-             std::unique_ptr<MulticastReceiver> secondary);
+  MulticastReceiver primary, secondary;
+  DataSource(MulticastReceiver primary,
+             MulticastReceiver secondary);
   void Join();
   void Leave();
 };
