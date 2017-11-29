@@ -14,8 +14,8 @@ Subscriber::Subscriber(uint64_t symbolid,
 
 
   // wish i could remove this - dependency injection has caused it? at least move it to be available at the DataSource level..
-  incremental_feed.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
-  incremental_feed.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  incremental_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
+  incremental_feed_.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
   snapshot_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
   snapshot_feed_.secondary.Register([this](char* d, size_t r) { this->OnData(d,r); });
   instrument_feed_.primary.Register([this](char* d, size_t r) { this->OnData(d,r); });
@@ -50,7 +50,7 @@ void Subscriber::OnSeqNumStatus(SeqNumStatus status) {
 Subscriber::~Subscriber() {
   incremental_feed_.Leave();
   snapshot_feed_.Leave();
-  instrument_feed_.Leave();
+  //instrument_feed_.Leave();
 }
 
 Subscriber
