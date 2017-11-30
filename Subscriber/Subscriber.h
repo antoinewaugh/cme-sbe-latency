@@ -8,16 +8,17 @@
 struct Subscriber {
 
   Subscriber(uint64_t symbolid, DataSource incremental_feed,
-             DataSource snapshot_feed,
-             DataSource instrument_feed, Handler &handler);
+             DataSource snapshot_feed, DataSource instrument_feed,
+             Handler &handler);
 
-  Subscriber(Subscriber&& ) = default;
+  Subscriber(Subscriber &&) = default;
   ~Subscriber();
 
-  Subscriber
-  static make_subscriber(uint64_t securityid, std::string channelid, Config &config,
-                  boost::asio::io_service &io_service,
-                  boost::asio::ip::address &listen_address, Handler &handler);
+  Subscriber static make_subscriber(uint64_t securityid, std::string channelid,
+                                    Config &config,
+                                    boost::asio::io_service &io_service,
+                                    boost::asio::ip::address &listen_address,
+                                    Handler &handler);
 
 private:
   DataSource incremental_feed_;

@@ -11,20 +11,13 @@ docker build -t cme-sbe-latency .
 ## Usage
 
 ```
-docker run cme-sbe-latency 0.0.0.0 \
-	<multicast_ip_incrementalA> \
-	<multicast_port_incrementalA> \
-	<multicast_ip_incrementalB> \
-	<multicast_port_incrementalB> \
-	<multicast_ip_snapshotA> \
-	<multicast_port_snapshotA> \
-	<multicast_ip_shapshotB> \
-	<multicast_port_snapshotB> 
+docker run cme-sbe-latency 0.0.0.0 <path_to_config.xml>
 ```
+
 # Sample
 
 ```
-docker run --net=host cme-sbe-latency  0.0.0.0 224.0.31.1 14310 224.0.32.1 15310 224.0.31.22 14310 224.0.32.22 15310 
+docker run --net=host cme-sbe-latency  0.0.0.0 config.xml
 
  Security 23936, Recovering 0, LastSeqNum 2541935
 
@@ -56,23 +49,22 @@ BidV		Price		AskV
 ```
 # Todo
 
+* Functionality
+    1. Channel Reset
+    2. Instrument Discovery
+    3. Complete processing orders
+    
+   
 * Testing:
     0. Add Catch2 support
-    1. DepthBook, DepthList
-    2. Decoder
-    3. SymbolFeed
+    1. Unit test:
+        * Decoder
+        * Subscriber 
     
-* Refactor:
-    1. DI
-    2. xml file load
-   
 * Performance:
     1. Valgrind
+    2. Other???
 
-* Functionality
-    1. XML file load
-    2. Provide apama event based protocol for subscribing 
-   
 * Record latency range for sample subscription to ES, compare to SBE adapter
 
 * Recovery:

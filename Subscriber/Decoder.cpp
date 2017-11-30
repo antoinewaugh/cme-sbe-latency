@@ -24,6 +24,22 @@ bool Decoder::DecodeIncrementalRefreshVolume(
 }
 
 bool Decoder::DecodeIncrementalRefreshTrade(
+    MDIncrementalRefreshTrade36 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
+    entry.next();
+
+    if (CheckStream(entry)) {
+    }
+  }
+}
+
+bool Decoder::DecodeIncrementalRefreshTradeSummary(
+
     MDIncrementalRefreshTradeSummary42 &refresh, Decoder::Message message) {
 
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
@@ -130,42 +146,95 @@ size_t Decoder::DecodeHeader(MessageHeader &header, char *buffer,
 size_t Decoder::DecodeMessage(char *buffer, uint64_t offset) {
 
   auto message_length = DecodeMessageLength(buffer, offset);
-  auto header_length = DecodeHeader(header_, buffer, offset + kMsgSize, 4096);
+  auto header_length =
+      DecodeHeader(messages_.header, buffer, offset + kMsgSize, 4096);
 
   uint64_t msg_offset = offset + kMsgSize + header_length;
 
-  auto message = Message{buffer, msg_offset, header_.blockLength(),
-                         header_.version(), 4096};
+  auto message = Message{buffer, msg_offset, messages_.header.blockLength(),
+                         messages_.header.version(), 4096};
 
-  switch (header_.templateId()) {
+  // TODO: order by historical occurrence
+  switch (messages_.header.templateId()) {
 
   case MDIncrementalRefreshBook32::sbeTemplateId():
-    DecodeIncrementalRefreshBook(incremental_refresh_book_, message);
+    DecodeIncrementalRefreshBook(messages_.incremental_refresh_book, message);
     break;
 
   case SnapshotFullRefresh38::sbeTemplateId():
-    DecodeSnapshot(snapshot_full_, message);
+    DecodeSnapshot(messages_.snapshot_full, message);
+    break;
+
+  case SnapshotFullRefreshOrderBook44::sbeTemplateId():
+    DecodeSnapshotFullRefreshOrderbook(messages_.snapshot_full_order_book,
+                                       message);
     break;
 
   case MDIncrementalRefreshVolume37::sbeTemplateId():
-    DecodeIncrementalRefreshVolume(incremental_volume_, message);
+    DecodeIncrementalRefreshVolume(messages_.incremental_volume, message);
+    break;
+
+  case MDIncrementalRefreshTrade36::sbeTemplateId():
+    DecodeIncrementalRefreshTrade(messages_.incremental_trade, message);
     break;
 
   case MDIncrementalRefreshTradeSummary42::sbeTemplateId():
-    DecodeIncrementalRefreshTrade(incremental_trade_, message);
+    DecodeIncrementalRefreshTradeSummary(messages_.incremental_trade_summary,
+                                         message);
     break;
 
   case MDIncrementalRefreshOrderBook43::sbeTemplateId():
-    DecodeIncrementalRefreshOrderBook(incremental_order_book_, message);
+    DecodeIncrementalRefreshOrderBook(messages_.incremental_order_book,
+                                      message);
+    break;
+
+  case MDIncrementalRefreshLimitsBanding34::sbeTemplateId():
+    DecodeIncrementalRefreshLimitsBanding(messages_.limit_banding, message);
     break;
 
   case MDIncrementalRefreshDailyStatistics33::sbeTemplateId():
-    DecodeIncrementalRefreshOrderBook(incremental_order_book_, message);
+    DecodeIncrementalRefreshDailyStatistics(messages_.daily_statistics,
+                                            message);
+    break;
+
+  case MDIncrementalRefreshSessionStatistics35::sbeTemplateId():
+    DecodeIncrementalRefreshSessionStatistics(messages_.session_statistics,
+                                              message);
+    break;
+
+  // less common messages
+
+  case ChannelReset4::sbeTemplateId():
+    DecodeChannelReset(messages_.channel_reset, message);
+    break;
+
+  case AdminHeartbeat12::sbeTemplateId():
+    DecodeAdminHeartbeat(messages_.admin_heartbeat, message);
+    break;
+
+  case MDInstrumentDefinitionFuture27::sbeTemplateId():
+    DecodeInstrumentDefinitionFuture(messages_.definition_future, message);
+    break;
+
+  case MDInstrumentDefinitionSpread29::sbeTemplateId():
+    DecodeInstrumentDefinitionSpread(messages_.definition_spread, message);
+    break;
+
+  case MDInstrumentDefinitionOption41::sbeTemplateId():
+    DecodeInstrumentDefinitionOption(messages_.definition_option, message);
+    break;
+
+  case QuoteRequest39::sbeTemplateId():
+    DecodeQuoteRequest(messages_.quote_request, message);
+    break;
+
+  case SecurityStatus30::sbeTemplateId():
+    DecodeSecurityStatus(messages_.security_status, message);
     break;
 
   default:
-    std::cout << "Unknown message type, templateId: " << header_.templateId()
-              << '\n';
+    std::cout << "Unknown message type, templateId: "
+              << messages_.header.templateId() << '\n';
     break;
   }
   return message_length;
@@ -317,4 +386,88 @@ bool Decoder::DecodeIncrementalRefreshSessionStatistics(
     if (CheckStream(entry)) {
     }
   }
+}
+
+bool Decoder::DecodeChannelReset(ChannelReset4 &refresh,
+                                 Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  // no need to check seqnum
+
+  ClearAllStates();
+}
+
+void Decoder::ClearAllStates() {
+
+  book_.Clear();
+  //  trades_.Clear();
+  //  status_.Clear();
+
+  // inform user of state clearing
+  // handler_.OnQuote()
+  // confirm we only call back after an event complete
+}
+
+bool Decoder::DecodeAdminHeartbeat(AdminHeartbeat12 &refresh,
+                                   Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  // reset heartbeat timeout
+  // on timeout ClearAllStates();
+}
+
+bool Decoder::DecodeInstrumentDefinitionFuture(
+    MDInstrumentDefinitionFuture27 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+  return false;
+}
+
+bool Decoder::DecodeInstrumentDefinitionOption(
+    MDInstrumentDefinitionOption41 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  return false;
+}
+
+bool Decoder::DecodeInstrumentDefinitionSpread(
+    MDInstrumentDefinitionSpread29 &refresh, Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  return false;
+}
+
+bool Decoder::DecodeQuoteRequest(QuoteRequest39 &refresh,
+                                 Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  //
+  return false;
+}
+
+bool Decoder::DecodeSecurityStatus(SecurityStatus30 &refresh,
+                                   Decoder::Message message) {
+
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+
+  return false;
+}
+
+bool Decoder::DecodeSnapshotFullRefreshOrderbook(
+    SnapshotFullRefreshOrderBook44 &refresh, Decoder::Message message) {
+  refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
+                        message.version, message.buffer_length);
+  return false;
 }

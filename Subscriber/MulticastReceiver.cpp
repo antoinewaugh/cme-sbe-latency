@@ -27,15 +27,17 @@ void MulticastReceiver::HandleReceiveFrom(
 }
 
 void MulticastReceiver::Leave() {
-  if(joined_) {
+  if (joined_) {
 
     joined_ = false;
-    socket_.close(); }
-
+    socket_.close();
   }
+}
 void MulticastReceiver::Join() {
 
-  if(joined_) { return;}
+  if (joined_) {
+    return;
+  }
 
   joined_ = true;
 
