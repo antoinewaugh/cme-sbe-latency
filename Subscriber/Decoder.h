@@ -50,6 +50,7 @@ struct Decoder {
           std::function<void(SeqNumStatus)> OnSeqNumStatus);
 
 private:
+
   bool recoverymode_ = false;
   int seqnum_ = 0;
   uint64_t securityid_;

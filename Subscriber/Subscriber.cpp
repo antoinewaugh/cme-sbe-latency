@@ -11,9 +11,7 @@ Subscriber::Subscriber(uint64_t symbolid, DataSource incremental_feed,
                [this](auto &&val) { this->OnSeqNumStatus(val); }) {
 
   // due to dependency injection callback assignment can no longer occur at
-  // construction
-  // resulted in a pass through
-
+  // construction resulted in a pass through
   incremental_feed_.Register([this](char *d, size_t r) { this->OnData(d, r); });
   snapshot_feed_.Register([this](char *d, size_t r) { this->OnData(d, r); });
   instrument_feed_.Register([this](char *d, size_t r) { this->OnData(d, r); });

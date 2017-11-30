@@ -1,6 +1,5 @@
 #include "Subscriber.h"
 #include <iostream>
-#include "ConfigGenerator.h"
 
 int main(int argc, char *argv[]) {
 
