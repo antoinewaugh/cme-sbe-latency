@@ -402,7 +402,7 @@ bool Decoder::DecodeChannelReset(ChannelReset4 &refresh,
 
   // no need to check seqnum
 
-  ClearAllStates();
+  //ClearAllStates();
 }
 
 void Decoder::ClearAllStates() {

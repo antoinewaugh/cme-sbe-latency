@@ -92,7 +92,7 @@ void Subscriber::OnIncrementalFeed(char *data, size_t bytes, NetworkPacketStatus
 // Gap detection not necessary as we are only subscribed in recovery mode
 void Subscriber::OnSnapshotFeed(char *data, size_t bytes,
                                 NetworkPacketStatus status) {
-  if(!status == Redundant) {
+  if(status != Redundant) {
     decoder_.DecodePacket(data, bytes);
   }
 }
@@ -100,7 +100,7 @@ void Subscriber::OnSnapshotFeed(char *data, size_t bytes,
 // Gap detection not necessary as we are only subscribed in recovery mode
 void Subscriber::OnInstrumentFeed(char *data, size_t bytes,
                                   NetworkPacketStatus status) {
-  if(!status == Redundant) {
+  if(status != Redundant) {
     decoder_.DecodePacket(data, bytes);
   }
 }
