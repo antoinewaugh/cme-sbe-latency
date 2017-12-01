@@ -109,15 +109,9 @@ void Subscriber::OnInstrumentFeed(char *data, size_t bytes,
 
 void Subscriber::OnChannelStatus(ChannelStatus status) {
   switch (status) {
-  case TimeoutIdentified:
-    HandleTimeout();
-    break;
-  case MarketRecovered:
-    StopMarketRecovery();
-    break;
-  case InstrumentsRecovered:
-    StopInstrumentRecovery();
-    break;
+  case TimeoutIdentified: HandleTimeout(); break;
+  case MarketRecovered: StopMarketRecovery(); break;
+  case InstrumentsRecovered:StopInstrumentRecovery(); break;
   }
 }
 
@@ -130,7 +124,6 @@ void Subscriber::HandleTimeout() {
 }
 
 void Subscriber::StopMarketRecovery() { snapshot_feed_.Leave(); }
-
 void Subscriber::StopInstrumentRecovery() { instrument_feed_.Leave(); }
 
 // Client systems should begin recovering messages when MsgSeqNum = 1.

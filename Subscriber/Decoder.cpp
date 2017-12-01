@@ -2,6 +2,11 @@
 
 #include <cmath>
 
+//using IncrementalTrade = MDIncrementalRefreshTrade36;
+//using IncrementalTradeSummary = MDIncrementalRefreshTradeSummary42;
+//using IncrementalVolume = MDIncrementalRefreshVolume37;
+
+
 Decoder::Decoder(uint64_t securityid, const Handler &handler,
                  std::function<void(ChannelStatus)> OnChannelStatus)
     : securityid_(securityid), handler_(handler),
@@ -264,8 +269,6 @@ void Decoder::StartRecovery() {
     rpt_seq_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
 
-    // cb_channel_(ChannelStatus::);
-    // call back with cleared book
 
     book_.Clear();
     handler_.OnQuote(book_, market_recovery_, securityid_, rpt_seq_);
@@ -305,21 +308,11 @@ void Decoder::HandleAskEntry(MDUpdateAction::Value action, int level,
 void Decoder::HandleBidEntry(MDUpdateAction::Value action, int level,
                              float price, int volume) {
   switch (action) {
-  case MDUpdateAction::New:
-    book_.AddBid(level, price, volume);
-    break;
-  case MDUpdateAction::Change:
-    book_.UpdateBid(level, price, volume);
-    break;
-  case MDUpdateAction::Delete:
-    book_.DeleteBid(level, price);
-    break;
-  case MDUpdateAction::DeleteFrom:
-    book_.DeleteBidFrom(level);
-    break;
-  case MDUpdateAction::DeleteThru:
-    book_.DeleteBidThru(level);
-    break;
+    case MDUpdateAction::New: book_.AddBid(level, price, volume); break;
+    case MDUpdateAction::Change: book_.UpdateBid(level, price, volume);break;
+    case MDUpdateAction::Delete: book_.DeleteBid(level, price); break;
+    case MDUpdateAction::DeleteFrom: book_.DeleteBidFrom(level);break;
+    case MDUpdateAction::DeleteThru: book_.DeleteBidThru(level);break;
   }
 }
 

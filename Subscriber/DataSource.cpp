@@ -3,6 +3,7 @@
 DataSource::DataSource(MulticastReceiver primary, MulticastReceiver secondary)
     : primary(std::move(primary)), secondary(std::move(secondary)) {
 
+
 }
 
 void DataSource::RegisterCallback(

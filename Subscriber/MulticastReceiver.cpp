@@ -41,7 +41,7 @@ void MulticastReceiver::Join() {
 
   joined_ = true;
 
-  boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v4(),
+  boost::asio::ip::udp::endpoint listen_endpoint(connection_.host.to_v4(),
                                                  connection_.port);
 
   socket_.open(listen_endpoint.protocol());
