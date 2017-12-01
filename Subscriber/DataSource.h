@@ -19,8 +19,8 @@ struct DataSource {
 
 private:
   void OnData(char *, size_t);
-  friend std::ostream &operator<<(std::ostream &os, const DataSource &source);
-  std::function<void(char *, size_t, NetworkPacketStatus)> callback_;
   NetworkPacketStatus GetNetworkPacketStatus(uint32_t seqnum);
+  std::function<void(char *, size_t, NetworkPacketStatus)> callback_;
   uint64_t lastseqnum_ = 0;
+  friend std::ostream &operator<<(std::ostream &os, const DataSource &source);
 };

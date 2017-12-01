@@ -69,7 +69,7 @@ bool Decoder::DecodeSnapshot(SnapshotFullRefresh38 &refresh,
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
 
-  if (!recoverymode_)
+  if (!market_recovery_)
     return false;
 
   if (refresh.securityID() != securityid_)
@@ -79,7 +79,7 @@ bool Decoder::DecodeSnapshot(SnapshotFullRefresh38 &refresh,
 
   book_.Clear();
 
-  seqnum_ = refresh.rptSeq();
+  rpt_seq_ = refresh.rptSeq();
 
   while (entry.hasNext()) {
     entry.next();
@@ -96,7 +96,7 @@ bool Decoder::DecodeSnapshot(SnapshotFullRefresh38 &refresh,
     }
   }
 
-  handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
+  handler_.OnQuote(book_, market_recovery_, securityid_, rpt_seq_);
 
   return true;
 }
@@ -126,7 +126,7 @@ bool Decoder::DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &refresh,
         HandleAskEntry(entry.mDUpdateAction(), level, price, volume);
       }
 
-      handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
+      handler_.OnQuote(book_, market_recovery_, securityid_, rpt_seq_);
     }
   }
 }
@@ -256,27 +256,27 @@ size_t Decoder::DecodePacket(char *buffer, size_t received) {
 
 void Decoder::StartRecovery() {
 
-  if (!recoverymode_) {
+  if (!market_recovery_) {
 
     std::cout << "\nStarting Recovery";
 
-    recoverymode_ = true;
-    seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
+    market_recovery_ = true;
+    rpt_seq_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
 
     // cb_channel_(ChannelStatus::);
     // call back with cleared book
 
     book_.Clear();
-    handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
+    handler_.OnQuote(book_, market_recovery_, securityid_, rpt_seq_);
   }
 }
 
 void Decoder::StopRecovery() {
 
-  if (recoverymode_) {
+  if (market_recovery_) {
     std::cout << "\nStopping Recovery";
-    recoverymode_ = false;
+    market_recovery_ = false;
     cb_channel_(ChannelStatus::MarketRecovered);
   }
 }
@@ -329,21 +329,21 @@ template <class T> bool Decoder::CheckStream(T entry) {
     return false;
   }
 
-  if (entry.rptSeq() < seqnum_ + 1) {
+  if (entry.rptSeq() < rpt_seq_ + 1) {
     return false; // redundant packet
   }
 
-  if (entry.rptSeq() > seqnum_ + 1) {
+  if (entry.rptSeq() > rpt_seq_ + 1) {
     std::cout << "Missing SeqNum identified, recovering. RptSeq: "
-              << entry.rptSeq() << ", ExRptSeq: " << seqnum_ << '\n';
+              << entry.rptSeq() << ", ExRptSeq: " << rpt_seq_ << '\n';
     StartRecovery();
     return false;
   }
 
-  if (recoverymode_)
+  if (market_recovery_)
     StopRecovery();
 
-  ++seqnum_;
+  ++rpt_seq_;
 
   return true;
 }
@@ -479,6 +479,6 @@ bool Decoder::DecodeSnapshotFullRefreshOrderbook(
 }
 
 void Decoder::Clear() {
-  seqnum_ = 0; // prepare for recovery
+  rpt_seq_ = 0; // prepare for recovery
   book_.Clear();
 }

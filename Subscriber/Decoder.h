@@ -46,14 +46,16 @@ struct Decoder {
 
   size_t DecodePacket(char *, size_t);
   Decoder(uint64_t securityid, const Handler &handler,
-          std::function<void(ChannelStatus)> OnSeqNumStatus);
+          std::function<void(ChannelStatus)> OnChannelStatus);
   static uint32_t GetSeqNum(char*, size_t);
   void Clear();
 
 private:
-  bool recoverymode_ = false;
-  int seqnum_ = 0;
+  bool market_recovery_ = false;
+  int rpt_seq_ = 0;
+
   uint64_t securityid_;
+  uint64_t groupid_;    // filtering on groups required
 
   Handler handler_;
   DepthBook book_;
