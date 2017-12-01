@@ -8,5 +8,4 @@ struct Handler {
                uint64_t seqnum);
   void OnTrade();
   void OnInstrument();
-
 };

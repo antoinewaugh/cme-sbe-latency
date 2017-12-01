@@ -21,12 +21,34 @@ struct Subscriber {
                                     Handler &handler);
 
 private:
+
   DataSource incremental_feed_;
   DataSource snapshot_feed_;
   DataSource instrument_feed_;
 
   Decoder decoder_;
 
-  void OnData(char *data, size_t bytes);
-  void OnSeqNumStatus(SeqNumStatus status);
+  // feed callbacks
+  void OnIncrementalFeed(char *data, size_t bytes, NetworkPacketStatus);
+  void OnSnapshotFeed(char *data, size_t bytes, NetworkPacketStatus);
+  void OnInstrumentFeed(char *data, size_t bytes, NetworkPacketStatus);
+
+  // decoder callbacks
+  void OnChannelStatus(ChannelStatus status);
+
+  // internal
+  void HandleTimeout();
+  void HandleMarketRecovered();
+  void HandleInstrumentRecovered();
+
+  void StartMarketRecovery();
+  void StopMarketRecovery();
+  void StartInstrumentRecovery();
+  void StopInstrumentRecovery();
+
+  // Client systems should begin recovering messages when MsgSeqNum = 1.
+  // Tag 911-TotNumReports indicates the total number of messages to process for
+  // a
+  // complete set of Security Definitions. CME Group does not guarantee the
+  // order of the messages being sent.
 };

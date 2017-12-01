@@ -53,7 +53,7 @@ BidV		Price		AskV
     1. Channel Reset
     2. Instrument Discovery
     3. Complete processing orders
-    
+    4. Support implied books
    
 * Testing:
     0. Add Catch2 support

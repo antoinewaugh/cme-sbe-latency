@@ -32,8 +32,7 @@ constexpr int kMsgSize = 2;
 constexpr int kByteOffest = 12;
 constexpr int kMsgHeaderVersion = 0;
 
-enum SeqNumStatus { Synchronized, Unsynchronised };
-enum InstrumentStatus { Downloading, Downloaded };
+enum ChannelStatus { InstrumentsRecovered, MarketRecovered, TimeoutIdentified };
 
 struct Decoder {
 
@@ -47,10 +46,11 @@ struct Decoder {
 
   size_t DecodePacket(char *, size_t);
   Decoder(uint64_t securityid, const Handler &handler,
-          std::function<void(SeqNumStatus)> OnSeqNumStatus);
+          std::function<void(ChannelStatus)> OnSeqNumStatus);
+  static uint32_t GetSeqNum(char*, size_t);
+  void Clear();
 
 private:
-
   bool recoverymode_ = false;
   int seqnum_ = 0;
   uint64_t securityid_;
@@ -58,7 +58,7 @@ private:
   Handler handler_;
   DepthBook book_;
 
-  std::function<void(SeqNumStatus)> cb_seqnumstatus_;
+  std::function<void(ChannelStatus)> cb_channel_;
 
   void StartRecovery();
   void StopRecovery();

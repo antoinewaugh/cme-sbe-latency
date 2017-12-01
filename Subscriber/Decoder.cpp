@@ -3,9 +3,9 @@
 #include <cmath>
 
 Decoder::Decoder(uint64_t securityid, const Handler &handler,
-                 std::function<void(SeqNumStatus)> OnSeqNumStatus)
+                 std::function<void(ChannelStatus)> OnChannelStatus)
     : securityid_(securityid), handler_(handler),
-      cb_seqnumstatus_(OnSeqNumStatus) {}
+      cb_channel_(OnChannelStatus) {}
 
 bool Decoder::DecodeIncrementalRefreshVolume(
     MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {
@@ -129,6 +129,12 @@ bool Decoder::DecodeIncrementalRefreshBook(MDIncrementalRefreshBook32 &refresh,
       handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
     }
   }
+}
+
+uint32_t Decoder::GetSeqNum(char *buffer, size_t received) {
+  if(received > 4) {
+    return SBE_LITTLE_ENDIAN_ENCODE_32(*((std::uint32_t *) (buffer)));
+  } return 0;
 }
 
 size_t Decoder::DecodeMessageLength(char *buffer, size_t offset) {
@@ -258,9 +264,9 @@ void Decoder::StartRecovery() {
     seqnum_ = 0; // ensures subsequent incrementals are ignored until snapshot
                  // alignment
 
-    cb_seqnumstatus_(SeqNumStatus(SeqNumStatus::Unsynchronised));
-
+    // cb_channel_(ChannelStatus::);
     // call back with cleared book
+
     book_.Clear();
     handler_.OnQuote(book_, recoverymode_, securityid_, seqnum_);
   }
@@ -271,7 +277,7 @@ void Decoder::StopRecovery() {
   if (recoverymode_) {
     std::cout << "\nStopping Recovery";
     recoverymode_ = false;
-    cb_seqnumstatus_(SeqNumStatus(SeqNumStatus::Unsynchronised));
+    cb_channel_(ChannelStatus::MarketRecovered);
   }
 }
 
@@ -470,4 +476,9 @@ bool Decoder::DecodeSnapshotFullRefreshOrderbook(
   refresh.wrapForDecode(message.buffer, message.offset, message.block_length,
                         message.version, message.buffer_length);
   return false;
+}
+
+void Decoder::Clear() {
+  seqnum_ = 0; // prepare for recovery
+  book_.Clear();
 }
