@@ -10,7 +10,11 @@
 Decoder::Decoder(uint64_t securityid, const Handler &handler,
                  std::function<void(ChannelStatus)> OnChannelStatus)
     : securityid_(securityid), handler_(handler),
-      cb_channel_(OnChannelStatus) {}
+      cb_channel_(OnChannelStatus) {
+
+  StartRecovery(); // need to start in a state to sync
+
+}
 
 bool Decoder::DecodeIncrementalRefreshVolume(
     MDIncrementalRefreshVolume37 &refresh, Decoder::Message message) {
@@ -327,9 +331,9 @@ template <class T> bool Decoder::CheckStream(T entry) {
   }
 
   if (entry.rptSeq() > rpt_seq_ + 1) {
-    std::cout << "Missing SeqNum identified, recovering. RptSeq: "
-              << entry.rptSeq() << ", ExRptSeq: " << rpt_seq_ << '\n';
-    StartRecovery();
+    //std::cout << "Missing SeqNum identified, recovering. RptSeq: "
+    //          << entry.rptSeq() << ", ExRptSeq: " << rpt_seq_ << '\n';
+    //StartRecovery();
     return false;
   }
 

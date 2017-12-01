@@ -49,6 +49,15 @@ BidV		Price		AskV
 ```
 # Todo
 
+* Items on the list:
+    1. Recovery channels loop - so logic for sequence gap is not valid
+    2. Incremental feed - this is looking good
+    3. Decoder needs to expose interface: 
+        StartRecovery() // Important because decoder needs to know when to ignore 
+                        // snapshot and when not to, including clearing book and setting rptseqnum
+        StopRecovery() // maybe decoder sets this state and notifies
+    
+
 * Functionality
     1. Channel Reset
     2. Instrument Discovery
