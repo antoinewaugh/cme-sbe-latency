@@ -3,14 +3,16 @@
 DataSource::DataSource(MulticastReceiver primary, MulticastReceiver secondary)
     : primary(std::move(primary)), secondary(std::move(secondary)) {
 
-  this->primary.Register([this](char* d, size_t r){this->OnData(d,r);});
-  this->secondary.Register([this](char* d, size_t r){this->OnData(d,r);});
-
 }
 
 void DataSource::RegisterCallback(
     std::function<void(char *, size_t, NetworkPacketStatus)> callback) {
+
   callback_ = callback;
+
+  primary.Register([this](char* d, size_t r){this->OnData(d,r);});
+  secondary.Register([this](char* d, size_t r){this->OnData(d,r);});
+
 }
 
 void DataSource::Join() {
