@@ -6,7 +6,6 @@
 //using IncrementalTradeSummary = MDIncrementalRefreshTradeSummary42;
 //using IncrementalVolume = MDIncrementalRefreshVolume37;
 
-
 Decoder::Decoder(uint64_t securityid, const Handler &handler,
                  std::function<void(ChannelStatus)> OnChannelStatus)
     : securityid_(securityid), handler_(handler),

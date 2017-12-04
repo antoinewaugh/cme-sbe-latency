@@ -49,14 +49,17 @@ BidV		Price		AskV
 ```
 # Todo
 
-* Items on the list:
-    1. Recovery channels loop - so logic for sequence gap is not valid
+* Items to pickup on:
+    0. We are in a working state IF we join snapshot at a good time (seqnum must be low enough to capture our snapshot...)
+    1. Recovery channels loop - so logic for sequence gap is not valid, might need to track primary lastseq and secondary lastseq to identify
+        difference between 1,1,2,2,3,3,4,4,5,5,6,6,7,7,1,1,2,2... and 1,1,2,3,2,3 .... maybe accept seqnum of 1 as a reset? what about 1,2,1..
+        certainly need to keep separate seqnum in this instance....
+        
     2. Incremental feed - this is looking good
     3. Decoder needs to expose interface: 
         StartRecovery() // Important because decoder needs to know when to ignore 
                         // snapshot and when not to, including clearing book and setting rptseqnum
         StopRecovery() // maybe decoder sets this state and notifies
-    
 
 * Functionality
     1. Channel Reset

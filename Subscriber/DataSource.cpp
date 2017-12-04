@@ -41,6 +41,14 @@ NetworkPacketStatus DataSource::GetNetworkPacketStatus(uint32_t seqnum) {
 
 }
 
+// this needs to be implmented to view primary and secondary
+void DataSource::OnDataPrimary(char *data, size_t received) {
+
+}
+// this needs to be implmented to view primary and secondary
+void DataSource::OnDataSeconary(char *data, size_t received) {
+
+}
 void DataSource::OnData(char *data, size_t received) {
 
   auto seqnum = Decoder::GetSeqNum(data,received);
