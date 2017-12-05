@@ -18,8 +18,10 @@ set(HEADER_FILES
         Packet.h
         Channel.h
         ChannelAccessor.h
-        ChannelInstrument.h
-        ChannelInstrumentManager.h
+        ChannelInstrumentBookHandler.h
+        InstrumentController.h
+        ChannelInstrumentSynchroniser.h
+        InstrumentMdHandler.h
         ChannelDepthBookManager.h
         )
 
@@ -33,8 +35,10 @@ set(SOURCE_FILES
         Packet.cpp
         Channel.cpp
         ChannelAccessor.cpp
-        ChannelInstrument.cpp
-        ChannelInstrumentManager.cpp
+        ChannelInstrumentBookHandler.cpp
+        InstrumentController.cpp
+        ChannelInstrumentSynchroniser.cpp
+        InstrumentMdHandler.cpp
         ChannelDepthBookManager.cpp
         )
 

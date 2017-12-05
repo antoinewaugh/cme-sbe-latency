@@ -17,7 +17,7 @@ public:
   void UpdateBid(int level, float price, int quantity);
   void DeleteBid(int level, float price);
   void DeleteBidFrom(int level);
-  void DeleteBidThru(int level);
+  void DeleteBidThru();
   void AddAsk(int level, float price, int quantity);
   void UpdateAsk(int level, float price, int quantity);
   void DeleteAsk(int level, float price);

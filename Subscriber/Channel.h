@@ -3,7 +3,7 @@
 #include "MulticastReceiver.h"
 #include "Connection.h"
 #include "Packet.h"
-#include "ChannelInstrumentManager.h"
+#include "InstrumentMdHandler.h"
 #include "ChannelDepthBookManager.h"
 
 #include<string>
@@ -19,7 +19,7 @@ private:
   MulticastReceiver instrumenta_;
   MulticastReceiver instrumentb_;
 
-  ChannelInstrumentManager instruments_;
+  InstrumentMdHandler instruments_;
   ChannelDepthBookManager depthbooks_;
 
   void OnPacket(Type, Feed, Packet*);

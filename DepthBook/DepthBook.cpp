@@ -16,7 +16,7 @@ void DepthBook::DeleteBid(int level, float price) {
 
 void DepthBook::DeleteBidFrom(int level) { bids_.DeleteFrom(level); }
 
-void DepthBook::DeleteBidThru(int level) { bids_.DeleteThru(); }
+void DepthBook::DeleteBidThru() { bids_.DeleteThru(); }
 
 void DepthBook::AddAsk(int level, float price, int quantity) {
   asks_.Add(level, price, quantity);
