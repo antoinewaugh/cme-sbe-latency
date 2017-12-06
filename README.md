@@ -49,6 +49,11 @@ BidV		Price		AskV
 ```
 # Todo
 
+Refactor items:
+* add support for commit()
+* not measuring message level seqnum gap , this means we could miss securitystatus, instrument definition if rptseq didnt gap too
+* start adding catch2 tests today
+
 * Items to pickup on:
     0. We are in a working state IF we join snapshot at a good time (seqnum must be low enough to capture our snapshot...)
     1. Recovery channels loop - so logic for sequence gap is not valid, might need to track primary lastseq and secondary lastseq to identify

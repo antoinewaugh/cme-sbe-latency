@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DepthBook.h>
 #include "ChannelAccessor.h"
 
 #include "sbe/MDIncrementalRefreshBook32.h"
@@ -18,16 +19,19 @@ class InstrumentMdHandler {
 public:
 
   void OnSnapshot(SnapshotFullRefresh38&);
-  void OnIncrementalRefreshBookEntry(MDIncrementalRefreshBook32::NoMDEntries &);
-  void OnIncrementalRefreshTradeEntry(MDIncrementalRefreshTrade36::NoMDEntries&);
-  void OnIncrementalRefreshVolume(MDIncrementalRefreshVolume37&);
-  void OnIncrementalTradeSumary(MDIncrementalRefreshTradeSummary42& );
-  void OnIncrementalDailyStatistics(MDIncrementalRefreshDailyStatistics33&);
-  void OnIncrementalSessionStatistics(MDIncrementalRefreshSessionStatistics35&);
-  void OnIncrementalLimitsBanding(MDIncrementalRefreshLimitsBanding34&);
-  void OnSecurityStatus(MDIncrementalRefreshLimitsBanding34&);
+  void OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &);
+  void OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries&);
+  void OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries&);
+  void OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries& );
+  void OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries&);
+  void OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries&);
+  void OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries&);
+  void OnSecurityStatus(SecurityStatus30&);
   void OnChannelReset();
   void Reset();
   InstrumentMdHandler(ChannelAccessor *);
 
+private:
+  DepthBook book_;
+  DepthBook implbook_;
 };

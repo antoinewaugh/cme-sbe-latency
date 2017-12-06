@@ -17,19 +17,14 @@ class InstrumentController {
 public:
   InstrumentController();
   void OnSnapshot(SnapshotFullRefresh38&);
-//void OnIncrementalRefreshBook(MDIncrementalRefreshBook32&);
-  void OnIncrementalRefreshBookEntry(MDIncrementalRefreshBook32::NoMDEntries &);
-  void OnIncrementalRefreshTrade(MDIncrementalRefreshTrade36&);
-  void OnIncrementalRefreshVolume(MDIncrementalRefreshVolume37&);
-  void OnIncrementalTradeSumary(MDIncrementalRefreshTradeSummary42& );
-  void OnIncrementalDailyStatistics(MDIncrementalRefreshDailyStatistics33&);
-  void OnIncrementalSessionStatistics(MDIncrementalRefreshSessionStatistics35&);
-  void OnIncrementalLimitsBanding(MDIncrementalRefreshLimitsBanding34&);
-  void OnSecurityStatus(MDIncrementalRefreshLimitsBanding34&);
+  template<typename T>
+  void OnIncremental(T &entry);
+  void OnSecurityStatus(SecurityStatus30&); // TODO: need to support logic from ChannelController if securityID blank send to all
   void OnChannelReset();
 
 private:
-  int securityid_;
+  uint32_t securityid_;
+  std::string securitygroup_;
   InstrumentState state_;
   long processed_rptseq_;
   std::string securitydesc_;

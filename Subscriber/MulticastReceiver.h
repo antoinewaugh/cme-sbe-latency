@@ -7,7 +7,6 @@
 #include <ostream>
 
 #include "Connection.h"
-#include "Decoder.h"
 
 struct MulticastReceiver {
 

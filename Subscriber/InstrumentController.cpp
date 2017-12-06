@@ -3,7 +3,7 @@
 #include <iostream>
 
 // Match event indicator needs to be exposed - when to commit changes to book
-//
+// Also consider commits need to be performed a level out at the channel controller level...
 
 void InstrumentController::switchState(InstrumentState current_state, InstrumentState new_state) {
   state_ = new_state;
@@ -36,14 +36,15 @@ void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh) {
   }
 }
 
-void InstrumentController::OnIncrementalRefreshBookEntry(MDIncrementalRefreshBook32::NoMDEntries &entry) {
+template<typename T>
+void InstrumentController::OnIncremental(T &entry) {
   auto current_state = state_;
   auto rptseq = entry.rptSeq();
   auto expected_rptseq = processed_rptseq_ + 1;
   if(current_state == InstrumentState::SYNC) {
     if(rptseq == expected_rptseq) {
       processed_rptseq_ = rptseq;
-      mdhandler_.OnIncrementalRefreshBookEntry(entry);
+      mdhandler_.OnIncremental(entry);
     } else if(rptseq > expected_rptseq) {
       mdhandler_.Reset();
       switchState(InstrumentState::SYNC, InstrumentState::OUTOFSYNC);
@@ -53,21 +54,21 @@ void InstrumentController::OnIncrementalRefreshBookEntry(MDIncrementalRefreshBoo
       std::cout << "Incremental feed synchronised" << '\n';
       processed_rptseq_ = rptseq;
       switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
-      mdhandler_.OnIncrementalRefreshBookEntry(entry);
+      mdhandler_.OnIncremental(entry);
     }
   } else if(current_state == INITIAL) {
     if(processed_rptseq_ == 0 && rptseq == 1) { // start of session, no recovery required
       processed_rptseq_ = rptseq;
       switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
-      mdhandler_.OnIncrementalRefreshBookEntry(entry);
+      mdhandler_.OnIncremental(entry);
     }
   }
 }
 
-void InstrumentController::OnIncrementalLimitsBanding(MDIncrementalRefreshLimitsBanding34 &refresh) {
- auto& entry  = refresh.noMDEntries();
-  entry.se
- refresh.matchEventIndicator()
+void InstrumentController::OnSecurityStatus(SecurityStatus30 &status) {
+  if((status.securityID() == securityid_) || (status.securityID() == status.securityIDNullValue() && status.securityGroup() == securitygroup_))  {
+    
+  }
 }
 
 void InstrumentController::OnChannelReset() {
