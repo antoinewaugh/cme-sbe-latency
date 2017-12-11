@@ -1,4 +1,5 @@
 #include "InstrumentMdHandler.h"
+static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
 void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
 
@@ -14,6 +15,9 @@ void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteFrom: book.DeleteBidFrom(level); break;
     case MDUpdateAction::DeleteThru: book.DeleteBidThru(); break;
   }
+
+  clear();
+  std::cout << book << '\n';
 }
 
 void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
@@ -30,6 +34,10 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteFrom: book.DeleteAskFrom(level);break;
     case MDUpdateAction::DeleteThru: book.DeleteAskThru();break;
   }
+
+  clear();
+  std::cout << book << '\n';
+
 }
 
 void InstrumentMdHandler::ClearState() {
@@ -104,6 +112,9 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh) {
       case MDEntryType::ImpliedOffer: implbook_.AddAsk(level, price, volume); break;
     }
   }
+
+  clear();
+  std::cout << book_ << '\n';
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &) {
