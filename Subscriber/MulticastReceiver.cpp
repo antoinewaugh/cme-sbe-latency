@@ -15,7 +15,8 @@ void MulticastReceiver::HandleReceiveFrom(
   if (!error) {
 
     // perform callback to user
-    callback_(data_, received);
+    packet.Reset(data_, received);
+    callback_(connection_.type, connection_.feed, &packet);
 
     // pull next message
     socket_.async_receive_from(
@@ -59,11 +60,15 @@ void MulticastReceiver::Join() {
                   boost::asio::placeholders::bytes_transferred));
 }
 
-void MulticastReceiver::Register(std::function<void(char *, size_t)> callback) {
+void MulticastReceiver::Register(std::function<void(Type, Feed, Packet*)> callback) {
   callback_ = callback;
 }
 
 std::ostream &operator<<(std::ostream &os, const MulticastReceiver &receiver) {
   os << "connection_: " << receiver.connection_;
   return os;
+}
+
+bool MulticastReceiver::IsActive() {
+  return joined_;
 }

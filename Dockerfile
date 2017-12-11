@@ -13,6 +13,16 @@ RUN apt-get update && apt-get -y install \
   git \
   libboost-all-dev 
 
+RUN \
+  apt-get update && \
+  apt-get install -y software-properties-common && \
+  add-apt-repository ppa:ubuntu-toolchain-r/test && \
+  apt-get update && \
+  apt-get install -y gcc-7 g++-7 && \
+  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 && \
+  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
+
+
 WORKDIR /opt/jdk
 RUN wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.tar.gz \
        &&   tar -zxf jdk-8u151-linux-x64.tar.gz -C /opt/jdk \
@@ -47,7 +57,7 @@ COPY . /src
 WORKDIR /src
 RUN mkdir build \
 	&& cd build \
-	&& cmake .. && make \
+	&& cmake -D CMAKE_CXX_COMPILER="/usr/bin/g++" .. && make \
 	&& mv cme_sbe_latency /usr/local/bin
 
 WORKDIR /usr/local/bin

@@ -8,9 +8,9 @@
 void InstrumentController::switchState(InstrumentState current_state, InstrumentState new_state) {
   state_ = new_state;
   if(new_state == InstrumentState::OUTOFSYNC) {
-    channel_.SubscribeToSnapshotsForInstrument(securityid_);
+    channel_->SubscribeToSnapshotsForInstrument(securityid_);
   } else if(new_state == InstrumentState::SYNC || new_state == InstrumentState::DISCONTINUED) {
-    channel_.UnsubscribeToSnapshotsForInstrument(securityid_);
+    channel_->UnsubscribeToSnapshotsForInstrument(securityid_);
   }
 }
 
@@ -36,35 +36,6 @@ void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh) {
   }
 }
 
-template<typename T>
-void InstrumentController::OnIncremental(T &entry) {
-  auto current_state = state_;
-  auto rptseq = entry.rptSeq();
-  auto expected_rptseq = processed_rptseq_ + 1;
-  if(current_state == InstrumentState::SYNC) {
-    if(rptseq == expected_rptseq) {
-      processed_rptseq_ = rptseq;
-      mdhandler_.OnIncremental(entry);
-    } else if(rptseq > expected_rptseq) {
-      mdhandler_.Reset();
-      switchState(InstrumentState::SYNC, InstrumentState::OUTOFSYNC);
-    }
-  } else if(current_state == InstrumentState::OUTOFSYNC) {
-    if(rptseq == expected_rptseq) {
-      std::cout << "Incremental feed synchronised" << '\n';
-      processed_rptseq_ = rptseq;
-      switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
-      mdhandler_.OnIncremental(entry);
-    }
-  } else if(current_state == INITIAL) {
-    if(processed_rptseq_ == 0 && rptseq == 1) { // start of session, no recovery required
-      processed_rptseq_ = rptseq;
-      switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
-      mdhandler_.OnIncremental(entry);
-    }
-  }
-}
-
 void InstrumentController::OnSecurityStatus(SecurityStatus30 &status) {
   if((status.securityID() == securityid_) || (status.securityID() == status.securityIDNullValue() && status.securityGroup() == securitygroup_))  {
     
@@ -78,4 +49,10 @@ void InstrumentController::OnChannelReset() {
     switchState(state_, InstrumentState::SYNC);
     mdhandler_.Reset();
   }
+}
+
+InstrumentController::InstrumentController(uint32_t securityid, std::string securitygroup, ChannelAccessor* channel ) :
+  securityid_(securityid), securitygroup_(securitygroup), state_(InstrumentState::INITIAL),channel_(channel)
+{
+  channel_->SubscribeToSnapshotsForInstrument(securityid);
 }

@@ -4,9 +4,7 @@
 
 class ChannelAccessor {
 public:
-  void StartInstrumentFeed();
-  void StopInstrumentFeed();
-  void SubscribeToSnapshotsForInstrument(std::uint64_t);
-  void UnsubscribeToSnapshotsForInstrument(std::uint64_t);
+  virtual void SubscribeToSnapshotsForInstrument(std::uint32_t) = 0;
+  virtual void UnsubscribeToSnapshotsForInstrument(std::uint32_t) = 0;
 };
 

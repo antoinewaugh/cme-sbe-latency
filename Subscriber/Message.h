@@ -21,18 +21,44 @@
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
 
+constexpr int kMsgSize = 2;
+constexpr int kByteOffest = 12;
+constexpr int kMsgHeaderVersion = 0;
+
+
+
 class Message {
 public:
   uint16_t GetTemplateId();
-  template<typename T> T Get();
+//  template<typename T> T Get();
+
+  template<typename T>
+  T& Get() {
+    if constexpr (std::is_same<T, ChannelReset4>::value) { return GetChannelReset(); };
+    if constexpr(std::is_same<T, AdminHeartbeat12>::value) { return GetAdminHeartbeat(); };
+    if constexpr(std::is_same<T, MDInstrumentDefinitionFuture27>::value) { return GetInstrumentDefinitionFuture(); };
+    if constexpr(std::is_same<T, MDInstrumentDefinitionOption41>::value) { return GetInstrumentDefinitionOption(); };
+    if constexpr(std::is_same<T, MDInstrumentDefinitionSpread29>::value) { return GetInstrumentDefinitionSpread(); };
+    if constexpr(std::is_same<T, QuoteRequest39>::value) { return GetQuoteRequest(); };
+    if constexpr(std::is_same<T, SecurityStatus30>::value) { return GetSecurityStatus(); };
+    if constexpr(std::is_same<T, SnapshotFullRefresh38>::value) { return GetSnapshotFullRefresh(); };
+    if constexpr(std::is_same<T, SnapshotFullRefreshOrderBook44>::value) { return GetSnapshotFullRefreshOrderBook(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshBook32>::value) { return GetIncrementalRefreshBook(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshVolume37>::value) { return GetIncrementalRefreshVolume(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshTrade36>::value) { return GetIncrementalRefreshTrade(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshOrderBook43>::value) { return GetIncrementalRefreshOrderBook(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshSessionStatistics35>::value) { return GetIncrementalRefreshSessionStatistics(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshLimitsBanding34>::value) { return GetIncrementalRefreshLimitsBanding(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshDailyStatistics33>::value) { return GetIncrementalRefreshDailyStatistics(); };
+  }
+  size_t Reset(char* buffer, size_t offset, int buffer_length);
+  uint16_t GetMsgSize();
 
 private:
 
-  char *buffer;
-  uint16_t offset;
-  uint16_t block_length;
-  uint16_t version;
-  uint16_t buffer_length;
+  uint16_t msg_size_;
+  char* buffer_;
+  uint16_t offset_;
 
   // reuses objects to prevent allocations
   MessageHeader header;

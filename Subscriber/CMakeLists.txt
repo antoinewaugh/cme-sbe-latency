@@ -13,11 +13,11 @@ set(HEADER_FILES
         Handler.h
         Message.h
         Packet.h
-        Channel.h
         ChannelAccessor.h
         InstrumentController.h
         ChannelController.h
         InstrumentMdHandler.h
+        Channel.h
         )
 
 set(SOURCE_FILES
@@ -25,11 +25,11 @@ set(SOURCE_FILES
         Handler.cpp
         Message.cpp
         Packet.cpp
-        Channel.cpp
         ChannelAccessor.cpp
         InstrumentController.cpp
         ChannelController.cpp
         InstrumentMdHandler.cpp
+        Channel.cpp
         )
 
 add_library(Subscriber STATIC ${SOURCE_FILES} ${HEADER_FILES})

@@ -29,9 +29,10 @@ public:
   void OnSecurityStatus(SecurityStatus30&);
   void OnChannelReset();
   void Reset();
-  InstrumentMdHandler(ChannelAccessor *);
 
 private:
   DepthBook book_;
   DepthBook implbook_;
+
+  void ClearState();
 };
