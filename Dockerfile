@@ -1,5 +1,7 @@
 
-FROM ubuntu:16.04
+#FROM ubuntu:16.04
+
+FROM gcc:7
 
 MAINTAINER Antoine Waugh
 
@@ -13,14 +15,14 @@ RUN apt-get update && apt-get -y install \
   git \
   libboost-all-dev 
 
-RUN \
-  apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository ppa:ubuntu-toolchain-r/test && \
-  apt-get update && \
-  apt-get install -y gcc-7 g++-7 && \
-  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 && \
-  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
+#RUN \
+#  apt-get update && \
+#  apt-get install -y software-properties-common && \
+#  add-apt-repository ppa:ubuntu-toolchain-r/test && \
+#  apt-get update && \
+#  apt-get install -y gcc-7 g++-7 && \
+#  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 && \
+#  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
 
 
 WORKDIR /opt/jdk
@@ -57,7 +59,7 @@ COPY . /src
 WORKDIR /src
 RUN mkdir build \
 	&& cd build \
-	&& cmake -D CMAKE_CXX_COMPILER="/usr/bin/g++" .. && make \
+	&& cmake .. && make \
 	&& mv cme_sbe_latency /usr/local/bin
 
 WORKDIR /usr/local/bin
