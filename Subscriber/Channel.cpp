@@ -198,6 +198,6 @@ auto instrumentb = std::move(MulticastReceiver(
           io_service, listen_address,
           config.GetConnection(channelid, Type::Instrument, Feed::B)));
 
-  return std::make_unique<Channel>(Channel(channelid, std::move(incrementala), std::move(incrementalb), std::move(snapshota),
-      std::move(snapshotb), std::move(instrumenta), std::move(instrumentb)));
+  return std::make_unique<Channel>(channelid, std::move(incrementala), std::move(incrementalb), std::move(snapshota),
+      std::move(snapshotb), std::move(instrumenta), std::move(instrumentb));
 }
