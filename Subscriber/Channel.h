@@ -37,6 +37,7 @@ public:
   MulticastReceiver instrumenta,
   MulticastReceiver instrumentb);
 
+  Channel(Channel &&) = delete;
   std::string GetId();
 
   void Subscribe(uint32_t securityid);

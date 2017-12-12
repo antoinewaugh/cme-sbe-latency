@@ -1,4 +1,7 @@
 #include "InstrumentMdHandler.h"
+
+#include <chrono>
+
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
 void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
@@ -16,8 +19,8 @@ void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteBidThru(); break;
   }
 
-  clear();
-  std::cout << book << '\n';
+//  clear();
+//  std::cout << book << '\n';
 }
 
 void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
@@ -35,8 +38,8 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteAskThru();break;
   }
 
-  clear();
-  std::cout << book << '\n';
+//clear();
+ // std::cout << book << '\n';
 
 }
 
@@ -113,8 +116,16 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh) {
     }
   }
 
-  clear();
-  std::cout << book_ << '\n';
+  auto exch_time = refresh.transactTime();
+  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+
+  auto delay_ns = ns_timestamp - exch_time;
+  auto delay_ms = delay_ns / 1000000.0;
+  std::cout << "Delay: " << delay_ms << "ms" <<'\n';
+ // clear();
+  //std::cout << book_ << '\n';
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &) {
