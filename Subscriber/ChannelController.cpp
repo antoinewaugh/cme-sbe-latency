@@ -10,12 +10,10 @@ void ChannelController::HandleSnapshotMessage(Message& m) {
 }
 
 InstrumentController* ChannelController::GetInstrumentController(uint32_t securityid) {
-  std::cout << "getInstrumentController :" << securityid << '\n';
   auto search = instrument_controllers_.find(securityid);
   if(search != std::end(instrument_controllers_)){
     return &(search->second);
   }
-  std::cout << "instrument_controllers_::" << instrument_controllers_.size() << '\n';
   return nullptr;
 }
 
@@ -75,15 +73,7 @@ void ChannelController::OnSnapshotPacket(Packet *packet) {
 void ChannelController::Subscribe(uint32_t securityid) {
   auto inst_controller = GetInstrumentController(securityid);
   if(inst_controller == nullptr) {
-    std::cout << "Subscribing : " << securityid << '\n';
     instrument_controllers_.emplace(securityid, std::move(InstrumentController(securityid, std::string(), channel_)));
-
-    std::cout << "inst_controller_.size(): " << instrument_controllers_.size() << '\n';
-    auto inst_controller = GetInstrumentController(securityid);
-
-    if (inst_controller) {
-      std::cout <<" FOUND!!! " << '\n';
-    }
   }
 }
 
