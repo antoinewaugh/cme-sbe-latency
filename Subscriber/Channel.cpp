@@ -1,6 +1,22 @@
 #include "Channel.h"
 #include "Config.h"
+/*
+ChannelNetworkController {
 
+};
+namespace sortino {
+namespace connectivity {
+namespace cme {
+
+ // subscriber acts as the builder,
+  class Subscriber {
+    Channel std::unique_ptr<Channel>
+    channel;
+
+  };
+
+}}} // sortino.connectivity.cme
+*/
 void Channel::OnPacket(Type type, Feed feed, Packet *data) {
   switch(type) {
 //    case Instrument: instruments_.OnInstrumentPacket(data); break;

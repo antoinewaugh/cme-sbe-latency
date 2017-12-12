@@ -17,7 +17,6 @@ void Packet::Reset(char *data, size_t received) {
   if(received >= processed_) {
     seqnum_ = SBE_LITTLE_ENDIAN_ENCODE_32(*((std::uint32_t *)(data)));
     sendtime_ = SBE_LITTLE_ENDIAN_ENCODE_64(*((std::uint64_t *)(data + sizeof(uint32_t)))); // offset = 4 butes for seqnum
-    message_.Reset(data, processed_, received); // this used to be sizeof buffer but i dont think its necessary..
   }
 }
 

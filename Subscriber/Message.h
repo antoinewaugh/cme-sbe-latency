@@ -20,18 +20,16 @@
 #include "sbe/SecurityStatus30.h"
 #include "sbe/SnapshotFullRefresh38.h"
 #include "sbe/SnapshotFullRefreshOrderBook44.h"
+#include <iostream>
 
 constexpr int kMsgSize = 2;
 constexpr int kByteOffest = 12;
 constexpr int kMsgHeaderVersion = 0;
 
 
-
 class Message {
 public:
   uint16_t GetTemplateId();
-//  template<typename T> T Get();
-
   template<typename T>
   T& Get() {
     if constexpr (std::is_same<T, ChannelReset4>::value) { return GetChannelReset(); };
@@ -46,10 +44,12 @@ public:
     if constexpr(std::is_same<T, MDIncrementalRefreshBook32>::value) { return GetIncrementalRefreshBook(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshVolume37>::value) { return GetIncrementalRefreshVolume(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshTrade36>::value) { return GetIncrementalRefreshTrade(); };
+    if constexpr(std::is_same<T, MDIncrementalRefreshTradeSummary42>::value) { return GetIncrementalRefreshTradeSummary(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshOrderBook43>::value) { return GetIncrementalRefreshOrderBook(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshSessionStatistics35>::value) { return GetIncrementalRefreshSessionStatistics(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshLimitsBanding34>::value) { return GetIncrementalRefreshLimitsBanding(); };
     if constexpr(std::is_same<T, MDIncrementalRefreshDailyStatistics33>::value) { return GetIncrementalRefreshDailyStatistics(); };
+    std::cerr << "FATAL: Unknown templateid passed to Message::Get() - " << GetTemplateId() << '\n';
   }
   size_t Reset(char* buffer, size_t offset, int buffer_length);
   uint16_t GetMsgSize();
@@ -93,6 +93,7 @@ private:
   MDIncrementalRefreshBook32& GetIncrementalRefreshBook();
   MDIncrementalRefreshVolume37& GetIncrementalRefreshVolume();
   MDIncrementalRefreshTrade36& GetIncrementalRefreshTrade();
+  MDIncrementalRefreshTradeSummary42& GetIncrementalRefreshTradeSummary();
   MDIncrementalRefreshOrderBook43& GetIncrementalRefreshOrderBook();
   MDIncrementalRefreshSessionStatistics35& GetIncrementalRefreshSessionStatistics();
   MDIncrementalRefreshLimitsBanding34& GetIncrementalRefreshLimitsBanding();

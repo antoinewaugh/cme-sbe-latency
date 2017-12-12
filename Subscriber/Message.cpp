@@ -63,6 +63,11 @@ MDIncrementalRefreshTrade36 &Message::GetIncrementalRefreshTrade() {
   return incremental_trade;
 }
 
+MDIncrementalRefreshTradeSummary42& Message::GetIncrementalRefreshTradeSummary() {
+  incremental_trade_summary.wrapForDecode(buffer_, offset_, header.blockLength(), header.version(), header.bufferLength());
+  return incremental_trade_summary;
+}
+
 MDIncrementalRefreshOrderBook43 &Message::GetIncrementalRefreshOrderBook() {
   incremental_order_book.wrapForDecode(buffer_, offset_, header.blockLength(), header.version(), header.bufferLength());
   return incremental_order_book;
@@ -83,26 +88,6 @@ MDIncrementalRefreshDailyStatistics33 &Message::GetIncrementalRefreshDailyStatis
   return daily_statistics;
 };
 
-//template<typename T>
-//T Message::Get() {
-//  if(std::is_same<T, ChannelReset4>()) { return GetChannelReset(); };
-//  if(std::is_same<T, AdminHeartbeat12>()) { return GetAdminHeartbeat(); };
-//  if(std::is_same<T, MDInstrumentDefinitionFuture27>()) { return GetInstrumentDefinitionFuture(); };
-//  if(std::is_same<T, MDInstrumentDefinitionOption41>()) { return GetInstrumentDefinitionOption(); };
-//  if(std::is_same<T, MDInstrumentDefinitionSpread29>()) { return GetInstrumentDefinitionSpread(); };
-//  if(std::is_same<T, QuoteRequest39>()) { return GetQuoteRequest(); };
-//  if(std::is_same<T, SecurityStatus30>()) { return GetSecurityStatus(); };
-//  if(std::is_same<T, SnapshotFullRefresh38>()) { return GetSnapshotFullRefresh(); };
-//  if(std::is_same<T, SnapshotFullRefreshOrderBook44>()) { return GetSnapshotFullRefreshOrderBook(); };
-//  if(std::is_same<T, MDIncrementalRefreshBook32>()) { return GetIncrementalRefreshBook(); };
-//  if(std::is_same<T, MDIncrementalRefreshVolume37>()) { return GetIncrementalRefreshVolume(); };
-//  if(std::is_same<T, MDIncrementalRefreshTrade36>()) { return GetIncrementalRefreshTrade(); };
-//  if(std::is_same<T, MDIncrementalRefreshOrderBook43>()) { return GetIncrementalRefreshOrderBook(); };
-//  if(std::is_same<T, MDIncrementalRefreshSessionStatistics35>()) { return GetIncrementalRefreshSessionStatistics(); };
-//  if(std::is_same<T, MDIncrementalRefreshLimitsBanding34>()) { return GetIncrementalRefreshLimitsBanding(); };
-//  if(std::is_same<T, MDIncrementalRefreshDailyStatistics33>()) { return GetIncrementalRefreshDailyStatistics(); };
-//}
-
 uint16_t Message::GetMsgSize() {
   return msg_size_;
 }
@@ -111,7 +96,7 @@ static uint16_t ExtractMsgSize(char* buffer, size_t offset) {
   return SBE_LITTLE_ENDIAN_ENCODE_16(*((std::uint16_t *)(buffer + offset)));
 }
 size_t Message::Reset(char* buffer, size_t offset, int buffer_length) {
-  msg_size_ = ExtractMsgSize(buffer_, offset_);
+  msg_size_ = ExtractMsgSize(buffer, offset);
   header.wrap(buffer, offset + kMsgSize, kMsgHeaderVersion, buffer_length);
   buffer_ = buffer;
   offset_ = offset + kMsgSize + header.encodedLength();
@@ -121,4 +106,5 @@ size_t Message::Reset(char* buffer, size_t offset, int buffer_length) {
 uint16_t Message::GetTemplateId() {
   return header.templateId();
 }
+
 

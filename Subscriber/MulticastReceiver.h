@@ -21,6 +21,7 @@ struct MulticastReceiver {
   void Join();
   void Leave();
   bool IsActive();
+
 private:
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
