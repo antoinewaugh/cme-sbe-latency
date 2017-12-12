@@ -76,9 +76,14 @@ void ChannelController::Subscribe(uint32_t securityid) {
   auto inst_controller = GetInstrumentController(securityid);
   if(inst_controller == nullptr) {
     std::cout << "Subscribing : " << securityid << '\n';
-    instrument_controllers_.emplace(securityid, InstrumentController(securityid, std::string(), channel_));
+    instrument_controllers_.emplace(securityid, std::move(InstrumentController(securityid, std::string(), channel_)));
 
     std::cout << "inst_controller_.size(): " << instrument_controllers_.size() << '\n';
+    auto inst_controller = GetInstrumentController(securityid);
+
+    if (inst_controller) {
+      std::cout <<" FOUND!!! " << '\n';
+    }
   }
 }
 
