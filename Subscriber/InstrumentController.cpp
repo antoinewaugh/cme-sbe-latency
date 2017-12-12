@@ -15,21 +15,17 @@ void InstrumentController::switchState(InstrumentState current_state, Instrument
 }
 
 void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh) {
-  std::cout << "OnSnapshot.." << '\n';
   auto current_state = state_;
   auto snpt_seqnum = refresh.rptSeq();
   if(current_state == INITIAL) {
-    std::cout << "OnSnapshot.. INITIAL" << '\n';
     processed_rptseq_ = snpt_seqnum;
     switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
     mdhandler_.OnSnapshot(refresh);
   } else if(current_state == InstrumentState::OUTOFSYNC) {
-    std::cout << "OnSnapshot.. OUTOFSYND" << '\n';
     if(snpt_seqnum > processed_rptseq_) {
       processed_rptseq_ = snpt_seqnum;
       mdhandler_.Reset();
       switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
-      std::cout << "OnSnapshot.. SYNC" << '\n';
       mdhandler_.OnSnapshot(refresh);
     }
   } else if(current_state == InstrumentState::SYNC && snpt_seqnum > processed_rptseq_){
