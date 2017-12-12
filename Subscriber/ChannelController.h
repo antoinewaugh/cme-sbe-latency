@@ -42,14 +42,20 @@ private:
       if(inst_controller) {
         inst_controller->OnIncremental(entry);
 
+        // print timestamp
         auto exch_time = message.transactTime();
         unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::system_clock::now().time_since_epoch())
             .count();
 
-        auto delay_ns = ns_timestamp - exch_time;
-        auto delay_ms = delay_ns / 1000;
-        std::cout << "Delay: " << delay_ms << "micros" << ", exch: " << exch_time << ", our: " << ns_timestamp << ", templateid: " << m.GetTemplateId()  << '\n';
+        // only print if our time > cme_time otherwise it would imply negative latency
+        if(exch_time < ns_timestamp) {
+          auto delay_ns = ns_timestamp - exch_time;
+          auto delay_ms = delay_ns / 1000;
+          std::cout << "Delay: " << delay_ms << "micros" << ", exch: " << exch_time << ", our: " << ns_timestamp
+                    << ", templateid: " << m.GetTemplateId() << '\n';
+        }
+
       }
     }
   }
