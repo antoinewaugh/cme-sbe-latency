@@ -10,10 +10,12 @@ void ChannelController::HandleSnapshotMessage(Message& m) {
 }
 
 InstrumentController* ChannelController::GetInstrumentController(uint32_t securityid) {
+  std::cout << "getInstrumentController :" << securityid << '\n';
   auto search = instrument_controllers_.find(securityid);
   if(search != std::end(instrument_controllers_)){
     return &(search->second);
   }
+  std::cout << "instrument_controllers_::" << instrument_controllers_.size() << '\n';
   return nullptr;
 }
 
