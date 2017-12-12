@@ -1,5 +1,6 @@
 #include "ChannelController.h"
 
+#include <iostream>
 void ChannelController::HandleSnapshotMessage(Message& m) {
   auto& snapshot = m.Get<SnapshotFullRefresh38>();
   auto inst_controller = GetInstrumentController(snapshot.securityID());
@@ -72,6 +73,7 @@ void ChannelController::OnSnapshotPacket(Packet *packet) {
 void ChannelController::Subscribe(uint32_t securityid) {
   auto inst_controller = GetInstrumentController(securityid);
   if(inst_controller == nullptr) {
+    std::cout << "Subscribing : " << securityid << '\n';
     instrument_controllers_.emplace(securityid, InstrumentController(securityid, std::string(), channel_));
   }
 }
