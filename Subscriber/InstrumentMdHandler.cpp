@@ -4,7 +4,18 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
+static std::uint64_t NanosecondTimeDelta(uint64_t start, uint64_t stop) {
+  return stop - start;
+}
+
+static std::uint64_t NanosecondTimeDeltaToNow(uint64_t start) {
+  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+  return NanosecondTimeDelta(start, ns_timestamp);
+}
+
+void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
 
   auto level = entry.mDPriceLevel();
   auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
@@ -19,11 +30,16 @@ void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteBidThru(); break;
   }
 
-//  clear();
-//  std::cout << book << '\n';
+  clear();
+
+  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
+  auto delay_adj = delay_ns < 0? 0: delay_ns;
+
+  std::cout << "Incremental: " << delay_adj/1000 << " μs" <<  '\n';
+  std::cout << book << '\n';
 }
 
-void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book) {
+void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
 
   auto level = entry.mDPriceLevel();
   auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
@@ -38,8 +54,13 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteAskThru();break;
   }
 
-//clear();
- // std::cout << book << '\n';
+  clear();
+
+  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
+  auto delay_adj = delay_ns < 0? 0: delay_ns;
+
+  std::cout << "Incremental: " << delay_adj/1000 << " μs" <<  '\n';
+  std::cout << book << '\n';
 
 }
 
@@ -49,19 +70,19 @@ void InstrumentMdHandler::ClearState() {
   // clear trades too? status?
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry, std::uint64_t transacttime) {
   switch(entry.mDEntryType()) {
     case MDEntryTypeBook::Bid:
-      HandleBidEntry(entry, book_);
+      HandleBidEntry(entry, book_, transacttime);
       break;
     case MDEntryTypeBook::Offer:
-      HandleAskEntry(entry, book_);
+      HandleAskEntry(entry, book_, transacttime);
       break;
     case MDEntryTypeBook::ImpliedBid:
-      HandleBidEntry(entry, implbook_);
+      HandleBidEntry(entry, implbook_, transacttime);
       break;
     case MDEntryTypeBook::ImpliedOffer:
-      HandleAskEntry(entry, implbook_);
+      HandleAskEntry(entry, implbook_, transacttime);
       break;
     case MDEntryTypeBook::BookReset:
       ClearState();
@@ -70,7 +91,7 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries 
 }
 
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries &entry) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries &entry, std::uint64_t transacttime) {
   auto action = entry.mDUpdateAction();
   switch(action) {
     case MDUpdateAction::New:
@@ -96,55 +117,60 @@ void InstrumentMdHandler::Reset() {
   ClearState();
 }
 
-void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh) {
+void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64_t transacttime) {
 
   ClearState();
 
-  auto& entry = refresh.noMDEntries();
-  while(entry.hasNext()) {
+  auto &entry = refresh.noMDEntries();
+  while (entry.hasNext()) {
     entry.next();
 
     auto level = entry.mDPriceLevel();
     auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
     auto volume = entry.mDEntrySize();
 
-    switch(entry.mDEntryType()) {
-      case MDEntryType::Bid: book_.AddBid(level, price, volume); break;
-      case MDEntryType::Offer: book_.AddAsk(level, price, volume); break;
-      case MDEntryType::ImpliedBid: implbook_.AddBid(level, price, volume); break;
-      case MDEntryType::ImpliedOffer: implbook_.AddAsk(level, price, volume); break;
+    switch (entry.mDEntryType()) {
+      case MDEntryType::Bid:
+        book_.AddBid(level, price, volume);
+        break;
+      case MDEntryType::Offer:
+        book_.AddAsk(level, price, volume);
+        break;
+      case MDEntryType::ImpliedBid:
+        implbook_.AddBid(level, price, volume);
+        break;
+      case MDEntryType::ImpliedOffer:
+        implbook_.AddAsk(level, price, volume);
+        break;
     }
   }
 
-  auto exch_time = refresh.transactTime();
-  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::system_clock::now().time_since_epoch())
-      .count();
+  clear();
 
-  auto delay_ns = ns_timestamp - exch_time;
-  auto delay_ms = delay_ns / 1000000.0;
-  std::cout << "Delay: " << delay_ms << "ms" <<'\n';
- // clear();
-  //std::cout << book_ << '\n';
+  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
+  auto delay_adj = delay_ns < 0? 0: delay_ns;
+
+  std::cout << "Snapshot: " << delay_adj/1000 << " μs" <<  '\n';
+  std::cout << book_ << '\n';
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries &) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 

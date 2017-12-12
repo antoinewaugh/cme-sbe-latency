@@ -5,7 +5,7 @@ void ChannelController::HandleSnapshotMessage(Message& m) {
   auto& snapshot = m.Get<SnapshotFullRefresh38>();
   auto inst_controller = GetInstrumentController(snapshot.securityID());
   if(inst_controller) {
-    inst_controller->OnSnapshot(snapshot);
+    inst_controller->OnSnapshot(snapshot, snapshot.transactTime());
   }
 }
 

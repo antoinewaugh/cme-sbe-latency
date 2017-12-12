@@ -18,14 +18,14 @@ class InstrumentMdHandler {
 
 public:
 
-  void OnSnapshot(SnapshotFullRefresh38&);
-  void OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &);
-  void OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries&);
-  void OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries&);
-  void OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries& );
-  void OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries&);
-  void OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries&);
-  void OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries&);
+  void OnSnapshot(SnapshotFullRefresh38&, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries&, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries&, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries&, std::uint64_t );
+  void OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries&, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries&, std::uint64_t);
+  void OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries&, std::uint64_t);
   void OnSecurityStatus(SecurityStatus30&);
   void OnChannelReset();
   void Reset();

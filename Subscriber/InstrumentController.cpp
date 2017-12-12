@@ -14,25 +14,25 @@ void InstrumentController::switchState(InstrumentState current_state, Instrument
   }
 }
 
-void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh) {
+void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64_t transacttime) {
   auto current_state = state_;
   auto snpt_seqnum = refresh.rptSeq();
   if(current_state == INITIAL) {
     processed_rptseq_ = snpt_seqnum;
     switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
-    mdhandler_.OnSnapshot(refresh);
+    mdhandler_.OnSnapshot(refresh, transacttime);
   } else if(current_state == InstrumentState::OUTOFSYNC) {
     if(snpt_seqnum > processed_rptseq_) {
       processed_rptseq_ = snpt_seqnum;
       mdhandler_.Reset();
       switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
-      mdhandler_.OnSnapshot(refresh);
+      mdhandler_.OnSnapshot(refresh, transacttime);
     }
   } else if(current_state == InstrumentState::SYNC && snpt_seqnum > processed_rptseq_){
     std::cout << "WARNING: Snapshot feed is being received faster than incremental - fast forwarding" << '\n';
     processed_rptseq_ = snpt_seqnum;
     mdhandler_.Reset();
-    mdhandler_.OnSnapshot(refresh);
+    mdhandler_.OnSnapshot(refresh, transacttime);
   }
 }
 

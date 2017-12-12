@@ -16,16 +16,16 @@ class InstrumentController {
 
 public:
   InstrumentController(uint32_t securityid, std::string securitygroup, ChannelAccessor* channel );
-  void OnSnapshot(SnapshotFullRefresh38&);
+  void OnSnapshot(SnapshotFullRefresh38&, std::uint64_t transacttime);
   template<typename T>
-  void OnIncremental(T &entry) {
+  void OnIncremental(T &entry, uint64_t transacttime) {
     auto current_state = state_;
     auto rptseq = entry.rptSeq();
     auto expected_rptseq = processed_rptseq_ + 1;
     if(current_state == InstrumentState::SYNC) {
       if(rptseq == expected_rptseq) {
         processed_rptseq_ = rptseq;
-        mdhandler_.OnIncremental(entry);
+        mdhandler_.OnIncremental(entry, transacttime);
       } else if(rptseq > expected_rptseq) {
         mdhandler_.Reset();
         switchState(InstrumentState::SYNC, InstrumentState::OUTOFSYNC);
@@ -35,13 +35,13 @@ public:
         std::cout << "Incremental feed synchronised" << '\n';
         processed_rptseq_ = rptseq;
         switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
-        mdhandler_.OnIncremental(entry);
+        mdhandler_.OnIncremental(entry, transacttime);
       }
     } else if(current_state == INITIAL) {
       if(processed_rptseq_ == 0 && rptseq == 1) { // start of session, no recovery required
         processed_rptseq_ = rptseq;
         switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
-        mdhandler_.OnIncremental(entry);
+        mdhandler_.OnIncremental(entry, transacttime);
       }
     }
   }
