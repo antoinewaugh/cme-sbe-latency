@@ -15,6 +15,8 @@
 #include "sbe/SecurityStatus30.h"
 #include "sbe/SnapshotFullRefresh38.h"
 #include <map>
+#include <chrono>
+#include <iostream>
 
 class ChannelController {
 
@@ -32,6 +34,16 @@ public:
 private:
   template<typename T>
   void HandleIncrementalMessage(Message& m) {
+
+    auto exch_time = refresh.transactTime();
+    unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::system_clock::now().time_since_epoch())
+        .count();
+
+    auto delay_ns = ns_timestamp - exch_time;
+    auto delay_ms = delay_ns / 1000000.0;
+    std::cout << "Delay: " << delay_ms << "ms" <<'\n';
+
     auto message = m.Get<T>();
     auto& entry = message.noMDEntries();
     while(entry.hasNext()) {
