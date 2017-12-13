@@ -56,11 +56,28 @@ void ChannelController::OnIncrementalMessage(Message& m) {
   }
 }
 
+#include <chrono>
+
+// move to helper : exists in InstrumetnMdHandler.cpp too
+static std::uint64_t NanosecondTimeDelta(uint64_t start, uint64_t stop) {
+  return stop - start;
+}
+
+static std::uint64_t NanosecondTimeDeltaToNow(uint64_t start) {
+  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+  return NanosecondTimeDelta(start, ns_timestamp);
+}
+
 void ChannelController::OnIncrementalPacket(Packet *packet) {
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     OnIncrementalMessage(message);
   }
+  auto delay_ns = NanosecondTimeDeltaToNow(packet->GetSendTime());
+  auto delay_adj = delay_ns < 0? 0: delay_ns;
+  std::cout << "Packet latency :" << delay_adj/1000 << " μs" <<  '\n';
 }
 
 void ChannelController::OnSnapshotPacket(Packet *packet) {
