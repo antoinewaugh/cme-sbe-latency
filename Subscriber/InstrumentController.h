@@ -29,18 +29,21 @@ public:
       } else if(rptseq > expected_rptseq) {
         mdhandler_.Reset();
         switchState(InstrumentState::SYNC, InstrumentState::OUTOFSYNC);
+        std::cout << "State : SYNC -> OUTOFSYNC" << '\n';
       }
     } else if(current_state == InstrumentState::OUTOFSYNC) {
       if(rptseq == expected_rptseq) {
         std::cout << "Incremental feed synchronised" << '\n';
         processed_rptseq_ = rptseq;
         switchState(InstrumentState::OUTOFSYNC, InstrumentState::SYNC);
+        std::cout << "State : OUTOFSYNC -> SYNC" << '\n';
         mdhandler_.OnIncremental(entry, transacttime);
       }
     } else if(current_state == INITIAL) {
       if(processed_rptseq_ == 0 && rptseq == 1) { // start of session, no recovery required
         processed_rptseq_ = rptseq;
         switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
+        std::cout << "State : INTIAL -> SYNC" << '\n';
         mdhandler_.OnIncremental(entry, transacttime);
       }
     }
