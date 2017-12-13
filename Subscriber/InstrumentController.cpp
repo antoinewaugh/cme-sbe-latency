@@ -19,8 +19,8 @@ void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint6
   auto snpt_seqnum = refresh.rptSeq();
   if(current_state == INITIAL) {
     processed_rptseq_ = snpt_seqnum;
-    switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
     std::cout << "State : INITIAL -> SYNC" << '\n';
+    switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
     mdhandler_.OnSnapshot(refresh, transacttime);
   } else if(current_state == InstrumentState::OUTOFSYNC) {
     if(snpt_seqnum > processed_rptseq_) {

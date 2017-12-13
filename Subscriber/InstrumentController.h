@@ -42,8 +42,8 @@ public:
     } else if(current_state == INITIAL) {
       if(processed_rptseq_ == 0 && rptseq == 1) { // start of session, no recovery required
         processed_rptseq_ = rptseq;
-        switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
         std::cout << "State : INTIAL -> SYNC" << '\n';
+        switchState(InstrumentState::INITIAL, InstrumentState::SYNC);
         mdhandler_.OnIncremental(entry, transacttime);
       }
     }

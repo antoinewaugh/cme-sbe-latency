@@ -138,15 +138,20 @@ void Channel::StartSnapshotB() {
 
 void Channel::SubscribeToSnapshotsForInstrument(uint32_t securityid) {
   channel_controller_.AddOutOfSyncInstrument(securityid);
+  if(!IsSnapshotFeedActive()) {
+    StartSnapshotFeed();
+  }
 }
 
 bool Channel::IsSnapshotFeedActive() {
-  return snapshota_.IsActive() || snapshota_.IsActive();
+  return snapshota_.IsActive() || snapshotb_.IsActive();
 }
 
 void Channel::UnsubscribeToSnapshotsForInstrument(uint32_t securityid) {
+  std::cout << "Unsubscribing to snapshots for : " << securityid << '\n';
   if(channel_controller_.RemoveOutOfSyncInstrument(securityid)) {
     if(IsSnapshotFeedActive()) {
+      std::cout << "Snapshot Feed Active.. " << '\n';
       if (!channel_controller_.HasOutOfSyncInstruments()) {
         StopSnapshotFeed();
       }
