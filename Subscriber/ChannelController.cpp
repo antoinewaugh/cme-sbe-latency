@@ -72,13 +72,24 @@ static std::uint64_t NanosecondTimeDeltaToNow(uint64_t start) {
 }
 
 void ChannelController::OnIncrementalPacket(Packet *packet) {
+
+  // REMOVE logging in future
+  auto delay_ns = NanosecondTimeDeltaToNow(packet->GetSendTime());
+  auto delay_adj = delay_ns < 0? 0: delay_ns;
+  std::cout << "Packet latency Preprocessing:" << delay_adj/1000 << " μs" <<  '\n';
+
+  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     OnIncrementalMessage(message);
   }
-  auto delay_ns = NanosecondTimeDeltaToNow(packet->GetSendTime());
-  auto delay_adj = delay_ns < 0? 0: delay_ns;
-  std::cout << "Packet latency :" << delay_adj/1000 << " μs" <<  '\n';
+
+  delay_ns = NanosecondTimeDeltaToNow(ns_timestamp);
+  delay_adj = delay_ns < 0? 0: delay_ns;
+  std::cout << "Processing time:" << delay_adj/1000 << " μs" << '\n';
 }
 
 void ChannelController::OnSnapshotPacket(Packet *packet) {
@@ -96,7 +107,7 @@ void ChannelController::Subscribe(uint32_t securityid) {
 }
 
 void ChannelController::Unsubscribe(uint32_t securityid) {
-
+// TODO
 }
 
 ChannelController::ChannelController(ChannelAccessor *channel):channel_(channel) {
@@ -119,7 +130,7 @@ bool ChannelController::RemoveOutOfSyncInstrument(uint32_t securityid) {
 }
 
 bool ChannelController::HasOutOfSyncInstruments() {
-  return false;
+  return outofsync_instruments_.size() > 0;
 }
 
 void ChannelController::HandleIncrementalQuoteRequest(Message &m) {
