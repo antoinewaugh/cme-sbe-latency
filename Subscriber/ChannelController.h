@@ -52,7 +52,7 @@ private:
   void HandleIncrementalQuoteRequest(Message& m);
   InstrumentController* GetInstrumentController(uint32_t securityid);
   std::map<uint32_t, InstrumentController> instrument_controllers_;
-  std::vector<uint32_t> outofsync_instruments_;
+  std::vector<std::uint32_t> outofsync_instruments_;
   ChannelAccessor* channel_ = nullptr;
 };
 

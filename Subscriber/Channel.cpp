@@ -1,22 +1,6 @@
 #include "Channel.h"
 #include "Config.h"
-/*
-ChannelNetworkController {
 
-};
-namespace sortino {
-namespace connectivity {
-namespace cme {
-
- // subscriber acts as the builder,
-  class Subscriber {
-    Channel std::unique_ptr<Channel>
-    channel;
-
-  };
-
-}}} // sortino.connectivity.cme
-*/
 void Channel::OnPacket(Type type, Feed feed, Packet *data) {
   switch(type) {
 //    case Instrument: instruments_.OnInstrumentPacket(data); break;
@@ -81,31 +65,37 @@ void Channel::StopInstrumentA() {
 }
 
 void Channel::StartIncrementalFeed() {
+  std::cout << "Starting Incremental Feeds: " << channelid_ << '\n';
   StartIncrementalA();
   StartIncrementalB();
 }
 
 void Channel::StopIncrementalFeed() {
+  std::cout << "Stopping Incremental Feeds: " << channelid_ << '\n';
   StopIncrementalA();
   StopIncrementalB();
 }
 
 void Channel::StartSnapshotFeed() {
+  std::cout << "Starting Snapshot Feeds: " << channelid_ << '\n';
   StartSnapshotA();
   StartSnapshotB();
 }
 
 void Channel::StopSnapshotFeed() {
+  std::cout << "Stopping Snapshot Feeds: " << channelid_ << '\n';
   StopSnapshotA();
   StopSnapshotB();
 }
 
 void Channel::StartInstrumentFeed() {
+  std::cout << "Starting Instrument Feeds: " << channelid_ << '\n';
   StartInstrumentA();
   StartInstrumentB();
 }
 
 void Channel::StopInstrumentFeed() {
+  std::cout << "Stopping Instrument Feeds: " << channelid_ << '\n';
   StopInstrumentA();
   StopInstrumentB();
 }
