@@ -33,7 +33,6 @@ std::string Channel::GetId() {
 void Channel::Subscribe(uint32_t securityid) {
   channel_controller_.Subscribe(securityid);
   StartIncrementalFeed();
-
 }
 
 void Channel::Unsubscribe(uint32_t securityid) {
