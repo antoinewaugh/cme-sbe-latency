@@ -33,10 +33,15 @@ std::string Channel::GetId() {
 void Channel::Subscribe(uint32_t securityid) {
   channel_controller_.Subscribe(securityid);
   StartIncrementalFeed();
+
   StartSnapshotFeed();
+  IsSnapshotFeedActive();
+  // TODO: dedermine when to drop all incrementals?
 }
 
 void Channel::Unsubscribe(uint32_t securityid) {
+
+  // TODO: remove instruemnts etc.. clean up
   channel_controller_.Unsubscribe(securityid);
 }
 
@@ -151,7 +156,6 @@ void Channel::UnsubscribeToSnapshotsForInstrument(uint32_t securityid) {
   std::cout << "Unsubscribing to snapshots for : " << securityid << '\n';
   if(channel_controller_.RemoveOutOfSyncInstrument(securityid)) {
     if(IsSnapshotFeedActive()) {
-      std::cout << "Snapshot Feed Active.. " << '\n';
       if (!channel_controller_.HasOutOfSyncInstruments()) {
         StopSnapshotFeed();
       }
