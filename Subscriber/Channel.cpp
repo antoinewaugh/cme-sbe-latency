@@ -34,8 +34,7 @@ void Channel::Subscribe(uint32_t securityid) {
   channel_controller_.Subscribe(securityid);
   StartIncrementalFeed();
 
-  StartSnapshotFeed();
-  IsSnapshotFeedActive();
+  UnsubscribeToSnapshotsForInstrument(23936) ;
   // TODO: dedermine when to drop all incrementals?
 }
 
