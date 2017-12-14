@@ -116,7 +116,7 @@ ChannelController::ChannelController(ChannelAccessor *channel):channel_(channel)
 
 void ChannelController::AddOutOfSyncInstrument(std::uint32_t securityid) {
   auto found = std::find(std::begin(outofsync_instruments_), std::end(outofsync_instruments_), securityid);
-  if (found != std::end(outofsync_instruments_)) {
+  if (found == std::end(outofsync_instruments_)) {
    outofsync_instruments_.push_back(securityid);
   }
 }
