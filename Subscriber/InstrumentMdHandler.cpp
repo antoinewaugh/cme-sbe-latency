@@ -4,16 +4,6 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-static std::uint64_t NanosecondTimeDelta(uint64_t start, uint64_t stop) {
-  return stop - start;
-}
-
-static std::uint64_t NanosecondTimeDeltaToNow(uint64_t start) {
-  unsigned long ns_timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::system_clock::now().time_since_epoch())
-      .count();
-  return NanosecondTimeDelta(start, ns_timestamp);
-}
 
 void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
 
@@ -30,13 +20,9 @@ void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteBidThru(); break;
   }
 
-  clear();
+//  clear();
 
-  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
-  auto delay_adj = delay_ns < 0? 0: delay_ns;
-
-  std::cout << "Incremental: " << delay_adj/1000 << " μs" <<  '\n';
-  std::cout << book << '\n';
+//  std::cout << book << '\n';
 }
 
 void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
@@ -54,13 +40,9 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteAskThru();break;
   }
 
-  clear();
+  //clear();
 
-  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
-  auto delay_adj = delay_ns < 0? 0: delay_ns;
-
-  std::cout << "Incremental: " << delay_adj/1000 << " μs" <<  '\n';
-  std::cout << book << '\n';
+ // std::cout << book << '\n';
 
 }
 
@@ -145,13 +127,9 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
     }
   }
 
-  clear();
+ // clear();
 
-  auto delay_ns = NanosecondTimeDeltaToNow(transacttime);
-  auto delay_adj = delay_ns < 0? 0: delay_ns;
-
-  std::cout << "Snapshot: " << delay_adj/1000 << " μs" <<  '\n';
-  std::cout << book_ << '\n';
+ // std::cout << book_ << '\n';
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {

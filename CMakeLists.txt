@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.6)
 project(cme_sbe_latency)
 
 #set(CMAKE_CXX_STANDARD 17)
@@ -7,13 +7,13 @@ add_definitions(-std=c++17)
 set(BOOST_ROOT /usr/local/boost_1_63_0)
 set(BOOST_INCLUDEDIR /usr/include)
 
-set(BOOST_LIBRARYDIR /usr/lib/x86_64-linux-gnu)
+set(BOOST_LIBRARYDIR /usr/local/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 
 find_package(Boost COMPONENTS system thread)
-include_directories( ${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 
 set(SOURCE_FILES main.cpp)
 add_executable(cme_sbe_latency ${SOURCE_FILES})

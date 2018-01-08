@@ -2,8 +2,20 @@
 #include <algorithm>
 
 #include <iostream>
+
+#include <chrono>
+
+void PrintTime(std::string ref, unsigned long transacttime) {
+  unsigned long our_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+  int diff = our_ts - transacttime;
+
+  std::cout << ref << ": " << diff/1000 << " μs" <<  '\n';
+}
+
 void ChannelController::HandleSnapshotMessage(Message& m) {
-  auto& snapshot = m.Get<SnapshotFullRefresh38>();
+  auto& snapshot = m.Get<SnapshotFullRefresh38>(); 
   auto inst_controller = GetInstrumentController(snapshot.securityID());
   if(inst_controller) {
     inst_controller->OnSnapshot(snapshot, snapshot.transactTime());
@@ -57,20 +69,33 @@ void ChannelController::OnIncrementalMessage(Message& m) {
   }
 }
 
-#include <chrono>
 
 void ChannelController::OnIncrementalPacket(Packet *packet) {
+ 
+  unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     OnIncrementalMessage(message);
   }
+
+  PrintTime("Incremental", ts);
 }
 
 void ChannelController::OnSnapshotPacket(Packet *packet) {
+
+  unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      std::chrono::system_clock::now().time_since_epoch())
+      .count();
+
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     HandleSnapshotMessage(message);
   }
+
+  PrintTime("Snapshot", ts);
 }
 
 void ChannelController::Subscribe(uint32_t securityid) {

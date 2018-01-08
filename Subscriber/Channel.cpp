@@ -3,7 +3,7 @@
 
 void Channel::OnPacket(Type type, Feed feed, Packet *data) {
   switch(type) {
-//    case Instrument: instruments_.OnInstrumentPacket(data); break;
+    //case Instrument: instruments_.OnInstrumentPacket(data); break;
     case Snapshot: channel_controller_.OnSnapshotPacket(data); break;
     case Incremental: channel_controller_.OnIncrementalPacket(data); break;
   }
