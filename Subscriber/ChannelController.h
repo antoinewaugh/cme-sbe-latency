@@ -32,13 +32,40 @@ public:
   void Unsubscribe(uint32_t securityid);
 
 private:
+
+  struct Output
+  {
+    // packet header
+    unsigned long servertime;
+    long msgseqnum;
+    unsigned long sendtime;
+
+    // message header
+    int templateid;
+    int msgsize;
+
+    // entry
+    unsigned long transacttime;
+    int rptseq;
+    bool lastmsgforevent;
+
+    friend std::ostream &operator<<(std::ostream &os, const Output &output);
+  } output;
+
   template<typename T>
   void HandleIncrementalMessage(Message& m) {
     auto message = m.Get<T>();
     auto transacttime = message.transactTime();
+
+    output.transacttime = transacttime;
+    output.lastmsgforevent = message.matchEventIndicator().endOfEvent();
+
     auto& entry = message.noMDEntries();
     while(entry.hasNext()) {
       entry.next();
+
+      output.rptseq = entry.rptSeq();
+
       auto inst_controller = GetInstrumentController(entry.securityID());
       if(inst_controller) {
         inst_controller->OnIncremental(entry, transacttime);

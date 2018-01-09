@@ -7,7 +7,7 @@ add_definitions(-std=c++17)
 set(BOOST_ROOT /usr/local/boost_1_63_0)
 set(BOOST_INCLUDEDIR /usr/include)
 
-set(BOOST_LIBRARYDIR /usr/local/lib)
+set(BOOST_LIBRARYDIR /usr/local/boost_1_63_0/lib)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
