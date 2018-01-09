@@ -17,6 +17,7 @@
 #include <map>
 #include <chrono>
 #include <iostream>
+#include <fstream>
 
 class ChannelController {
 
@@ -30,6 +31,11 @@ public:
   bool HasOutOfSyncInstruments();
   void Subscribe(uint32_t securityid);
   void Unsubscribe(uint32_t securityid);
+
+  void WritePackets(std::ofstream& file, char* bytes, size_t received) {
+    file.write(reinterpret_cast<char*>(&received), sizeof(size_t));
+    file.write(bytes, received);
+  }
 
   struct Output
   {
@@ -73,7 +79,7 @@ private:
       }
     }
 
-    std::cout << output << '\n';
+    logfile << output << '\n';
   }
   void OnIncrementalMessage(Message&);
   void HandleSnapshotMessage(Message& m);
@@ -84,6 +90,8 @@ private:
   std::map<uint32_t, InstrumentController> instrument_controllers_;
   std::vector<std::uint32_t> outofsync_instruments_;
   ChannelAccessor* channel_ = nullptr;
+  std::ofstream logfile;
+  std::ofstream binaryfile;
 };
 
 

@@ -12,6 +12,8 @@ public:
   bool HasNextMessage();
   Message& NextMessage();
 
+  char* GetBytes() { return rawbytes_;}
+  size_t GetReceived() { return received_;}
 private:
 
   char* rawbytes_;

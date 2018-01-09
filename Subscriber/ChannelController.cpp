@@ -73,6 +73,8 @@ void ChannelController::OnIncrementalPacket(Packet *packet) {
   output.msgseqnum = packet->GetSeqNum();
   output.sendtime = packet->GetSendTime();
 
+  WritePackets(binaryfile, packet->GetBytes(), packet->GetReceived());
+
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     OnIncrementalMessage(message);
@@ -99,7 +101,7 @@ void ChannelController::Unsubscribe(uint32_t securityid) {
 // TODO
 }
 
-ChannelController::ChannelController(ChannelAccessor *channel):channel_(channel) {
+ChannelController::ChannelController(ChannelAccessor *channel):channel_(channel), logfile("310.log") , binaryfile("310.dat", std::ios::binary) {
 
 }
 
