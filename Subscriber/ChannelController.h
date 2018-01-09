@@ -31,8 +31,6 @@ public:
   void Subscribe(uint32_t securityid);
   void Unsubscribe(uint32_t securityid);
 
-private:
-
   struct Output
   {
     // packet header
@@ -50,7 +48,10 @@ private:
     bool lastmsgforevent;
 
     friend std::ostream &operator<<(std::ostream &os, const Output &output);
+
   } output;
+
+private:
 
   template<typename T>
   void HandleIncrementalMessage(Message& m) {
@@ -71,6 +72,8 @@ private:
         inst_controller->OnIncremental(entry, transacttime);
       }
     }
+
+    std::cout << output << '\n';
   }
   void OnIncrementalMessage(Message&);
   void HandleSnapshotMessage(Message& m);
