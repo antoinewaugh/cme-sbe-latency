@@ -64,10 +64,6 @@ Refactor items:
         certainly need to keep separate seqnum in this instance....
         
     2. Incremental feed - this is looking good
-    3. Decoder needs to expose interface: 
-        StartRecovery() // Important because decoder needs to know when to ignore 
-                        // snapshot and when not to, including clearing book and setting rptseqnum
-        StopRecovery() // maybe decoder sets this state and notifies
 
 * Functionality
     1. Channel Reset
