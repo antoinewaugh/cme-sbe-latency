@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 namespace sp {
 namespace lltp {
 namespace cme {
@@ -13,6 +15,9 @@ namespace cme {
     int sessionlowask;
     int sessionhighprice;
     int sessionlowprice;
+    int settlement;
+
+    friend std::ostream &operator<<(std::ostream &os, const SessionStatistics &statistics);
 
     int openinterest;
     int clearedvolume;

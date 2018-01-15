@@ -20,3 +20,7 @@ void Handler::OnTrade(uint64_t securityid, Trade& trade) {
 void Handler::OnStatus(uint64_t securityid, SecurityStatus status) {
   std::cout << "Status >> " << (int)status << '\n';
 }
+
+void Handler::OnStatistics(uint64_t securityid, SessionStatistics &statistics) {
+  std::cout << statistics << '\n';
+}

@@ -138,28 +138,45 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMD
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &entry, std::uint64_t transacttime) {
   statistics_.clearedvolume = entry.mDEntrySize();
-
- // handler_.OnStatistics(statistics_);
+  handler_.OnStatistics(entry.securityID(), statistics_);
 }
 
-//void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &entry, std::uint64_t transacttime) {
-//  auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
-//  switch(entry.mDEntryType()) {
-//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
-//    case MDEntryTypeDailyStatistics::OpenInterest: statistics_.openinterest = price; break;
-//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
-//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
-//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
-//  }
-//
-//}
-
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &, std::uint64_t transacttime) {
-
+// could be problematic if entry doesnt have px / size?
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &entry, std::uint64_t transacttime) {
+  auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
+  auto volume = entry.mDEntrySize();
+  switch(entry.mDEntryType()) {
+    case MDEntryTypeDailyStatistics::SettlementPrice: statistics_.settlement= price; break;
+    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
+    case MDEntryTypeDailyStatistics::ClearedVolume: statistics_.clearedvolume = volume; break;
+    case MDEntryTypeDailyStatistics::OpenInterest: statistics_.openinterest = volume; break;
+  }
+  handler_.OnStatistics(entry.securityID(), statistics_);
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries &, std::uint64_t transacttime) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &entry, std::uint64_t transacttime) {
 
+  auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
+
+  switch(entry.mDEntryType()) {
+    case MDEntryTypeStatistics::OpenPrice: statistics_.openingprice = price; break;
+    case MDEntryTypeStatistics::LowTrade: statistics_.sessionlowprice= price; break;
+    case MDEntryTypeStatistics::HighTrade: statistics_.sessionhighprice= price; break;
+    case MDEntryTypeStatistics::LowestOffer: statistics_.sessionlowask= price; break;
+    case MDEntryTypeStatistics::HighestBid: statistics_.sessionhighbid= price; break;
+  }
+  handler_.OnStatistics(entry.securityID(), statistics_);
+}
+
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries &entry, std::uint64_t transacttime) {
+
+  auto highprice = entry.highLimitPrice().mantissa() * std::pow(10, entry.highLimitPrice().exponent());
+  auto lowprice = entry.lowLimitPrice().mantissa() * std::pow(10, entry.lowLimitPrice().exponent());
+
+  statistics_.sessionlowprice = lowprice;
+  statistics_.sessionhighprice= highprice;
+
+  handler_.OnStatistics(entry.securityID(), statistics_);
 }
 
 void InstrumentMdHandler::OnChannelReset() {
