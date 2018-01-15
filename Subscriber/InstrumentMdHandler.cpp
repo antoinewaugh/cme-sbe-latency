@@ -19,10 +19,6 @@ void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteFrom: book.DeleteBidFrom(level); break;
     case MDUpdateAction::DeleteThru: book.DeleteBidThru(); break;
   }
-
-//  clear();
-
-//  std::cout << book << '\n';
 }
 
 void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
@@ -40,16 +36,11 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
     case MDUpdateAction::DeleteThru: book.DeleteAskThru();break;
   }
 
-  //clear();
-
- // std::cout << book << '\n';
-
 }
 
 void InstrumentMdHandler::ClearState() {
   book_.Clear();
   implbook_.Clear();
-  // clear trades too? status?
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry, std::uint64_t transacttime) {
@@ -127,9 +118,13 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
     }
   }
 
- // clear();
+  Callback(book_);
+}
 
- // std::cout << book_ << '\n';
+
+void InstrumentMdHandler::Callback(DepthBook const& book) {
+  clear();
+  std::cout << book << '\n';
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {
@@ -154,6 +149,12 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoM
 
 void InstrumentMdHandler::OnChannelReset() {
 
+}
+
+void InstrumentMdHandler::Commit() {
+
+//  Callback(implbook_);
+  Callback(book_);
 }
 
 

@@ -58,3 +58,7 @@ InstrumentController::InstrumentController(uint32_t securityid, std::string secu
 {
   channel_->SubscribeToSnapshotsForInstrument(securityid);
 }
+
+void InstrumentController::Commit() {
+  mdhandler_.Commit();
+}

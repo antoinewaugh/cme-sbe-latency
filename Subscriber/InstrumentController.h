@@ -49,9 +49,9 @@ public:
     }
   }
 
-//  template<typename T> void OnIncremental(T &entry);
   void OnSecurityStatus(SecurityStatus30&); // TODO: need to support logic from ChannelController if securityID blank send to all
   void OnChannelReset();
+  void Commit();
 
 private:
   uint32_t securityid_;

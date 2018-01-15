@@ -32,6 +32,9 @@ public:
   void Unsubscribe(uint32_t securityid);
 
 private:
+
+  void Commit();
+
   template<typename T>
   void HandleIncrementalMessage(Message& m) {
     auto message = m.Get<T>();
@@ -44,10 +47,13 @@ private:
         inst_controller->OnIncremental(entry, transacttime);
       }
     }
+    if(message.matchEventIndicator().endOfEvent()) {
+      Commit();
+    }
+
   }
   void OnIncrementalMessage(Message&);
   void HandleSnapshotMessage(Message& m);
-//  template<typename T> void HandleIncrementalMessage(Message&);
   void HandleIncrementalSecurityStatus(Message& m);
   void HandleIncrementalQuoteRequest(Message& m);
   InstrumentController* GetInstrumentController(uint32_t securityid);

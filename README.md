@@ -49,13 +49,15 @@ BidV		Price		AskV
 ```
 # Todo
 
-Refactor items:
+Functionality
 * add support for commit()
-* manage subscriptions
-* confirm this line : if(*message.securityGroup() != message.securityGroupNullValue()) { // need to confirm this
-* not measuring message level seqnum gap , this means we could miss securitystatus, instrument definition if rptseq didnt gap too
-* start adding catch2 tests today
+* status
+* trades
+* statistics
 
+
+* confirm this line : if(*message.securityGroup() != message.securityGroupNullValue()) { // need to confirm this
+* start adding catch2 tests today
 
 * Items to pickup on:
     0. We are in a working state IF we join snapshot at a good time (seqnum must be low enough to capture our snapshot...)
@@ -77,10 +79,6 @@ Refactor items:
         * Decoder
         * Subscriber 
     
-* Performance:
-    1. Valgrind
-    2. Other???
-
 * Record latency range for sample subscription to ES, compare to SBE adapter
 
 * Recovery:

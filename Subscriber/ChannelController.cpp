@@ -137,3 +137,9 @@ void ChannelController::HandleIncrementalQuoteRequest(Message &m) {
 
 }
 
+void ChannelController::Commit() {
+  for(auto && [_, inst_controller] : instrument_controllers_) {
+     inst_controller.Commit();
+  }
+}
+

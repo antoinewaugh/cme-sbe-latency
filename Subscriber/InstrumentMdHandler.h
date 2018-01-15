@@ -29,10 +29,12 @@ public:
   void OnSecurityStatus(SecurityStatus30&);
   void OnChannelReset();
   void Reset();
+  void Commit();
 
 private:
   DepthBook book_;
   DepthBook implbook_;
 
+  void Callback(DepthBook const&);
   void ClearState();
 };
