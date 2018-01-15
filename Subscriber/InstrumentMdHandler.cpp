@@ -3,8 +3,6 @@
 #include "Trade.h"
 #include <chrono>
 
-static void clear() { std::cout << "\x1B[2J\x1B[H"; }
-
 void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
 
   auto level = entry.mDPriceLevel();
@@ -131,7 +129,7 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
 
 
 void InstrumentMdHandler::Callback(DepthBook const& book) {
-// handler_.OnQuote(book, 0,0);
+  handler_.OnQuote(book, 0,0);
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {
