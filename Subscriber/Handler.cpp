@@ -7,12 +7,16 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-void Handler::OnQuote(DepthBook const& book, uint64_t securityid,
+void Handler::OnQuote(uint64_t securityid,DepthBook const& book,
                       uint64_t seqnum) {
   clear();
   std::cout << book << '\n';
 }
 
-void Handler::OnTrade(Trade& trade, uint64_t securityid) {
+void Handler::OnTrade(uint64_t securityid, Trade& trade) {
   std::cout << trade<< '\n';
+}
+
+void Handler::OnStatus(uint64_t securityid, SecurityStatus status) {
+  std::cout << "Status >> " << (int)status << '\n';
 }

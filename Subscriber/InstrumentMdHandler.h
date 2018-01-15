@@ -14,6 +14,9 @@
 #include "sbe/QuoteRequest39.h"
 #include "sbe/SecurityStatus30.h"
 #include "sbe/SnapshotFullRefresh38.h"
+#include "SessionStatistics.h"
+
+using sp::lltp::cme::SessionStatistics;
 
 class InstrumentMdHandler {
 
@@ -33,10 +36,11 @@ public:
   void Commit();
 
 private:
+  uint32_t securityid_;
   DepthBook book_;
   DepthBook implbook_;
+  SessionStatistics statistics_;
   bool statechange_;
   Handler handler_;
-  void Callback(DepthBook const&);
   void ClearState();
 };

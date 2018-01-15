@@ -1,5 +1,4 @@
 #include "InstrumentMdHandler.h"
-
 #include "Trade.h"
 #include <chrono>
 
@@ -37,9 +36,12 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
 }
 
 void InstrumentMdHandler::ClearState() {
+
   statechange_ = false;
+
   book_.Clear();
   implbook_.Clear();
+
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry, std::uint64_t transacttime) {
@@ -65,35 +67,32 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries 
   }
 }
 
-
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries &entry, std::uint64_t transacttime) {
-
-  statechange_ = true;
-
-  auto action = entry.mDUpdateAction();
-  switch(action) {
-    case MDUpdateAction::New:
-//      tradehandler_.Add()
-      break;
-    case MDUpdateAction::Change:
-//      tradehandler_.Update()
-      break;
-    case MDUpdateAction::Delete:
-//      tradehandler_.Delete()
-      break;
-  }
-}
-
-//..... Need to expand out all other ::NoMDEntries types
+// Only used by partner cme exchanges
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries &entry, std::uint64_t transacttime) {}
 
 void InstrumentMdHandler::OnSecurityStatus(SecurityStatus30 &status) {
-  statechange_ = true;
-//  statushandler_.....
+
+  auto TranslateStatus = [=](SecurityStatus30 s) -> sp::lltp::cme::SecurityStatus {
+    switch(s.securityTradingStatus()) {
+      case SecurityTradingStatus::TradingHalt: return SecurityStatus(SecurityStatus::TradingHalt);
+      case SecurityTradingStatus::Close: return SecurityStatus(SecurityStatus::Close);
+      case SecurityTradingStatus::NewPriceIndication: return SecurityStatus(SecurityStatus::NewPriceIndication);
+      case SecurityTradingStatus::ReadyToTrade: return SecurityStatus(SecurityStatus::ReadyToTrade);
+      case SecurityTradingStatus::NotAvailableForTrading: return SecurityStatus(SecurityStatus::NotAvailableForTrading);
+      case SecurityTradingStatus::UnknownorInvalid: return SecurityStatus(SecurityStatus::UnknownorInvalid);
+      case SecurityTradingStatus::PreOpen: return SecurityStatus(SecurityStatus::PreOpen);
+      case SecurityTradingStatus::PreCross: return SecurityStatus(SecurityStatus::PreCross);
+      case SecurityTradingStatus::Cross: return SecurityStatus(SecurityStatus::Cross);
+      case SecurityTradingStatus::PostClose: return SecurityStatus(SecurityStatus::PostClose);
+      case SecurityTradingStatus::NoChange: return SecurityStatus(SecurityStatus::NoChange);
+      case SecurityTradingStatus::NULL_VALUE: return SecurityStatus(SecurityStatus::NULL_VALUE);
+    }
+  };
+
+  handler_.OnStatus(0, TranslateStatus(status));
 }
 
-
 void InstrumentMdHandler::Reset() {
-  ClearState();
 }
 
 void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64_t transacttime) {
@@ -124,16 +123,7 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
     }
   }
 
-  Callback(book_);
-}
-
-
-void InstrumentMdHandler::Callback(DepthBook const& book) {
-  handler_.OnQuote(book, 0,0);
-}
-
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {
-
+  handler_.OnQuote(0, book_, 0);
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &entry, std::uint64_t transacttime) {
@@ -142,13 +132,27 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMD
   auto volume = entry.mDEntrySize();
   Trade trade(price, volume);
 
-  handler_.OnTrade(trade, entry.securityID());
+  handler_.OnTrade(entry.securityID(), trade);
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &, std::uint64_t transacttime) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &entry, std::uint64_t transacttime) {
+  statistics_.clearedvolume = entry.mDEntrySize();
 
+ // handler_.OnStatistics(statistics_);
 }
+
+//void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshDailyStatistics33::NoMDEntries &entry, std::uint64_t transacttime) {
+//  auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
+//  switch(entry.mDEntryType()) {
+//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
+//    case MDEntryTypeDailyStatistics::OpenInterest: statistics_.openinterest = price; break;
+//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
+//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
+//    case MDEntryTypeDailyStatistics::FixingPrice: statistics_.fixingprice = price; break;
+//  }
+//
+//}
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &, std::uint64_t transacttime) {
 
@@ -159,15 +163,18 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoM
 }
 
 void InstrumentMdHandler::OnChannelReset() {
+  ClearState();
 
+  handler_.OnQuote(0, book_, 0);
+  handler_.OnQuote(0, implbook_, 0);
 }
 
 void InstrumentMdHandler::Commit() {
 
   if(statechange_) {
     statechange_ = false;
-    //  Callback(implbook_);
-    Callback(book_);
+    handler_.OnQuote(0, implbook_, 0);
+    handler_.OnQuote(0, book_, 0);
   }
 }
 

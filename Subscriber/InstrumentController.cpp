@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-// Match event indicator needs to be exposed - when to commit changes to book
-// Also consider commits need to be performed a level out at the channel controller level...
-
 void InstrumentController::switchState(InstrumentState current_state, InstrumentState new_state) {
   state_ = new_state;
   if(new_state == InstrumentState::OUTOFSYNC) {
@@ -40,7 +37,7 @@ void InstrumentController::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint6
 
 void InstrumentController::OnSecurityStatus(SecurityStatus30 &status) {
   if((status.securityID() == securityid_) || (status.securityID() == status.securityIDNullValue() && status.securityGroup() == securitygroup_))  {
-    
+    mdhandler_.OnSecurityStatus(status);
   }
 }
 
@@ -49,7 +46,7 @@ void InstrumentController::OnChannelReset() {
   // TODO: clear incremental queue? will automatically occur as seqnum < expected_seqnum
   if(state_ != InstrumentState::DISCONTINUED) {
     switchState(state_, InstrumentState::SYNC);
-    mdhandler_.Reset();
+    mdhandler_.OnChannelReset();
   }
 }
 
