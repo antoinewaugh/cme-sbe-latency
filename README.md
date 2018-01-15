@@ -49,13 +49,6 @@ BidV		Price		AskV
 ```
 # Todo
 
-Functionality
-* add support for commit()
-* status
-* trades
-* statistics
-
-
 * confirm this line : if(*message.securityGroup() != message.securityGroupNullValue()) { // need to confirm this
 * start adding catch2 tests today
 
