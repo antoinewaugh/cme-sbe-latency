@@ -1,5 +1,6 @@
 #include "InstrumentMdHandler.h"
 
+#include "Trade.h"
 #include <chrono>
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
@@ -130,15 +131,20 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
 
 
 void InstrumentMdHandler::Callback(DepthBook const& book) {
-  clear();
-  std::cout << book << '\n';
+// handler_.OnQuote(book, 0,0);
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &, std::uint64_t transacttime) {
 
 }
 
-void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &, std::uint64_t transacttime) {
+void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &entry, std::uint64_t transacttime) {
+
+  auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
+  auto volume = entry.mDEntrySize();
+  Trade trade(price, volume);
+
+  handler_.OnTrade(trade, entry.securityID());
 
 }
 

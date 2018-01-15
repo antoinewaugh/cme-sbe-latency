@@ -7,13 +7,13 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-void Handler::OnQuote(DepthBook &book, bool recovering, uint64_t securityid,
+void Handler::OnQuote(DepthBook &book, uint64_t securityid,
                       uint64_t seqnum) {
   clear();
-  std::cout << "Security: " << securityid << ", Recovering: " << recovering
-            << ", LastSeqNum: " << seqnum << '\n';
-
+// std::cout << "Security: " << securityid << ", LastSeqNum: " << seqnum << '\n';
   std::cout << book << '\n';
+}
 
-  // book.ToString()
+void Handler::OnTrade(Trade& trade, uint64_t securityid) {
+  std::cout << trade<< '\n';
 }

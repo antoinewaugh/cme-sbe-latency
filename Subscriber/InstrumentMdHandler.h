@@ -2,6 +2,7 @@
 
 #include <DepthBook.h>
 #include "ChannelAccessor.h"
+#include "Handler.h"
 
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshDailyStatistics33.h"
@@ -35,6 +36,7 @@ private:
   DepthBook book_;
   DepthBook implbook_;
   bool statechange_;
+  Handler handler_;
   void Callback(DepthBook const&);
   void ClearState();
 };

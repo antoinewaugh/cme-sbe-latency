@@ -43,7 +43,7 @@ const DepthList DepthBook::Bids() const { return bids_; }
 
 const DepthList DepthBook::Asks() const { return asks_; }
 
-std::ostream &operator<<(std::ostream &os, const DepthBook &book) {
+std::ostream &operator<<(std::ostream &os, DepthBook const& book) {
 
   os << "BidV\t\tPrice\t\tAskV" << '\n';
   os << "--------------------------------------" << '\n';

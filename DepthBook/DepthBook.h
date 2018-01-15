@@ -23,5 +23,5 @@ public:
   void DeleteAsk(int level, float price);
   void DeleteAskFrom(int level);
   void DeleteAskThru();
-  friend std::ostream &operator<<(std::ostream &os, const DepthBook &book);
+  friend std::ostream &operator<<(std::ostream &os, DepthBook const& book);
 };

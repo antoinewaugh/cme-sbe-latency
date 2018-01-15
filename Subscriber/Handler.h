@@ -1,11 +1,11 @@
 #pragma once
 
 #include "DepthBook.h"
+#include "Trade.h"
 
 struct Handler {
 
-  void OnQuote(DepthBook &book, bool recovering, uint64_t securityid,
+  void OnQuote(DepthBook &book, uint64_t securityid,
                uint64_t seqnum);
-  void OnTrade();
-  void OnInstrument();
+  void OnTrade(Trade &trade, uint64_t securityid);
 };
