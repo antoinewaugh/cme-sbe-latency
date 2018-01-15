@@ -34,7 +34,7 @@ public:
 private:
   DepthBook book_;
   DepthBook implbook_;
-
+  bool statechange_;
   void Callback(DepthBook const&);
   void ClearState();
 };

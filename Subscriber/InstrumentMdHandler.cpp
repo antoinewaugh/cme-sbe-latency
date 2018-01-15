@@ -4,7 +4,6 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-
 void HandleBidEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& book, uint64_t transacttime) {
 
   auto level = entry.mDPriceLevel();
@@ -39,11 +38,15 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
 }
 
 void InstrumentMdHandler::ClearState() {
+  statechange_ = false;
   book_.Clear();
   implbook_.Clear();
 }
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry, std::uint64_t transacttime) {
+
+  statechange_ = true;
+
   switch(entry.mDEntryType()) {
     case MDEntryTypeBook::Bid:
       HandleBidEntry(entry, book_, transacttime);
@@ -65,6 +68,9 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries 
 
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries &entry, std::uint64_t transacttime) {
+
+  statechange_ = true;
+
   auto action = entry.mDUpdateAction();
   switch(action) {
     case MDUpdateAction::New:
@@ -82,6 +88,7 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries
 //..... Need to expand out all other ::NoMDEntries types
 
 void InstrumentMdHandler::OnSecurityStatus(SecurityStatus30 &status) {
+  statechange_ = true;
 //  statushandler_.....
 }
 
@@ -153,8 +160,11 @@ void InstrumentMdHandler::OnChannelReset() {
 
 void InstrumentMdHandler::Commit() {
 
-//  Callback(implbook_);
-  Callback(book_);
+  if(statechange_) {
+    statechange_ = false;
+    //  Callback(implbook_);
+    Callback(book_);
+  }
 }
 
 
