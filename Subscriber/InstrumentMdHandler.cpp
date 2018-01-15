@@ -38,6 +38,7 @@ void HandleAskEntry(MDIncrementalRefreshBook32::NoMDEntries& entry, DepthBook& b
 void InstrumentMdHandler::ClearState() {
 
   statechange_ = false;
+  std::cout << "state change -> False" << '\n';
 
   book_.Clear();
   implbook_.Clear();
@@ -47,6 +48,7 @@ void InstrumentMdHandler::ClearState() {
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshBook32::NoMDEntries &entry, std::uint64_t transacttime) {
 
   statechange_ = true;
+  std::cout << "state change -> True" << '\n';
 
   switch(entry.mDEntryType()) {
     case MDEntryTypeBook::Bid:
