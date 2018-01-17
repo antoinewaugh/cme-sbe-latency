@@ -49,6 +49,13 @@ BidV		Price		AskV
 ```
 # Todo
 
+* handle channel-level sequence gaps, i.e. if gap occurs in instrument download how shall this be handled?
+* channel controller should check every packet msgseqnum > previous. and detect a gap if need be.
+    * data could also be supressed if packet has been procesesd in the past. confirm behaviour is in fact duplicate msgid
+* instrument discovery: startup process
+* recovery from snapshot - > updated market statistics
+
+
 * confirm this line : if(*message.securityGroup() != message.securityGroupNullValue()) { // need to confirm this
 * start adding catch2 tests today
 
@@ -68,9 +75,7 @@ BidV		Price		AskV
    
 * Testing:
     0. Add Catch2 support
-    1. Unit test:
-        * Decoder
-        * Subscriber 
+
     
 * Record latency range for sample subscription to ES, compare to SBE adapter
 

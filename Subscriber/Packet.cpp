@@ -14,6 +14,10 @@ void Packet::Reset(char *data, size_t received) {
   rawbytes_ = data;
   received_ = received  ;
   processed_ = kByteOffest;
+  if(received > kByteOffest) {
+    seqnum_ = SBE_LITTLE_ENDIAN_ENCODE_32(*((std::uint32_t *) (data)));
+    sendtime_ = SBE_LITTLE_ENDIAN_ENCODE_64(*((std::uint64_t *) (data + sizeof(uint32_t))));
+  }
 }
 
 uint32_t Packet::GetSeqNum() {

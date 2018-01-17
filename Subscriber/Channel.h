@@ -6,10 +6,13 @@
 #include "InstrumentMdHandler.h"
 #include "ChannelAccessor.h"
 #include "ChannelController.h"
+#include "SymbolController.h"
 
 #include<string>
 #include<memory>
 #include "Config.h"
+
+using sp::lltp::cme::SymbolController;
 
 template<typename T>
 class Channel: public ChannelAccessor {
@@ -24,7 +27,7 @@ private:
   MulticastReceiver instrumenta_;
   MulticastReceiver instrumentb_;
 
-//  InstrumentMdHandler instruments_;
+  SymbolController symbol_controller_;
   ChannelController channel_controller_;
   bool IsSnapshotFeedActive();
   void OnPacket(Type, Feed, Packet*);
@@ -68,6 +71,7 @@ public:
 
   void SubscribeToSnapshotsForInstrument(uint32_t securityid);
   void UnsubscribeToSnapshotsForInstrument(uint32_t securityid);
+  void UnsubscribeInstrumentDownload();
 
   void StartAll();
   void StopAll();
@@ -119,8 +123,11 @@ std::unique_ptr<Channel<T>> Channel<T>::make_channel(T handler, std::string chan
 }
 
 template<typename T> void Channel<T>::OnPacket(Type type, Feed feed, Packet *data) {
+  std::cout << "type: " << type << ", feed: " << feed << " , Packet seqnum " << data->GetSeqNum() << '\n';
+  return;
+
   switch(type) {
-    //case Instrument: instruments_.OnInstrumentPacket(data); break;
+//    case Instrument: symbol_controller_.OnInstrumentPacket(data); break;
     case Snapshot: channel_controller_.OnSnapshotPacket(data); break;
     case Incremental: channel_controller_.OnIncrementalPacket(data); break;
   }
@@ -141,6 +148,9 @@ template<typename T> Channel<T>::Channel(T handler, std::string channelid, Multi
   instrumentb_.Register([this](auto type, auto feed, Packet* packet){this->OnPacket(type, feed, packet);});
 
   channel_controller_ = ChannelController(this);
+
+  StartInstrumentFeed();
+
 }
 
 template<typename T> std::string Channel<T>::GetId() {
@@ -274,6 +284,11 @@ template<typename T> void Channel<T>::UnsubscribeToSnapshotsForInstrument(uint32
       }
     }
   }
+}
+
+template <typename T>
+void Channel<T>::UnsubscribeInstrumentDownload() {
+  StopInstrumentFeed();
 }
 
 

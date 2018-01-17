@@ -16,6 +16,7 @@ set(HEADER_FILES
         ChannelAccessor.h
         InstrumentController.h
         ChannelController.h
+        SymbolController.h
         InstrumentMdHandler.h
         Channel.h
         )
@@ -27,6 +28,7 @@ set(SOURCE_FILES
         Packet.cpp
         ChannelAccessor.cpp
         InstrumentController.cpp
+        SymbolController.cpp
         ChannelController.cpp
         InstrumentMdHandler.cpp
         Channel.cpp

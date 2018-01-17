@@ -69,6 +69,16 @@ void ChannelController::OnIncrementalMessage(Message& m) {
   }
 }
 
+void ChannelController::OnInstrumentMessage(Message& m) {
+  auto templateid = m.GetTemplateId();
+  if(templateid == MDInstrumentDefinitionSpread29::sbeTemplateId()) {
+    HandleInstrumentMessage<MDInstrumentDefinitionSpread29>(m);
+  } else if(templateid == MDInstrumentDefinitionOption41::sbeTemplateId()) {
+    HandleInstrumentMessage<MDInstrumentDefinitionOption41>(m);
+  } else if(templateid == MDInstrumentDefinitionFuture27::sbeTemplateId()) {
+    HandleInstrumentMessage<MDInstrumentDefinitionFuture27>(m);
+  }
+}
 
 void ChannelController::OnIncrementalPacket(Packet *packet) {
  
@@ -142,4 +152,5 @@ void ChannelController::Commit() {
      inst_controller.Commit();
   }
 }
+
 
