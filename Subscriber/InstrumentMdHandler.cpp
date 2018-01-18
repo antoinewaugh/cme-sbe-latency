@@ -71,8 +71,8 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTrade36::NoMDEntries
 
 void InstrumentMdHandler::OnSecurityStatus(SecurityStatus30 &status) {
 
-  auto TranslateStatus = [=](SecurityStatus30 s) -> sp::lltp::cme::SecurityStatus {
-    switch(s.securityTradingStatus()) {
+  auto TranslateStatus = [=](SecurityTradingStatus::Value s) -> sp::lltp::cme::SecurityStatus {
+    switch(s) {
       case SecurityTradingStatus::TradingHalt: return SecurityStatus(SecurityStatus::TradingHalt);
       case SecurityTradingStatus::Close: return SecurityStatus(SecurityStatus::Close);
       case SecurityTradingStatus::NewPriceIndication: return SecurityStatus(SecurityStatus::NewPriceIndication);
@@ -88,7 +88,7 @@ void InstrumentMdHandler::OnSecurityStatus(SecurityStatus30 &status) {
     }
   };
 
-  handler_.OnStatus(0, TranslateStatus(status));
+  handler_.OnStatus(0, TranslateStatus(status.securityTradingStatus()));
 }
 
 void InstrumentMdHandler::Reset() {
@@ -119,11 +119,68 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
       case MDEntryType::ImpliedOffer:
         implbook_.AddAsk(level, price, volume);
         break;
+      case MDEntryType::Trade:
+        handler_.OnTrade(refresh.securityID(), {price, volume}); // persist? callbacks after whole book updated?
+        break;
+      case MDEntryType::OpenPrice:
+        statistics_.openingprice = price;
+        break;
+      case MDEntryType::SettlementPrice:
+        statistics_.settlement = price;
+        break;
+      case MDEntryType::TradingSessionHighPrice:
+        statistics_.sessionhighprice = price;
+        break;
+      case MDEntryType::TradingSessionLowPrice:
+        statistics_.sessionlowprice = price;
+        break;
+      case MDEntryType::ClearedVolume:
+        statistics_.clearedvolume = volume;
+        break;
+      case MDEntryType::OpenInterest:
+        statistics_.openinterest = volume;
+        break;
+      case MDEntryType::BookReset:
+        // really?
+        break;
+      case MDEntryType::SessionHighBid:
+        statistics_.sessionhighbid = price;
+        break;
+      case MDEntryType::SessionLowOffer:
+        statistics_.sessionlowask = price;
+        break;
+      case MDEntryType::FixingPrice:
+        statistics_.fixingprice = price;
+        break;
+      case MDEntryType::ElectronicVolume:
+        statistics_.electronicvolume = volume;
+        break;
     }
   }
 
-  handler_.OnQuote(0, book_, 0);
+  auto TranslateStatus = [=](SecurityTradingStatus::Value s) -> sp::lltp::cme::SecurityStatus {
+    switch(s) {
+      case SecurityTradingStatus::TradingHalt: return SecurityStatus(SecurityStatus::TradingHalt);
+      case SecurityTradingStatus::Close: return SecurityStatus(SecurityStatus::Close);
+      case SecurityTradingStatus::NewPriceIndication: return SecurityStatus(SecurityStatus::NewPriceIndication);
+      case SecurityTradingStatus::ReadyToTrade: return SecurityStatus(SecurityStatus::ReadyToTrade);
+      case SecurityTradingStatus::NotAvailableForTrading: return SecurityStatus(SecurityStatus::NotAvailableForTrading);
+      case SecurityTradingStatus::UnknownorInvalid: return SecurityStatus(SecurityStatus::UnknownorInvalid);
+      case SecurityTradingStatus::PreOpen: return SecurityStatus(SecurityStatus::PreOpen);
+      case SecurityTradingStatus::PreCross: return SecurityStatus(SecurityStatus::PreCross);
+      case SecurityTradingStatus::Cross: return SecurityStatus(SecurityStatus::Cross);
+      case SecurityTradingStatus::PostClose: return SecurityStatus(SecurityStatus::PostClose);
+      case SecurityTradingStatus::NoChange: return SecurityStatus(SecurityStatus::NoChange);
+      case SecurityTradingStatus::NULL_VALUE: return SecurityStatus(SecurityStatus::NULL_VALUE);
+    }
+  };
+
+  handler_.OnQuote(refresh.securityID(), book_, refresh.rptSeq());
+  handler_.OnStatistics(refresh.securityID(), statistics_);
+  handler_.OnStatus(refresh.securityID(), TranslateStatus(refresh.mDSecurityTradingStatus()));
+
 }
+
 
 void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMDEntries &entry, std::uint64_t transacttime) {
 

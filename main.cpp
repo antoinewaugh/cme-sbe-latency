@@ -23,14 +23,17 @@ int main(int argc, char *argv[]) {
 //    std::cout << channel << '\n';
 //  }
 
+
   boost::asio::io_service io_service;
+ // boost::asio::io_service::work work(io_service);
+
 //  auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
   auto listen_address = boost::asio::ip::address::from_string("10.144.138.2");
   auto configs = Config::load("config.xml");
   auto channel = Channel<Handler>::make_channel(handler, "310", configs, io_service, listen_address);
 
-  uint64_t ESH8 = 21168; // ESZ7;
-  channel->Subscribe(ESH8);
+  //channel->Subscribe(21168);
+  channel->Subscribe("ESH8");
 
   io_service.run();
 

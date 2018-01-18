@@ -10,7 +10,7 @@ void PrintTime(std::string ref, unsigned long transacttime) {
       .count();
   int diff = our_ts - transacttime;
 
-  std::cout << ref << ": " << diff/1000 << " μs" <<  '\n';
+  std::cout << ref << ": " << diff << " nanos" <<  '\n';
 }
 
 void ChannelController::HandleSnapshotMessage(Message& m) {
@@ -70,31 +70,24 @@ void ChannelController::OnIncrementalMessage(Message& m) {
 }
 
 void ChannelController::OnIncrementalPacket(Packet *packet) {
-
-
-  while(packet->HasNextMessage()) {
-    unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::system_clock::now().time_since_epoch())
-        .count();
-    auto& message = packet->NextMessage();
-    OnIncrementalMessage(message);
-    PrintTime("Incremental Message", ts);
+  auto seqnum = packet->GetSeqNum();
+  if(seqnum == expectedseqnum_ || expectedseqnum_ == 0) {
+    expectedseqnum_ = seqnum + 1;
+    while (packet->HasNextMessage()) {
+      auto &message = packet->NextMessage();
+      OnIncrementalMessage(message);
+    }
+  } else if (seqnum > expectedseqnum_) {
+    // seq gap detected on incremental - currently only reset occurs when
+    std::cout << "Packet level seq gap detected on incremental channel, ignoring unless RptSeq sync issue." << '\n';
   }
-
 }
 
 void ChannelController::OnSnapshotPacket(Packet *packet) {
-
-  unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::system_clock::now().time_since_epoch())
-      .count();
-
   while(packet->HasNextMessage()) {
     auto& message = packet->NextMessage();
     HandleSnapshotMessage(message);
   }
-
-  PrintTime("Snapshot", ts);
 }
 
 void ChannelController::Subscribe(uint32_t securityid) {

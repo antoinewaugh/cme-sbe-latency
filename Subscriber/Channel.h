@@ -20,7 +20,6 @@ class Channel: public ChannelAccessor {
 private:
 
   std::string channelid_;
-  long expectedseqnum_ = 0;
   MulticastReceiver incrementala_;
   MulticastReceiver incrementalb_;
   MulticastReceiver snapshota_;
@@ -34,6 +33,7 @@ private:
   void OnPacket(Type, Feed, Packet*);
 
   T handler;
+  std::vector<std::string> pendingsubscription_;
 
 public:
   Channel(T handler, std::string channelid,
@@ -49,7 +49,9 @@ public:
 
   void Subscribe(uint32_t securityid);
   void Unsubscribe(uint32_t
-                   securityid);
+  securityid);
+  void Subscribe(std::string symbol);
+  void Unsubscribe(std::string symbol);
 
   void StartIncrementalA();
   void StopIncrementalA();
@@ -69,13 +71,15 @@ public:
   void StopSnapshotFeed();
   void StartInstrumentFeed();
   void StopInstrumentFeed();
-
-  void SubscribeToSnapshotsForInstrument(uint32_t securityid);
-  void UnsubscribeToSnapshotsForInstrument(uint32_t securityid);
-  void UnsubscribeInstrumentDownload();
-
   void StartAll();
   void StopAll();
+
+  // exposed via the ChannelAccessor api
+  void SubscribeToSnapshotsForInstrument(uint32_t securityid);
+  void UnsubscribeToSnapshotsForInstrument(uint32_t securityid);
+  void SubscribeInstrumentDownload();
+  void UnsubscribeInstrumentDownload();
+
 
   static std::unique_ptr<Channel<T>> make_channel(T handler,
                                    std::string channelid, Config &config,
@@ -124,19 +128,10 @@ std::unique_ptr<Channel<T>> Channel<T>::make_channel(T handler, std::string chan
 }
 
 template<typename T> void Channel<T>::OnPacket(Type type, Feed feed, Packet *data) {
-
-  auto seqnum = data->GetSeqNum();
-
   switch(type) {
     case Instrument: symbol_controller_.OnInstrumentPacket(data); break;
     case Snapshot: channel_controller_.OnSnapshotPacket(data); break;
-    case Incremental:
-      if(seqnum >= expectedseqnum_) { // handler for sequence gap detection
-        expectedseqnum_ = seqnum + 1;
-        channel_controller_.OnIncrementalPacket(data);
-        //std::cout << "type: " << type << ", feed: " << feed << " , Packet seqnum " << data->GetSeqNum() << '\n';
-      }
-      break;
+    case Incremental: channel_controller_.OnIncrementalPacket(data);
   }
 }
 
@@ -157,8 +152,6 @@ template<typename T> Channel<T>::Channel(T handler, std::string channelid, Multi
   channel_controller_ = ChannelController(this);
   symbol_controller_ = SymbolController(this);
 
-  StartInstrumentFeed();
-
 }
 
 template<typename T> std::string Channel<T>::GetId() {
@@ -168,6 +161,7 @@ template<typename T> std::string Channel<T>::GetId() {
 template<typename T> void Channel<T>::Subscribe(uint32_t securityid) {
   channel_controller_.Subscribe(securityid);
   StartIncrementalFeed();
+
 }
 
 template<typename T> void Channel<T>::Unsubscribe(uint32_t securityid) {
@@ -234,6 +228,11 @@ template<typename T> void Channel<T>::StopInstrumentFeed() {
   std::cout << "Stopping Instrument Feeds: " << channelid_ << '\n';
   StopInstrumentA();
   StopInstrumentB();
+  for(auto &symbol : pendingsubscription_) {
+    auto symbolid = symbol_controller_.GetInstrument(symbol).securityid;
+    std::cout << "Subscribing to symbol: " << symbolid << '\n';
+    Subscribe(symbolid);
+  }
 }
 
 template<typename T> void Channel<T>::StartAll() {
@@ -299,5 +298,18 @@ void Channel<T>::UnsubscribeInstrumentDownload() {
   StopInstrumentFeed();
 }
 
+template <typename T>
+void Channel<T>::SubscribeInstrumentDownload() {
+  StartInstrumentFeed();
+}
 
+template <typename T>
+void Channel<T>::Subscribe(std::string symbol) {
+  pendingsubscription_.push_back(symbol);
+}
+
+template <typename T>
+void Channel<T>::Unsubscribe(std::string symbol) {
+  symbol_controller_.GetInstrument(symbol).securityid;
+}
 

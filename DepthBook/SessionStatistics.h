@@ -18,6 +18,7 @@ namespace cme {
     int settlement = 0;
     int openinterest = 0;
     int clearedvolume = 0;
+    int electronicvolume = 0;
 
     friend std::ostream &operator<<(std::ostream &os, const SessionStatistics &statistics);
   };
