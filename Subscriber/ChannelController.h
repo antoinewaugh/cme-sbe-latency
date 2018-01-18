@@ -43,7 +43,9 @@ private:
     auto message = m.Get<T>();
     auto transacttime = message.transactTime();
     auto& entry = message.noMDEntries();
+    int i = 0;
     while(entry.hasNext()) {
+      i++;
       entry.next();
       auto inst_controller = GetInstrumentController(entry.securityID());
       if(inst_controller) {
@@ -53,6 +55,7 @@ private:
     if(message.matchEventIndicator().endOfEvent()) {
       Commit();
     }
+    std::cout<<"entries: " << i << '\n';
   }
 
   void OnIncrementalMessage(Message&);
