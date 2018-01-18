@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <chrono>
-
 void PrintTime(std::string ref, unsigned long transacttime) {
   unsigned long our_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
       std::chrono::system_clock::now().time_since_epoch())
@@ -15,7 +14,7 @@ void PrintTime(std::string ref, unsigned long transacttime) {
 }
 
 void ChannelController::HandleSnapshotMessage(Message& m) {
-  auto& snapshot = m.Get<SnapshotFullRefresh38>(); 
+  auto& snapshot = m.Get<SnapshotFullRefresh38>();
   auto inst_controller = GetInstrumentController(snapshot.securityID());
   if(inst_controller) {
     inst_controller->OnSnapshot(snapshot, snapshot.transactTime());
@@ -31,6 +30,7 @@ InstrumentController* ChannelController::GetInstrumentController(uint32_t securi
 }
 
 void ChannelController::HandleIncrementalSecurityStatus(Message& m) {
+//  void ChannelController::HandleIncrementalSecurityStatus(Message& m) {
   auto& message = m.Get<SecurityStatus30>();
   // if group available, propagate status event to all instruments
   // (receiving instrument controllers check for group relevance)
@@ -69,29 +69,18 @@ void ChannelController::OnIncrementalMessage(Message& m) {
   }
 }
 
-void ChannelController::OnInstrumentMessage(Message& m) {
-  auto templateid = m.GetTemplateId();
-  if(templateid == MDInstrumentDefinitionSpread29::sbeTemplateId()) {
-    HandleInstrumentMessage<MDInstrumentDefinitionSpread29>(m);
-  } else if(templateid == MDInstrumentDefinitionOption41::sbeTemplateId()) {
-    HandleInstrumentMessage<MDInstrumentDefinitionOption41>(m);
-  } else if(templateid == MDInstrumentDefinitionFuture27::sbeTemplateId()) {
-    HandleInstrumentMessage<MDInstrumentDefinitionFuture27>(m);
-  }
-}
-
 void ChannelController::OnIncrementalPacket(Packet *packet) {
- 
-  unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::system_clock::now().time_since_epoch())
-      .count();
+
 
   while(packet->HasNextMessage()) {
+    unsigned long ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::system_clock::now().time_since_epoch())
+        .count();
     auto& message = packet->NextMessage();
     OnIncrementalMessage(message);
+    PrintTime("Incremental Message", ts);
   }
 
-  PrintTime("Incremental", ts);
 }
 
 void ChannelController::OnSnapshotPacket(Packet *packet) {

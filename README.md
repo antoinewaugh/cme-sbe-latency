@@ -55,6 +55,9 @@ BidV		Price		AskV
 * instrument discovery: startup process
 * recovery from snapshot - > updated market statistics
 
+# thoughts on performance
+* microbenchmark adding/removing/modifying book
+* decoding of non-relevant packets time taken to relevant, identify overhead of calling instrument...
 
 * confirm this line : if(*message.securityGroup() != message.securityGroupNullValue()) { // need to confirm this
 * start adding catch2 tests today

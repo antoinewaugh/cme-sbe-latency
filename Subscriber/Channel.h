@@ -20,6 +20,7 @@ class Channel: public ChannelAccessor {
 private:
 
   std::string channelid_;
+  long expectedseqnum_ = 0;
   MulticastReceiver incrementala_;
   MulticastReceiver incrementalb_;
   MulticastReceiver snapshota_;
@@ -123,13 +124,19 @@ std::unique_ptr<Channel<T>> Channel<T>::make_channel(T handler, std::string chan
 }
 
 template<typename T> void Channel<T>::OnPacket(Type type, Feed feed, Packet *data) {
-  std::cout << "type: " << type << ", feed: " << feed << " , Packet seqnum " << data->GetSeqNum() << '\n';
-  return;
+
+  auto seqnum = data->GetSeqNum();
 
   switch(type) {
-//    case Instrument: symbol_controller_.OnInstrumentPacket(data); break;
+    case Instrument: symbol_controller_.OnInstrumentPacket(data); break;
     case Snapshot: channel_controller_.OnSnapshotPacket(data); break;
-    case Incremental: channel_controller_.OnIncrementalPacket(data); break;
+    case Incremental:
+      if(seqnum >= expectedseqnum_) { // handler for sequence gap detection
+        expectedseqnum_ = seqnum + 1;
+        channel_controller_.OnIncrementalPacket(data);
+        //std::cout << "type: " << type << ", feed: " << feed << " , Packet seqnum " << data->GetSeqNum() << '\n';
+      }
+      break;
   }
 }
 
@@ -148,6 +155,7 @@ template<typename T> Channel<T>::Channel(T handler, std::string channelid, Multi
   instrumentb_.Register([this](auto type, auto feed, Packet* packet){this->OnPacket(type, feed, packet);});
 
   channel_controller_ = ChannelController(this);
+  symbol_controller_ = SymbolController(this);
 
   StartInstrumentFeed();
 

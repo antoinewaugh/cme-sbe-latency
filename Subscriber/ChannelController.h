@@ -38,7 +38,6 @@ public:
 private:
 
   void Commit();
-
   template<typename T>
   void HandleIncrementalMessage(Message& m) {
     auto message = m.Get<T>();
@@ -56,39 +55,10 @@ private:
     }
   }
 
-  template<typename T>
-  void HandleInstrumentMessage(Message& m) {
-    auto& message = m.Get<T>();
-    auto securitystatus = message.mDSecurityTradingStatus();
-    auto securityid = message.securityID();
-    auto symbol = message.getSymbolAsString();
-    auto securitygroupid = message.getSecurityGroupAsString();
-    auto type = message.getSecurityTypeAsString();
-
-    switch(message.securityUpdateAction()) {
-      case SecurityUpdateAction::Add: break;
-      case SecurityUpdateAction::Delete: break;
-      case SecurityUpdateAction::Modify: break;
-    }
-
-    // todo:
-    // add / delete / modify instrument map/vector
-    // add support for HandleInsturmentMessage to be called from incremental feed
-    // unsubscribe from instrument feed once contracts downloaded
-    // consider larger scale missing packets on instrument download etc, message seq number tracking...
-    // add static routes
-    // test on cert
-    // consider monitoring packet level seq num gaps
-    // consider tests which mimic the cme cert process proir to doing certification..
-
-  }
-
   void OnIncrementalMessage(Message&);
   void HandleSnapshotMessage(Message& m);
-  void OnInstrumentMessage(Message& m);
   void HandleIncrementalSecurityStatus(Message& m);
   void HandleIncrementalQuoteRequest(Message& m);
-
   InstrumentController* GetInstrumentController(uint32_t securityid);
   std::map<uint32_t, InstrumentController> instrument_controllers_;
   std::vector<std::uint32_t> outofsync_instruments_;
