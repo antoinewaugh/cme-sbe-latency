@@ -14,10 +14,13 @@ namespace cme {
 struct Instrument {
  int securityid;
  std::string symbol;
- std::string securitygroupid;
+ std::string securitygroup;
  std::string type;
+ uint64_t activationdatetime;
+ uint64_t expirationdatetime;
+ int marketsegmentid;
 
-  friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument);
+ friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument);
 };
 
 class SymbolController {
@@ -56,11 +59,25 @@ void SymbolController::HandleDefinition(T& definition) {
   auto securitystatus = definition.mDSecurityTradingStatus();
   auto securityid = definition.securityID();
   auto symbol = std::string(definition.getSymbolAsString().c_str());                  // std::string wrapper required as AsString returns string containing fixed length
-  auto securitygroupid = std::string(definition.getSecurityGroupAsString().c_str());
+  auto securitygroup = std::string(definition.getSecurityGroupAsString().c_str());
   auto type = std::string(definition.getSecurityTypeAsString().c_str());
+  auto marketsegmentid = definition.marketSegmentID();
+
+  uint64_t  activationdatetime;
+  uint64_t  expirydatetime;
+
+  auto event = definition.noEvents();
+  while(event.hasNext())  {
+    uint64_t time = event.eventTime();
+    event.next();
+    switch(event.eventType()) {
+      case EventType::Activation:  activationdatetime = event.eventTime();
+      case EventType::LastEligibleTradeDate: expirydatetime = event.eventTime();
+    }
+  }
 
   if(definition.securityUpdateAction() == SecurityUpdateAction::Add) {
-    auto instrument = Instrument{securityid, symbol, securitygroupid, type};
+    auto instrument = Instrument{securityid, symbol, securitygroup, type, activationdatetime, expirydatetime, marketsegmentid};
     instruments_.emplace(symbol, instrument);
     std::cout << instrument << '\n';
   } else if(definition.securityUpdateAction() == SecurityUpdateAction::Modify) {
@@ -68,7 +85,7 @@ void SymbolController::HandleDefinition(T& definition) {
     if (result != std::end(instruments_)) {
       auto instrument = result->second;
       instrument.securityid = securityid;
-      instrument.securitygroupid = securitygroupid;
+      instrument.securitygroup = securitygroup;
       instrument.type = type;
     }
   } else if(definition.securityUpdateAction() == SecurityUpdateAction::Delete) {

@@ -9,7 +9,7 @@ static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
 void Handler::OnQuote(uint64_t securityid,DepthBook const& book,
                       uint64_t seqnum) {
- clear();
+// clear();
   std::cout << book << '\n';
 }
 

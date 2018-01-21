@@ -29,11 +29,16 @@ int main(int argc, char *argv[]) {
 
 //  auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
   auto listen_address = boost::asio::ip::address::from_string("10.144.138.2");
-  auto configs = Config::load("config.xml");
-  auto channel = Channel<Handler>::make_channel(handler, "310", configs, io_service, listen_address);
+  //auto configs = Config::load("config.xml");
+//  auto channel = Channel<Handler>::make_channel(handler, "310", configs, io_service, listen_address);
+  auto configs = Config::load("config-conformance.xml");
+  auto channel = Channel<Handler>::make_channel(handler, "925", configs, io_service, listen_address);
 
   //channel->Subscribe(21168);
-  channel->Subscribe("ESH8");
+  channel->Subscribe("0GLBJ8");
+//  channel->Subscribe("ESH8");
+
+
 
   io_service.run();
 

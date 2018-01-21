@@ -98,6 +98,8 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
 
   ClearState();
 
+  Trade trade;
+
   auto &entry = refresh.noMDEntries();
   while (entry.hasNext()) {
     entry.next();
@@ -120,7 +122,9 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
         implbook_.AddAsk(level, price, volume);
         break;
       case MDEntryType::Trade:
-        handler_.OnTrade(refresh.securityID(), {price, volume}); // persist? callbacks after whole book updated?
+        trade.price = price;
+        trade.volume = volume;
+        handler_.OnTrade(refresh.securityID(), trade); // persist? callbacks after whole book updated?
         break;
       case MDEntryType::OpenPrice:
         statistics_.openingprice = price;
@@ -141,7 +145,7 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
         statistics_.openinterest = volume;
         break;
       case MDEntryType::BookReset:
-        // really?
+        // Nothing to do, book already cleared.
         break;
       case MDEntryType::SessionHighBid:
         statistics_.sessionhighbid = price;
@@ -175,6 +179,10 @@ void InstrumentMdHandler::OnSnapshot(SnapshotFullRefresh38 &refresh, std::uint64
     }
   };
 
+  statistics_.lowlimitprice = refresh.lowLimitPrice().mantissa() * std::pow(10, refresh.lowLimitPrice().exponent());
+  statistics_.highlimitprice = refresh.highLimitPrice().mantissa() * std::pow(10, refresh.highLimitPrice().exponent());
+
+  handler_.OnQuote(refresh.securityID(), implbook_, refresh.rptSeq());
   handler_.OnQuote(refresh.securityID(), book_, refresh.rptSeq());
   handler_.OnStatistics(refresh.securityID(), statistics_);
   handler_.OnStatus(refresh.securityID(), TranslateStatus(refresh.mDSecurityTradingStatus()));
@@ -186,7 +194,12 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshTradeSummary42::NoMD
 
   auto price = entry.mDEntryPx().mantissa() * std::pow(10, entry.mDEntryPx().exponent());
   auto volume = entry.mDEntrySize();
-  Trade trade(price, volume);
+  int updatetype = 0; // New
+  switch(entry.mDUpdateAction())  {
+    case MDUpdateAction::Change: updatetype = 1; break;
+    case MDUpdateAction::Delete: updatetype = 2; break;
+  }
+  Trade trade(price, volume, updatetype);
 
   handler_.OnTrade(entry.securityID(), trade);
 
@@ -229,8 +242,8 @@ void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoM
   auto highprice = entry.highLimitPrice().mantissa() * std::pow(10, entry.highLimitPrice().exponent());
   auto lowprice = entry.lowLimitPrice().mantissa() * std::pow(10, entry.lowLimitPrice().exponent());
 
-  statistics_.sessionlowprice = lowprice;
-  statistics_.sessionhighprice= highprice;
+  statistics_.lowlimitprice = lowprice;
+  statistics_.highlimitprice= highprice;
 
   handler_.OnStatistics(entry.securityID(), statistics_);
 }

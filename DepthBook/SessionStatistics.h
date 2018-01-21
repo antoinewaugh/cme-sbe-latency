@@ -8,6 +8,8 @@ namespace cme {
 
   struct SessionStatistics {
 
+    int lowlimitprice = 0;
+    int highlimitprice = 0;
     int openingprice = 0;
     int fixingprice = 0;
     int indictiveopeningprice = 0;
