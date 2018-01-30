@@ -1,6 +1,6 @@
 #include "DepthBook.h"
 
-DepthBook::DepthBook() : bids_(true), asks_(false) {}
+//MarketData::MarketData() : bids_(true), asks_(false) {}
 
 void DepthBook::AddBid(int level, float price, int quantity) {
   bids_.Add(level, price, quantity);
@@ -16,7 +16,7 @@ void DepthBook::DeleteBid(int level, float price) {
 
 void DepthBook::DeleteBidFrom(int level) { bids_.DeleteFrom(level); }
 
-void DepthBook::DeleteBidThru() { bids_.DeleteThru(); }
+void DepthBook::DeleteBidThru(int level) { bids_.DeleteThru(level); }
 
 void DepthBook::AddAsk(int level, float price, int quantity) {
   asks_.Add(level, price, quantity);
@@ -32,7 +32,7 @@ void DepthBook::DeleteAsk(int level, float price) {
 
 void DepthBook::DeleteAskFrom(int level) { asks_.DeleteFrom(level); }
 
-void DepthBook::DeleteAskThru() { asks_.DeleteThru(); }
+void DepthBook::DeleteAskThru(int level) { asks_.DeleteThru(level); }
 
 void DepthBook::Clear() {
   bids_.Clear();
@@ -45,6 +45,7 @@ const DepthList DepthBook::Asks() const { return asks_; }
 
 std::ostream &operator<<(std::ostream &os, DepthBook const& book) {
 
+  os << "Security: " << book.security_ << '\n';
   os << "BidV\t\tPrice\t\tAskV" << '\n';
   os << "--------------------------------------" << '\n';
 

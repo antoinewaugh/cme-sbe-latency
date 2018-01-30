@@ -20,50 +20,72 @@
 #include <map>
 #include <chrono>
 #include <iostream>
+#include "Instrument.h"
 
-class ChannelController {
+namespace sp {
+namespace lltp {
+namespace cme {
 
-public:
-  ChannelController() = default;
-  ChannelController(ChannelAccessor* channel);
-  void OnIncrementalPacket(Packet*);
-  void OnSnapshotPacket(Packet*);
-  void OnInstrumentPacket(Packet*);
-  void AddOutOfSyncInstrument(uint32_t securityid);
-  bool RemoveOutOfSyncInstrument(uint32_t securityid);
-  bool HasOutOfSyncInstruments();
-  void Subscribe(uint32_t securityid);
-  void Unsubscribe(uint32_t securityid);
+  class ChannelController {
 
-private:
+  public:
+    ChannelController() = default;
 
-  void Commit();
-  template<typename T>
-  void HandleIncrementalMessage(Message& m) {
-    auto message = m.Get<T>();
-    auto transacttime = message.transactTime();
-    auto& entry = message.noMDEntries();
-    while(entry.hasNext()) {
-      entry.next();
-      auto inst_controller = GetInstrumentController(entry.securityID());
-      if(inst_controller) {
-        inst_controller->OnIncremental(entry, transacttime);
+    ChannelController(ChannelAccessor *channel);
+
+    void OnIncrementalPacket(Packet *);
+
+    void OnSnapshotPacket(Packet *);
+
+    void OnInstrumentPacket(Packet *);
+
+    void AddOutOfSyncInstrument(uint32_t securityid);
+
+    bool RemoveOutOfSyncInstrument(uint32_t securityid);
+
+    bool HasOutOfSyncInstruments();
+
+    void Subscribe(Instrument inst);
+
+    void Unsubscribe(uint32_t securityid);
+
+  private:
+
+    void Commit();
+
+    template<typename T>
+    void HandleIncrementalMessage(Message &m) {
+      auto message = m.Get<T>();
+      auto transacttime = message.transactTime();
+      auto &entry = message.noMDEntries();
+      while (entry.hasNext()) {
+        entry.next();
+        auto inst_controller = GetInstrumentController(entry.securityID());
+        if (inst_controller) {
+          inst_controller->OnIncremental(entry, transacttime);
+        }
+      }
+      if (message.matchEventIndicator().endOfEvent()) {
+        Commit();
       }
     }
-    if(message.matchEventIndicator().endOfEvent()) {
-      Commit();
-    }
-  }
-  long expectedseqnum_ = 0;
-  void OnIncrementalMessage(Message&);
-  void HandleSnapshotMessage(Message& m);
-  void HandleIncrementalSecurityStatus(Message& m);
-  void HandleIncrementalQuoteRequest(Message& m);
-  InstrumentController* GetInstrumentController(uint32_t securityid);
-  std::map<uint32_t, InstrumentController> instrument_controllers_;
-  std::vector<std::uint32_t> outofsync_instruments_;
-  ChannelAccessor* channel_ = nullptr;
-};
+
+    long expectedseqnum_ = 0;
+
+    void OnIncrementalMessage(Message &);
+
+    void HandleSnapshotMessage(Message &m);
+
+    void HandleIncrementalSecurityStatus(Message &m);
+
+    void HandleIncrementalQuoteRequest(Message &m);
+
+    InstrumentController *GetInstrumentController(uint32_t securityid);
+
+    std::map<uint32_t, InstrumentController> instrument_controllers_;
+    std::vector<std::uint32_t> outofsync_instruments_;
+    ChannelAccessor *channel_ = nullptr;
+  };
 
 
-
+}}}

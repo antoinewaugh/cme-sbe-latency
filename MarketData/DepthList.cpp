@@ -5,8 +5,8 @@
 #include "DepthList.h"
 #include <numeric>
 
-DepthList::DepthList(bool isbid) : isbid_(isbid) {
-  levels_.reserve(MAX_BOOK_SIZE + 1); // +1 allows for add to occur at level 1
+DepthList::DepthList(bool isbid, uint32_t size) : isbid_(isbid), size_(size) {
+  levels_.reserve(size_ + 1); // +1 allows for add to occur at level 1
                                       // which temporarily pushes book size ==
                                       // max + 1
 }
@@ -15,8 +15,8 @@ void DepthList::Add(int level, float price, int quantity) {
   if (level - 1 <= levels_.size()) {
     levels_.insert(levels_.begin() + level - 1, {price, quantity});
 
-    if (levels_.size() > MAX_BOOK_SIZE)
-      levels_.erase(levels_.begin() + MAX_BOOK_SIZE);
+    if (levels_.size() > size_)
+      levels_.erase(levels_.begin() + size_);
   } else
     std::cerr << "Add out of range." << '\n';
 }
@@ -27,10 +27,12 @@ void DepthList::Update(int level, float price, int quantity) {
     if (price_level.price == price)
       price_level.quantity = quantity;
     else
-      std::cerr << "Price mismatch on update request." << '\n';
+      std::cerr << "Price mismatch on update request: "
+                <<  price << " != " << price_level.price << '\n';
   } else {
 
-    std::cerr << "Update bid level out of range." << '\n';
+    std::cout << "Update bid level out of range : "
+              << level << " > " << levels_.size() << '\n';
   }
 }
 
@@ -41,20 +43,33 @@ void DepthList::Delete(int level, float price) {
     if (it->price == price)
       levels_.erase(it);
     else
-      std::cerr << "Price mismatch on delete request." << '\n';
+      std::cout << "Price mismatch on delete request: "
+                << price << " != " << it->price << '\n';
   } else {
-    std::cerr << "Delete level out of range." << '\n';
+    std::cout << "Delete level out of range : "
+              << level << " > " << levels_.size() << '\n';
   }
 }
 
 void DepthList::DeleteFrom(int level) {
-  if (level - 1 < levels_.size())
-    levels_.erase(levels_.begin() + level - 1, levels_.end());
-  else
-    std::cerr << "Delete bid from level out of range." << '\n';
+  if (level - 1 < levels_.size()) {
+    auto start = levels_.begin();
+    auto finish = std::next(levels_.begin(), level);
+    levels_.erase(start, finish);
+  } else {
+    std::cerr << "Delete from level out of range." << '\n';
+  }
 }
 
-void DepthList::DeleteThru() { levels_.clear(); }
+void DepthList::DeleteThru(int level) {
+  if (level - 1 < levels_.size()) {
+    auto start = std::next(levels_.begin(), level - 1);
+    auto finish = levels_.end();
+    levels_.erase(start, finish);
+  } else {
+    std::cerr << "Delete thru level out of range." << '\n';
+  }
+}
 
 void DepthList::Clear() { levels_.clear(); }
 
@@ -76,22 +91,6 @@ std::string DepthList::ToString() {
 
   return "[" + prices + "],[" + quantities + "]";
 }
-/*
-struct object
-{
-  int a;
-  int b;
-};
-
-constexpr char ListSize = 12;
-std::array<object, ListSize> list;
-std::array<std::pair<std::string, std::string>, ListSize> strings;
-std::transform(std::begin(list), std::end(list), std::begin(strings), [](const
-object& input)
-{
-return { std::to_string(input.a),  std::to_string(input.b) };
-});
-*/
 
 std::ostream &operator<<(std::ostream &os, const DepthList &list) {
   if (list.isbid_) {

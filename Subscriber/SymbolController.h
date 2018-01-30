@@ -6,22 +6,15 @@
 #include <unordered_map>
 #include <ostream>
 #include <algorithm>
+#include "Instrument.h"
+
+
 
 namespace sp {
 namespace lltp {
 namespace cme {
 
-struct Instrument {
- int securityid;
- std::string symbol;
- std::string securitygroup;
- std::string type;
- uint64_t activationdatetime;
- uint64_t expirationdatetime;
- int marketsegmentid;
-
- friend std::ostream &operator<<(std::ostream &os, const Instrument &instrument);
-};
+using sp::lltp::cme::Instrument;
 
 class SymbolController {
 public:
@@ -68,16 +61,30 @@ void SymbolController::HandleDefinition(T& definition) {
 
   auto event = definition.noEvents();
   while(event.hasNext())  {
-    uint64_t time = event.eventTime();
     event.next();
+    uint64_t time = event.eventTime();
     switch(event.eventType()) {
       case EventType::Activation:  activationdatetime = event.eventTime();
       case EventType::LastEligibleTradeDate: expirydatetime = event.eventTime();
     }
   }
 
+  int marketdepth = 0;
+  int implmarketdepth = 0;
+
+  auto feed = definition.noMDFeedTypes();
+  while(feed.hasNext()) {
+    feed.next();
+    auto type = feed.getMDFeedTypeAsString();
+    if(type == "GBX") {
+      marketdepth = feed.marketDepth();
+    } else if (type == "GBI") {
+      implmarketdepth = feed.marketDepth();
+    }
+  }
+
   if(definition.securityUpdateAction() == SecurityUpdateAction::Add) {
-    auto instrument = Instrument{securityid, symbol, securitygroup, type, activationdatetime, expirydatetime, marketsegmentid};
+    auto instrument = Instrument{securityid, symbol, securitygroup, type, activationdatetime, expirydatetime, marketsegmentid, marketdepth, implmarketdepth};
     instruments_.emplace(symbol, instrument);
     std::cout << instrument << '\n';
   } else if(definition.securityUpdateAction() == SecurityUpdateAction::Modify) {

@@ -19,7 +19,17 @@ enum SecurityStatus {
   Cross = (std::uint8_t)25,
   PostClose = (std::uint8_t)26,
   NoChange = (std::uint8_t)103,
-  NULL_VALUE = (std::uint8_t)255
+  NULL_STATUS = (std::uint8_t)255
+};
+
+enum SecurityEvent
+{
+  NoEvent = (std::uint8_t)0,
+  NoCancel = (std::uint8_t)1,
+  ResetStatistics = (std::uint8_t)4,
+  ImpliedMatchingON = (std::uint8_t)5,
+  ImpliedMatchingOFF = (std::uint8_t)6,
+  NULL_EVENT = (std::uint8_t)255
 };
 
 }}} // sp.llts.cme

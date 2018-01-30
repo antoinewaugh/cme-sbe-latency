@@ -1,8 +1,9 @@
-project(DepthBook)
+project(MarketData)
 
 add_definitions(-std=c++17)
 
 set(HEADER_FILES
+        Instrument.h
         DepthList.h
         DepthBook.h
         Trade.h
@@ -10,10 +11,11 @@ set(HEADER_FILES
         SecurityStatus.h)
 
 set(SOURCE_FILES
+        Instrument.cpp
         DepthList.cpp
         DepthBook.cpp
         Trade.cpp
         SessionStatistics.cpp
         SecurityStatus.cpp)
 
-add_library(DepthBook STATIC ${SOURCE_FILES} ${HEADER_FILES})
+add_library(MarketData STATIC ${SOURCE_FILES} ${HEADER_FILES})

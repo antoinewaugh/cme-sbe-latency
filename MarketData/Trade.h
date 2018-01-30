@@ -4,13 +4,13 @@
 
 class Trade {
 public:
-  Trade(double price, int volume, int updateaction):price(price), volume(volume),updateaction(updateaction)  {}
+  Trade(std::string symbol, double price, int volume, int updateaction):symbol(symbol), price(price), volume(volume),updateaction(updateaction)  {}
   Trade() = default;
 
   double price;
   int volume;
   int updateaction;
-
+    std::string symbol;
   friend std::ostream &operator<<(std::ostream &os, const Trade &trade) {
 
     std::string update;
@@ -20,7 +20,7 @@ public:
         case 2: update = "Delete"; break;
     }
 
-    os << "Trade >>  price: " << trade.price << " volume: " << trade.volume<< " update: " << update;
+    os << trade.symbol << " Trade >>  price: " << trade.price << " volume: " << trade.volume<< " update: " << update;
     return os;
   }
 };

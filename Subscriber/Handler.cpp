@@ -7,20 +7,32 @@
 
 static void clear() { std::cout << "\x1B[2J\x1B[H"; }
 
-void Handler::OnQuote(uint64_t securityid,DepthBook const& book,
-                      uint64_t seqnum) {
+void Handler::OnQuote(uint64_t securityid,DepthBook const& book) {
 // clear();
+
+  std::cout << "*********** Quote ***************\n";
+  std::cout << securityid << "\n";
+  std::cout << "*********************************\n";
   std::cout << book << '\n';
 }
 
 void Handler::OnTrade(uint64_t securityid, Trade& trade) {
-  std::cout << trade<< '\n';
+  std::cout << "*********** Trade ***************\n";
+  std::cout << securityid << "\n";
+  std::cout << "*********************************\n";
+  std::cout << trade << '\n';
 }
 
-void Handler::OnStatus(uint64_t securityid, SecurityStatus status) {
-  std::cout << "Status >> " << (int)status << '\n';
+void Handler::OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event) {
+  std::cout << "*********** Status ***************\n";
+  std::cout << securityid << "\n";
+  std::cout << "*********************************\n";
+  std::cout << "Status: >> " << (int)status << " Event:" << (int)event << '\n';
 }
 
 void Handler::OnStatistics(uint64_t securityid, SessionStatistics &statistics) {
+  std::cout << "*********** Statistics ***************\n";
+  std::cout << securityid << "\n";
+  std::cout << "*********************************\n";
   std::cout << statistics << '\n';
 }
