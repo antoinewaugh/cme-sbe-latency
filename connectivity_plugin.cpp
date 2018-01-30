@@ -24,7 +24,7 @@ using sp::lltp::cme::SessionStatistics;
 class CMEConnectivityPlugin: public AbstractTransport {
 public:
   CMEConnectivityPlugin(const TransportConstructorParameters& params)
-      : AbstractTransport(params), handler(std::move(std::make_unique<HandlerImpl>(hostSide)))
+      : AbstractTransport(params), handler(hostSide)
   {}
 
   virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
@@ -33,7 +33,7 @@ public:
     boost::asio::io_service io_service;
     auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
     auto configs = Config::load("config.xml");
-    auto channel = Channel<Handler>::make_channel(handler.get(), "310", configs, io_service, listen_address);
+    auto channel = Channel<Handler>::make_channel(&handler, "310", configs, io_service, listen_address);
     channel->Subscribe("ESH8");
     io_service.run();
   }
@@ -56,7 +56,7 @@ private:
     com::softwareag::connectivity::Message depth;
   };
 
-  std::unique_ptr<Handler> handler;
+  HandlerImpl handler;
 
 };
 
