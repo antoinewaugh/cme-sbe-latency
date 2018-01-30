@@ -94,7 +94,19 @@ void CMEConnectivityPlugin::HandlerImpl::Send(DepthBook const &book) {
   host->sendBatchTowardsHost(&msg, (&msg)+1);
 }
 
+  void CMEConnectivityPlugin::HandlerImpl::OnTrade(uint64_t securityid, Trade &trade) {
 
-SAG_DECLARE_CONNECTIVITY_TRANSPORT_CLASS(CMEConnectivityPlugin);
+  }
+
+  void CMEConnectivityPlugin::HandlerImpl::OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event) {
+
+  }
+
+  void CMEConnectivityPlugin::HandlerImpl::OnStatistics(uint64_t securityid, SessionStatistics &statistics) {
+
+  }
+
+
+  SAG_DECLARE_CONNECTIVITY_TRANSPORT_CLASS(CMEConnectivityPlugin);
 
 }}} // namespace
