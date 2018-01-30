@@ -2,6 +2,7 @@
 project(Subscriber)
 
 add_definitions(-std=c++17)
+add_definitions(-fPIC)
 
 # imported library
 add_library(sbe STATIC IMPORTED)

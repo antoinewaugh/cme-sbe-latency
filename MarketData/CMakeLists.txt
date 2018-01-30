@@ -1,6 +1,7 @@
 project(MarketData)
 
 add_definitions(-std=c++17)
+add_definitions(-fPIC)
 
 set(HEADER_FILES
         Instrument.h

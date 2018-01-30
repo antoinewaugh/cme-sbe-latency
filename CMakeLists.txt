@@ -24,7 +24,7 @@ find_package(Boost COMPONENTS system thread)
 include_directories(${Boost_INCLUDE_DIRS})
 
 set(SOURCE_FILES connectivity_plugin.cpp)
-add_library(cme_sbe_latency ${SOURCE_FILES})
+add_library(cme_sbe_latency SHARED ${SOURCE_FILES})
 
 include_directories(${PROJECT_INCLUDE_DIRS})
 include_directories(${APAMA_INCLUDE_DIRS})
