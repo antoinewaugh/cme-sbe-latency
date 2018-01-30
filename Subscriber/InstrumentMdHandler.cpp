@@ -143,7 +143,7 @@ namespace cme {
       }
     };
 
-    handler_.OnStatus(instrument_.securityid, TranslateStatus(status.securityTradingStatus()),
+    handler_->OnStatus(instrument_.securityid, TranslateStatus(status.securityTradingStatus()),
                       TranslateEvent(status.securityTradingEvent()));
   }
 
@@ -181,7 +181,7 @@ namespace cme {
         case MDEntryType::Trade:
           trade.price = price;
           trade.volume = volume;
-          handler_.OnTrade(instrument_.securityid, trade); // persist? callbacks after whole book updated?
+          handler_->OnTrade(instrument_.securityid, trade); // persist? callbacks after whole book updated?
           break;
         case MDEntryType::OpenPrice:
           statistics_.openingprice = price;
@@ -259,10 +259,10 @@ namespace cme {
           refresh.highLimitPrice().mantissa() * std::pow(10, refresh.highLimitPrice().exponent());
     }
 
-    handler_.OnQuote(instrument_.securityid, implbook_);
-    handler_.OnQuote(instrument_.securityid, book_);
-    handler_.OnStatistics(instrument_.securityid, statistics_);
-    handler_.OnStatus(instrument_.securityid, TranslateStatus(refresh.mDSecurityTradingStatus()),
+    handler_->OnQuote(instrument_.securityid, implbook_);
+    handler_->OnQuote(instrument_.securityid, book_);
+    handler_->OnStatistics(instrument_.securityid, statistics_);
+    handler_->OnStatus(instrument_.securityid, TranslateStatus(refresh.mDSecurityTradingStatus()),
                       SecurityEvent(SecurityEvent::NULL_EVENT));
 
   }
@@ -284,14 +284,14 @@ namespace cme {
     }
     Trade trade(instrument_.symbol, price, volume, updatetype);
 
-    handler_.OnTrade(instrument_.securityid, trade);
+    handler_->OnTrade(instrument_.securityid, trade);
 
   }
 
   void
   InstrumentMdHandler::OnIncremental(MDIncrementalRefreshVolume37::NoMDEntries &entry, std::uint64_t transacttime) {
     statistics_.electronicvolume = entry.mDEntrySize();
-    handler_.OnStatistics(instrument_.securityid, statistics_);
+    handler_->OnStatistics(instrument_.securityid, statistics_);
   }
 
 // could be problematic if entry doesnt have px / size?
@@ -313,7 +313,7 @@ namespace cme {
         statistics_.openinterest = volume;
         break;
     }
-    handler_.OnStatistics(instrument_.securityid, statistics_);
+    handler_->OnStatistics(instrument_.securityid, statistics_);
   }
 
   void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshSessionStatistics35::NoMDEntries &entry,
@@ -338,7 +338,7 @@ namespace cme {
         statistics_.sessionhighbid = price;
         break;
     }
-    handler_.OnStatistics(instrument_.securityid, statistics_);
+    handler_->OnStatistics(instrument_.securityid, statistics_);
   }
 
   void InstrumentMdHandler::OnIncremental(MDIncrementalRefreshLimitsBanding34::NoMDEntries &entry,
@@ -350,29 +350,30 @@ namespace cme {
     statistics_.lowlimitprice = lowprice;
     statistics_.highlimitprice = highprice;
 
-    handler_.OnStatistics(instrument_.securityid, statistics_);
+    handler_->OnStatistics(instrument_.securityid, statistics_);
   }
 
   void InstrumentMdHandler::OnChannelReset() {
     ClearState();
 
-    handler_.OnQuote(instrument_.securityid, book_);
-    handler_.OnQuote(instrument_.securityid, implbook_);
+    handler_->OnQuote(instrument_.securityid, book_);
+    handler_->OnQuote(instrument_.securityid, implbook_);
   }
 
   void InstrumentMdHandler::Commit() {
 
     if (statechange_) {
       statechange_ = false;
-      handler_.OnQuote(instrument_.securityid, implbook_);
-      handler_.OnQuote(instrument_.securityid, book_);
+      handler_->OnQuote(instrument_.securityid, implbook_);
+      handler_->OnQuote(instrument_.securityid, book_);
     }
   }
 
-  InstrumentMdHandler::InstrumentMdHandler(Instrument instrument)
+  InstrumentMdHandler::InstrumentMdHandler(Instrument instrument, Handler* handler)
       : instrument_(instrument),
         book_(instrument.symbol, instrument.securityid, instrument.marketdepth),
-        implbook_(instrument.symbol, instrument.securityid, instrument.implmarketdepth) {}
+        implbook_(instrument.symbol, instrument.securityid, instrument.implmarketdepth),
+        handler_(handler){}
 
 
 }}}

@@ -3,28 +3,37 @@ project(cme_sbe_latency)
 
 #set(CMAKE_CXX_STANDARD 17)
 
+# Check Apama Environment
+if(DEFINED APAMA_HOME)
+    message("APAMA_HOME found : $ENV{APAMA_HOME}")
+    set(APAMA_INCLUDE_DIRS "${APAMA_HOME}/include")
+    set(APAMA_LIBRARIES "${APAMA_HOME}/lib/libapclient.so")
+else()
+    message(FATAL_ERROR "Please specify APAMA_HOME using -DAPAMA_HOME=/path/to/Apama")
+endif()
+
 add_definitions(-std=c++17)
+
 set(BOOST_ROOT /usr/local/boost_1_63_0)
 set(BOOST_INCLUDEDIR /usr/include)
-
 set(BOOST_LIBRARYDIR /usr/local/lib)
-
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 
 find_package(Boost COMPONENTS system thread)
 include_directories(${Boost_INCLUDE_DIRS})
 
-set(SOURCE_FILES main.cpp)
-add_executable(cme_sbe_latency ${SOURCE_FILES})
+set(SOURCE_FILES connectivity_plugin.cpp)
+add_library(cme_sbe_latency ${SOURCE_FILES})
 
+include_directories(${PROJECT_INCLUDE_DIRS})
+include_directories(${APAMA_INCLUDE_DIRS})
 include_directories(Config)
-add_subdirectory(Config)
-
 include_directories(MarketData)
-add_subdirectory(MarketData)
-
 include_directories(Subscriber)
+
+add_subdirectory(Config)
+add_subdirectory(MarketData)
 add_subdirectory(Subscriber)
 
 #####################################################################
@@ -68,4 +77,5 @@ add_subdirectory(test)
 #### // GTEST
 #####################################################################
 
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Config Subscriber MarketData)
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Config Subscriber MarketData ${APAMA_LIBRARIRES})
+

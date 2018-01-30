@@ -1,0 +1,17 @@
+connectivityPlugins:
+  CMESbeAdapter:
+    directory: ${PARENT_DIR}/cmake-build-debug/
+    libraryName: cme_sbe_adapter
+    class: CMEConnectivityPlugin
+
+startChains:
+  CmeSbeAdapterChain:
+    - apama.eventMap:
+        # inbound channel
+        subscribeChannels:
+          - cme_sbe_inbound
+        # outbound channel
+        defaultChannel: cme_sbe_outbound
+
+    - CMESbeAdapter:
+        configFilePath: ${PARENT_DIR}/models/baseline.pb

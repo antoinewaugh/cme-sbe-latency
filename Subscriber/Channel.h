@@ -37,11 +37,11 @@ namespace cme {
 
     void OnPacket(Type, Feed, Packet *);
 
-    T handler;
+    Handler* handler;
     std::vector<std::string> pendingsubscription_;
 
   public:
-    Channel(T handler, std::string channelid,
+    Channel(T* handler, std::string channelid,
             MulticastReceiver incrementala,
             MulticastReceiver incrementalb,
             MulticastReceiver snapshota,
@@ -111,8 +111,10 @@ namespace cme {
 
     void UnsubscribeInstrumentDownload();
 
+    Handler* GetHandler();
 
-    static std::unique_ptr<Channel<T>> make_channel(T handler,
+
+    static std::unique_ptr<Channel<T>> make_channel(T* handler,
                                                     std::string channelid, Config &config,
                                                     boost::asio::io_service &io_service,
                                                     boost::asio::ip::address &listen_address
@@ -121,7 +123,7 @@ namespace cme {
 
 
   template<typename T>
-  std::unique_ptr<Channel<T>> Channel<T>::make_channel(T handler, std::string channelid, Config &config,
+  std::unique_ptr<Channel<T>> Channel<T>::make_channel(T* handler, std::string channelid, Config &config,
                                                        boost::asio::io_service &io_service,
                                                        boost::asio::ip::address &listen_address
   ) {
@@ -174,7 +176,7 @@ namespace cme {
   }
 
   template<typename T>
-  Channel<T>::Channel(T handler, std::string channelid, MulticastReceiver incrementala, MulticastReceiver incrementalb,
+  Channel<T>::Channel(T* handler, std::string channelid, MulticastReceiver incrementala, MulticastReceiver incrementalb,
                       MulticastReceiver snapshota, MulticastReceiver snapshotb, MulticastReceiver instrumenta,
                       MulticastReceiver instrumentb)
       : channelid_(channelid), incrementala_(std::move(incrementala)), incrementalb_(std::move(incrementalb)),
@@ -376,5 +378,10 @@ namespace cme {
   template<typename T>
   void Channel<T>::Unsubscribe(std::string symbol) {
     symbol_controller_.GetInstrument(symbol).securityid;
+  }
+
+  template <typename T>
+  Handler* Channel<T>::GetHandler() {
+    return handler;
   }
 }}}

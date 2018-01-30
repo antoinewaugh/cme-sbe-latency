@@ -1,0 +1,22 @@
+package com.apama.marketdata;
+
+using com.softwareag.connectivity.ConnectivityPlugins;
+
+event Depth {
+    string symbol;
+	sequence<float> bid_prices;
+	sequence<integer> bid_volumes;
+	sequence<float> ask_prices;
+	sequence<integer> ask_volumes;
+}
+
+monitor init { 
+	action onload() {
+	    log "Loaded init.mon";
+	    monitor.subscribe("cme_sbe_outbound");
+		on Depth() as d {
+			log d.toString();
+		}
+        ConnectivityPlugins.onApplicationInitialized();
+	} 
+}

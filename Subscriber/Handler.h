@@ -11,8 +11,8 @@ using sp::lltp::cme::SessionStatistics;
 
 struct Handler {
 
-  void OnQuote(uint64_t securityid, DepthBook const& book);
-  void OnTrade(uint64_t securityid, Trade &trade );
-  void OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event);
-  void OnStatistics(uint64_t securityid, SessionStatistics&);
+  virtual void OnQuote(uint64_t securityid, DepthBook const& book) = 0;
+  virtual void OnTrade(uint64_t securityid, Trade &trade ) = 0;
+  virtual void OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event) = 0;
+  virtual void OnStatistics(uint64_t securityid, SessionStatistics&) = 0;
 };

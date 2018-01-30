@@ -9,7 +9,6 @@
 #include "Instrument.h"
 
 
-
 namespace sp {
 namespace lltp {
 namespace cme {

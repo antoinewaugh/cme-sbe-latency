@@ -24,7 +24,7 @@ namespace cme {
   class InstrumentMdHandler {
 
   public:
-    InstrumentMdHandler(Instrument);
+    InstrumentMdHandler(Instrument, Handler*);
 
     void OnSnapshot(SnapshotFullRefresh38 &, std::uint64_t);
 
@@ -56,7 +56,7 @@ namespace cme {
     DepthBook implbook_;
     SessionStatistics statistics_;
     bool statechange_;
-    Handler handler_;
+    Handler* handler_;
 
     void ClearState();
   };

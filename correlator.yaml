@@ -1,0 +1,18 @@
+environment:
+  ENV: Test
+
+correlator:
+  runtime: interpreted
+  runtime-cache: ${PARENT_DIR}/cache
+  initialization:
+    list:
+       - ${APAMA_HOME}/monitors/ConnectivityPluginsControl.mon
+       - ${APAMA_HOME}/monitors/ConnectivityPlugins.mon
+       - init.mon
+
+    encoding: UTF8
+
+server:
+
+#eplLogging:
+#    .root: { file: correlator.log }
