@@ -21,27 +21,7 @@ using sp::lltp::cme::SecurityEvent;
 using sp::lltp::cme::SecurityStatus ;
 using sp::lltp::cme::SessionStatistics;
 
-class CMEConnectivityPlugin: public AbstractTransport {
-public:
-  CMEConnectivityPlugin(const TransportConstructorParameters& params)
-      : AbstractTransport(params), handler(hostSide)
-  {}
-
-  virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
-  virtual void start() { logger.info("CME SBE plugin started.");
-
-    boost::asio::io_service io_service;
-    auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
-    auto configs = Config::load("config.xml");
-    auto channel = Channel<Handler>::make_channel(&handler, "310", configs, io_service, listen_address);
-    channel->Subscribe("ESH8");
-    io_service.run();
-  }
-  virtual void shutdown() { logger.info("CME SBE plugin shutting down."); }
-
-private:
-
-  class HandlerImpl: public Handler {
+class HandlerImpl: public Handler {
   public:
     HandlerImpl(HostSide::ptr_t host):host(host) {
     }
@@ -56,15 +36,35 @@ private:
     com::softwareag::connectivity::Message depth;
   };
 
-  HandlerImpl handler;
+  static void t(HostSide::ptr_t host) {
+    boost::asio::io_service io_service;
+    auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
+    auto configs = Config::load("config.xml");
+    HandlerImpl handler(host);
+    auto channel = Channel<Handler>::make_channel(&handler, "310", configs, io_service, listen_address);
+    channel->Subscribe("ESH8");
+    io_service.run();
+  }
+
+class CMEConnectivityPlugin: public AbstractTransport {
+public:
+  CMEConnectivityPlugin(const TransportConstructorParameters& params)
+      : AbstractTransport(params)
+  {}
+
+  virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
+  virtual void start() { logger.info("CME SBE plugin started."); }
+  virtual void shutdown() { logger.info("CME SBE plugin shutting down.");
+    //io_service.stop();
+  }
 
 };
 
-void CMEConnectivityPlugin::HandlerImpl::OnQuote(uint64_t securityid, DepthBook const &book) {
+void HandlerImpl::OnQuote(uint64_t securityid, DepthBook const &book) {
   Send(book);
 }
 
-void CMEConnectivityPlugin::HandlerImpl::Send(DepthBook const &book) {
+void HandlerImpl::Send(DepthBook const &book) {
   map_t payload;
   payload.insert(data_t("symbol"), data_t("ESH8"));
 
@@ -89,22 +89,22 @@ void CMEConnectivityPlugin::HandlerImpl::Send(DepthBook const &book) {
   payload[data_t("ask_prices")] = data_t(std::move(askp));
   payload[data_t("ask_volumes")] = data_t(std::move(askv));
 
-  com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
-  msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");
-  host->sendBatchTowardsHost(&msg, (&msg)+1);
+    com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
+    msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");
+    host->sendBatchTowardsHost(&msg, (&msg) + 1);
 }
 
-  void CMEConnectivityPlugin::HandlerImpl::OnTrade(uint64_t securityid, Trade &trade) {
+void HandlerImpl::OnTrade(uint64_t securityid, Trade &trade) {
 
-  }
+}
 
-  void CMEConnectivityPlugin::HandlerImpl::OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event) {
+void HandlerImpl::OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event) {
 
-  }
+}
 
-  void CMEConnectivityPlugin::HandlerImpl::OnStatistics(uint64_t securityid, SessionStatistics &statistics) {
+void HandlerImpl::OnStatistics(uint64_t securityid, SessionStatistics &statistics) {
 
-  }
+}
 
 
   SAG_DECLARE_CONNECTIVITY_TRANSPORT_CLASS(CMEConnectivityPlugin);
