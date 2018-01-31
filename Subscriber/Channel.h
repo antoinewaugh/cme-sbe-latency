@@ -179,7 +179,7 @@ namespace cme {
   Channel<T>::Channel(T* handler, std::string channelid, MulticastReceiver incrementala, MulticastReceiver incrementalb,
                       MulticastReceiver snapshota, MulticastReceiver snapshotb, MulticastReceiver instrumenta,
                       MulticastReceiver instrumentb)
-      : channelid_(channelid), incrementala_(std::move(incrementala)), incrementalb_(std::move(incrementalb)),
+      : handler(handler), channelid_(channelid), incrementala_(std::move(incrementala)), incrementalb_(std::move(incrementalb)),
         snapshota_(std::move(snapshota)), snapshotb_(std::move(snapshotb)),
         instrumenta_(std::move(instrumenta)), instrumentb_(std::move(instrumentb)) // need to provide access to impl
   {
