@@ -17,7 +17,7 @@ void sp::lltp::cme::ChannelContext::SubscribeToSnapshotsForInstrument(std::uint3
 }
 
 void sp::lltp::cme::ChannelContext::UnsubscribeToSnapshotsForInstrument(std::uint32_t securityid) {
-    channel->SubscribeToSnapshotsForInstrument(securityid);
+    channel->UnsubscribeToSnapshotsForInstrument(securityid);
 }
 
 void sp::lltp::cme::ChannelContext::SubscribeInstrumentDownload() {
