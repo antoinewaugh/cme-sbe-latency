@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Channel.h"
+#include "ChannelImpl.h"
 #include "boost/asio.hpp"
 #include <string>
 

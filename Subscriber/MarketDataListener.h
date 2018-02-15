@@ -9,7 +9,7 @@ using sp::lltp::cme::SecurityStatus;
 using sp::lltp::cme::SecurityEvent;
 using sp::lltp::cme::SessionStatistics;
 
-struct Handler {
+struct MarketDataListener {
 
   virtual void OnQuote(uint64_t securityid, DepthBook const& book) = 0;
   virtual void OnTrade(uint64_t securityid, Trade &trade ) = 0;

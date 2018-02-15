@@ -1,9 +1,8 @@
 #include "ChannelController.h"
 #include <algorithm>
-
 #include <iostream>
-
 #include <chrono>
+
 namespace sp {
 namespace lltp {
 namespace cme {
@@ -106,7 +105,7 @@ namespace cme {
     // TODO
   }
 
-  ChannelController::ChannelController(ChannelAccessor *channel) : channel_(channel) {
+  ChannelController::ChannelController(ChannelContext *channel) : channel_(channel) {
 
   }
 

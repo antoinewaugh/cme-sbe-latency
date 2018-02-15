@@ -1,7 +1,7 @@
 connectivityPlugins:
   CMESbeAdapter:
-    directory: ${PARENT_DIR}/build/
-    libraryName: cme_sbe_latency
+    directory: ${PARENT_DIR}/cmake-build-debug
+    libraryName: cme_sbe_latencyd
     class: CMEConnectivityPlugin
 
 startChains:

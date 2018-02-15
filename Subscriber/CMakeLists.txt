@@ -11,29 +11,30 @@ set_property(TARGET sbe PROPERTY INTERFACE_INCLUDE_DIRECTORIES /usr/local/includ
 
 set(HEADER_FILES
         MulticastReceiver.h
-        Handler.h
+        MarketDataListener.h
         Message.h
         Packet.h
-        ChannelAccessor.h
+        ChannelContext.h
         InstrumentController.h
         ChannelController.h
         SymbolController.h
         InstrumentMdHandler.h
         Channel.h
+        ChannelImpl.h
         )
 
 set(SOURCE_FILES
         MulticastReceiver.cpp
-        Handler.cpp
+        MarketDataListener.cpp
         Message.cpp
         Packet.cpp
-        ChannelAccessor.cpp
+        ChannelContext.cpp
         InstrumentController.cpp
         SymbolController.cpp
         ChannelController.cpp
         InstrumentMdHandler.cpp
         Channel.cpp
-        )
+        ChannelImpl.cpp)
 
 add_library(Subscriber STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(Subscriber sbe)

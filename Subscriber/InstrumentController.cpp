@@ -55,8 +55,8 @@ namespace cme {
     }
   }
 
-  InstrumentController::InstrumentController(Instrument instrument, ChannelAccessor *channel) :
-      instrument_(instrument), state_(InstrumentState::INITIAL), mdhandler_(instrument, channel->GetHandler()), channel_(channel) {
+  InstrumentController::InstrumentController(Instrument instrument, ChannelContext *channelcontext) :
+      instrument_(instrument), state_(InstrumentState::INITIAL), mdhandler_(instrument, channelcontext), channel_(channelcontext) {
     channel_->SubscribeToSnapshotsForInstrument(instrument_.securityid);
   }
 

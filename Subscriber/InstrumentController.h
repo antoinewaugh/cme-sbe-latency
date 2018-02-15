@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InstrumentMdHandler.h"
-#include "ChannelAccessor.h"
+#include "ChannelContext.h"
 #include "Instrument.h"
 
 /*
@@ -21,7 +21,7 @@ namespace cme {
   class InstrumentController {
 
   public:
-    InstrumentController(Instrument instrument, ChannelAccessor *channel);
+    InstrumentController(Instrument instrument, ChannelContext *channel);
 
     void OnSnapshot(SnapshotFullRefresh38 &, std::uint64_t transacttime);
 
@@ -71,7 +71,7 @@ namespace cme {
     std::string securitydesc_;
 
     InstrumentMdHandler mdhandler_;
-    ChannelAccessor *channel_;
+    ChannelContext *channel_;
 
     void switchState(InstrumentState, InstrumentState);
   };

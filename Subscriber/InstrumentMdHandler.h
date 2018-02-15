@@ -1,8 +1,8 @@
 #pragma once
 
 #include <DepthBook.h>
-#include "ChannelAccessor.h"
-#include "Handler.h"
+#include "ChannelContext.h"
+#include "MarketDataListener.h"
 
 #include "sbe/MDIncrementalRefreshBook32.h"
 #include "sbe/MDIncrementalRefreshDailyStatistics33.h"
@@ -24,7 +24,7 @@ namespace cme {
   class InstrumentMdHandler {
 
   public:
-    InstrumentMdHandler(Instrument, Handler*);
+    InstrumentMdHandler(Instrument, ChannelContext*);
 
     void OnSnapshot(SnapshotFullRefresh38 &, std::uint64_t);
 
@@ -56,7 +56,7 @@ namespace cme {
     DepthBook implbook_;
     SessionStatistics statistics_;
     bool statechange_;
-    Handler* handler_;
+    ChannelContext* channelcontext;
 
     void ClearState();
   };

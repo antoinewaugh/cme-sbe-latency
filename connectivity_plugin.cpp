@@ -1,14 +1,14 @@
 
+#include "Config.h"
 #include "DepthBook.h"
 #include "Trade.h"
 #include "SessionStatistics.h"
 #include "SecurityStatus.h"
-
 #include <sag_connectivity_plugins.hpp>
 
+#include <thread>
 #include "boost/asio.hpp"
-#include "Config.h"
-#include "Channel.h"
+#include "ChannelImpl.h"
 
 using namespace sp::lltp::cme;
 using namespace com::softwareag::connectivity;
@@ -21,7 +21,7 @@ using sp::lltp::cme::SecurityEvent;
 using sp::lltp::cme::SecurityStatus ;
 using sp::lltp::cme::SessionStatistics;
 
-class HandlerImpl: public Handler {
+class HandlerImpl: public MarketDataListener {
   public:
     HandlerImpl(HostSide::ptr_t host):host(host) {
     }
@@ -36,28 +36,34 @@ class HandlerImpl: public Handler {
     com::softwareag::connectivity::Message depth;
   };
 
-  static void t(HostSide::ptr_t host) {
+void Subscribe(MarketDataListener* host) {
     boost::asio::io_service io_service;
     auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
     auto configs = Config::load("config.xml");
-    HandlerImpl handler(host);
-    auto channel = Channel<Handler>::make_channel(&handler, "310", configs, io_service, listen_address);
+    auto channel = ChannelImpl::make_channel("310", configs, io_service, listen_address);
+    channel->RegisterMarketDataListener(host);
     channel->Subscribe("ESH8");
     io_service.run();
-  }
+}
 
 class CMEConnectivityPlugin: public AbstractTransport {
 public:
   CMEConnectivityPlugin(const TransportConstructorParameters& params)
-      : AbstractTransport(params)
+      : AbstractTransport(params), handler(hostSide)
   {}
 
   virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
   virtual void start() { logger.info("CME SBE plugin started."); }
-  virtual void shutdown() { logger.info("CME SBE plugin shutting down.");
-    //io_service.stop();
+  virtual void shutdown() { logger.info("CME SBE plugin shutting down."); }
+  virtual void hostReady() {
+      std::thread t(Subscribe, &handler);
+      t.detach();
+//      Subscribe(&handler);
+      logger.info("HostReady received.");
   }
 
+private:
+    HandlerImpl handler;
 };
 
 void HandlerImpl::OnQuote(uint64_t securityid, DepthBook const &book) {
@@ -89,9 +95,9 @@ void HandlerImpl::Send(DepthBook const &book) {
   payload[data_t("ask_prices")] = data_t(std::move(askp));
   payload[data_t("ask_volumes")] = data_t(std::move(askv));
 
-    com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
-    msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");
-    host->sendBatchTowardsHost(&msg, (&msg) + 1);
+  com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
+  msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");
+  host->sendBatchTowardsHost(&msg, (&msg) + 1);
 }
 
 void HandlerImpl::OnTrade(uint64_t securityid, Trade &trade) {
@@ -106,7 +112,6 @@ void HandlerImpl::OnStatistics(uint64_t securityid, SessionStatistics &statistic
 
 }
 
-
-  SAG_DECLARE_CONNECTIVITY_TRANSPORT_CLASS(CMEConnectivityPlugin);
+SAG_DECLARE_CONNECTIVITY_TRANSPORT_CLASS(CMEConnectivityPlugin);
 
 }}} // namespace

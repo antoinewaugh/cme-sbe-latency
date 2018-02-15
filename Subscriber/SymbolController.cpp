@@ -4,7 +4,7 @@ namespace sp {
 namespace lltp {
 namespace cme {
 
-SymbolController::SymbolController(ChannelAccessor *channel) : state_(INIT), channel_(channel) {
+SymbolController::SymbolController(ChannelContext *channel) : state_(INIT), channel_(channel) {
   channel_->SubscribeInstrumentDownload();
   ResetState();
 }

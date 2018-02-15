@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChannelAccessor.h"
+#include "ChannelContext.h"
 #include "Packet.h"
 #include "Message.h"
 #include <unordered_map>
@@ -18,7 +18,7 @@ using sp::lltp::cme::Instrument;
 class SymbolController {
 public:
   SymbolController() = default;
-  SymbolController(ChannelAccessor* channel);
+  SymbolController(ChannelContext* channel);
   Instrument GetInstrument(std::string const& symbol);
   void OnInstrumentPacket(Packet*);
 
@@ -37,7 +37,7 @@ private:
   template<typename T> void HandleDefinition(T& definition);
   template<typename T> void OnInstrument(T&);
   DownloadState state_;
-  ChannelAccessor* channel_;
+  ChannelContext* channel_;
   int totalnumreports_ = 0;
   int processedreports_ = 0;
   int expectedseqnum_ = 0;
@@ -118,16 +118,6 @@ void SymbolController::OnInstrument(T& definition) {
 }
 
 }}}
-
-// namespace
-
-  // todo:
-  // add / delete / modify instrument map/vector
-  // add support for HandleInsturmentMessage to be called from incremental feed
-  // unsubscribe from instrument feed once contracts downloaded
-  // consider larger scale missing packets on instrument download etc, message seq number tracking...
-  // add static routes
-  // test..
 
 
 

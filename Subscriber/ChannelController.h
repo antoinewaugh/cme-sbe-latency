@@ -31,7 +31,7 @@ namespace cme {
   public:
     ChannelController() = default;
 
-    ChannelController(ChannelAccessor *channel);
+    ChannelController(ChannelContext *channel);
 
     void OnIncrementalPacket(Packet *);
 
@@ -84,7 +84,7 @@ namespace cme {
 
     std::map<uint32_t, InstrumentController> instrument_controllers_;
     std::vector<std::uint32_t> outofsync_instruments_;
-    ChannelAccessor *channel_ = nullptr;
+    ChannelContext *channel_ = nullptr;
   };
 
 
