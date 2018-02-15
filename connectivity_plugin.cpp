@@ -23,8 +23,8 @@ using sp::lltp::cme::SessionStatistics;
 
 class HandlerImpl: public MarketDataListener {
   public:
-    HandlerImpl(HostSide::ptr_t host):host(host) {
-    }
+    HandlerImpl(HostSide::ptr_t host):host(host) {}
+    HandlerImpl() = default;
     void OnQuote(uint64_t securityid,DepthBook const& book);
     void OnTrade(uint64_t securityid, Trade& trade);
     void OnStatus(uint64_t securityid, SecurityStatus status, SecurityEvent event);
@@ -33,30 +33,50 @@ class HandlerImpl: public MarketDataListener {
   private:
     void Send(DepthBook const& book);
     HostSide::ptr_t host;
-    com::softwareag::connectivity::Message depth;
   };
 
-void Subscribe(MarketDataListener* host) {
-    boost::asio::io_service io_service;
-    auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
-    auto configs = Config::load("config.xml");
-    auto channel = ChannelImpl::make_channel("310", configs, io_service, listen_address);
-    channel->RegisterMarketDataListener(host);
-    channel->Subscribe("ESH8");
-    io_service.run();
-}
+   void Subscribe(HostSide::ptr_t* hostSide) {
+       map_t payload;
+  payload.insert(data_t("symbol"), data_t("ESH8"));
+
+  list_t bidp, bidv, askp, askv;
+
+  payload[data_t("bid_prices")] = data_t(std::move(bidp));
+  payload[data_t("bid_volumes")] = data_t(std::move(bidv));
+  payload[data_t("ask_prices")] = data_t(std::move(askp));
+  payload[data_t("ask_volumes")] = data_t(std::move(askv));
+
+  com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
+  msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");
+     (*hostSide)->sendBatchTowardsHost(&msg, (&msg)+1);
+
+   }
+
+//void Subscribe(MarketDataListener* handler) {
+//    boost::asio::io_service io_service;
+//    auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
+//    auto configs = Config::load("config.xml");
+//    auto channel = ChannelImpl::make_channel("310", configs, io_service, listen_address);
+//    channel->RegisterMarketDataListener(handler);
+//    channel->Subscribe("ESH8");
+//    io_service.run();
+//}
 
 class CMEConnectivityPlugin: public AbstractTransport {
 public:
   CMEConnectivityPlugin(const TransportConstructorParameters& params)
-      : AbstractTransport(params), handler(hostSide)
-  {}
+      : AbstractTransport(params)
+  {
+
+  }
 
   virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
   virtual void start() { logger.info("CME SBE plugin started."); }
   virtual void shutdown() { logger.info("CME SBE plugin shutting down."); }
   virtual void hostReady() {
-      std::thread t(Subscribe, &handler);
+//      handler = HandlerImpl(hostSide);
+ //     std::thread t(Subscribe, &handler);
+         std::thread t(Subscribe, &hostSide);
       t.detach();
 //      Subscribe(&handler);
       logger.info("HostReady received.");
