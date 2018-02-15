@@ -14,7 +14,7 @@ monitor init {
 	action onload() {
 	    log "Loaded init.mon";
 	    monitor.subscribe("cme_sbe_outbound");
-		on Depth() as d {
+		on all Depth() as d {
 			log d.toString();
 		}
         ConnectivityPlugins.onApplicationInitialized();
