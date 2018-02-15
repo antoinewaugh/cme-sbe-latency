@@ -105,8 +105,8 @@ void HandlerImpl::Send(DepthBook const &book) {
   auto asks = book.Asks();
   for(int i = 0; i < asks.Size(); ++i) {
     auto level = asks.Get(i);
-    bidp.push_back(data_t(level.price));
-    bidv.push_back(data_t(static_cast<int64_t>(level.quantity)));
+    askp.push_back(data_t(level.price));
+    askv.push_back(data_t(static_cast<int64_t>(level.quantity)));
   }
 
   payload[data_t("bid_prices")] = data_t(std::move(bidp));
