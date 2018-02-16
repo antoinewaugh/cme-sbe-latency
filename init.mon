@@ -21,9 +21,11 @@ monitor init {
 	    monitor.subscribe("cme_sbe_outbound");
 		on all Depth() as d {
 
-            integer rec_ts = (timeMgr.getMicroTime() * 1000.0).round();
-            integer sent_ts = d.timestamps[0];
-            log (rec_ts - sent_ts).toString();
+            integer rec_ts = (timeMgr.getMicroTime() * 1000000000.0).round();
+            integer asio_ts = d.timestamps[0];
+            integer sent_ts = d.timestamps[1];
+            log "Packet received -> decoded " + (asio_ts - sent_ts).toString();
+            log "Packet sent c++ -> received correlator " + (rec_ts - sent_ts).toString();
 
 	        //log d.toString();
 		}

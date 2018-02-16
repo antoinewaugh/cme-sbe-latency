@@ -119,6 +119,7 @@ void HandlerImpl::Send(DepthBook const &book) {
   int64_t ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
           std::chrono::system_clock::now().time_since_epoch()).count();
 
+  timestamps.push_back(data_t(rec_ts));
   timestamps.push_back(data_t(ts));
   payload[data_t("timestamps")] = data_t(std::move(timestamps));
 

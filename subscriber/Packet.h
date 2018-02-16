@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "Message.h"
 
+static int64_t rec_ts = 0;
+
 class Packet {
 public:
 
