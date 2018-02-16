@@ -14,6 +14,8 @@
 using namespace sp::lltp::cme;
 using namespace com::softwareag::connectivity;
 
+timing timings = {0,0,0,0};
+
 namespace sp {
 namespace atp {
 namespace cme {

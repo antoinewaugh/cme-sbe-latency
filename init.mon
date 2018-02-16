@@ -21,11 +21,11 @@ monitor init {
 	    monitor.subscribe("cme_sbe_outbound");
 		on all Depth() as d {
 
-            integer rec_ts = d.timestamps[0];
-            integer dec_ts = d.timestamps[1];
-            integer presend_ts = d.timestamps[2];
-            integer send_ts = d.timestamps[3];
-            integer corr_ts = (timeMgr.getMicroTime() * 1000000000.0).round();
+            integer rec_ts := d.timestamps[0];
+            integer dec_ts := d.timestamps[1];
+            integer presend_ts := d.timestamps[2];
+            integer send_ts := d.timestamps[3];
+            integer corr_ts := (timeMgr.getMicroTime() * 1000000000.0).round();
 
             log "Received -> Decoded " + (dec_ts - rec_ts).toString();
             log "Decoded -> Presend " + (presend_ts - dec_ts).toString();

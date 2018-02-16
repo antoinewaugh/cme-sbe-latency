@@ -1,6 +1,7 @@
 #include "InstrumentMdHandler.h"
 #include "Trade.h"
 #include <chrono>
+#include "Message.h"
 
 namespace sp {
 namespace lltp {
@@ -361,6 +362,8 @@ namespace cme {
   }
 
   void InstrumentMdHandler::Commit() {
+    timings.dec_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
     if (statechange_) {
       statechange_ = false;
       channelcontext->NotifyBookRefresh(instrument_.securityid, book_);
