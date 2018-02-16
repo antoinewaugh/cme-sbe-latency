@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "boost/asio.hpp"
-#include "Config.h"
+#include "config.h"
 #include "ChannelImpl.h"
 #include "MarketDataListener.h"
 

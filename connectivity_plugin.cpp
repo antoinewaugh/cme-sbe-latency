@@ -1,5 +1,5 @@
 
-#include "Config.h"
+#include "config.h"
 #include "DepthBook.h"
 #include "Trade.h"
 #include "SessionStatistics.h"
@@ -9,6 +9,7 @@
 #include <thread>
 #include "boost/asio.hpp"
 #include "ChannelImpl.h"
+#include <chrono>
 
 using namespace sp::lltp::cme;
 using namespace com::softwareag::connectivity;
@@ -113,6 +114,13 @@ void HandlerImpl::Send(DepthBook const &book) {
   payload[data_t("bid_volumes")] = data_t(std::move(bidv));
   payload[data_t("ask_prices")] = data_t(std::move(askp));
   payload[data_t("ask_volumes")] = data_t(std::move(askv));
+
+  list_t timestamps;
+  int64_t ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::system_clock::now().time_since_epoch()).count();
+
+  timestamps.push_back(data_t(ts));
+  payload[data_t("timestamps")] = data_t(std::move(timestamps));
 
   com::softwareag::connectivity::Message msg(data_t(std::move(payload)));
   msg.putMetadataValue(com::softwareag::connectivity::Message::HOST_MESSAGE_TYPE(), "com.apama.marketdata.Depth");

@@ -8,14 +8,24 @@ event Depth {
 	sequence<integer> bid_volumes;
 	sequence<float> ask_prices;
 	sequence<integer> ask_volumes;
+	sequence<integer> timestamps;
 }
 
-monitor init { 
+monitor init {
+
+    import "TimeFormatPlugin" as timeMgr;
+
 	action onload() {
+
 	    log "Loaded init.mon";
 	    monitor.subscribe("cme_sbe_outbound");
 		on all Depth() as d {
-			log d.toString();
+
+            integer rec_ts = (timeMgr.getMicroTime() * 1000.0).round();
+            integer sent_ts = d.timestamps[0];
+            log (rec_ts - sent_ts).toString();
+
+	        //log d.toString();
 		}
         ConnectivityPlugins.onApplicationInitialized();
 	} 

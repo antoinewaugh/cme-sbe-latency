@@ -28,13 +28,13 @@ add_library(cme_sbe_latency SHARED ${SOURCE_FILES})
 
 include_directories(${PROJECT_INCLUDE_DIRS})
 include_directories(${APAMA_INCLUDE_DIRS})
-include_directories(Config)
-include_directories(MarketData)
-include_directories(Subscriber)
+include_directories(config)
+include_directories(marketdata)
+include_directories(subscriber)
 
-add_subdirectory(Config)
-add_subdirectory(MarketData)
-add_subdirectory(Subscriber)
+add_subdirectory(config)
+add_subdirectory(marketdata)
+add_subdirectory(subscriber)
 
 #####################################################################
 #### GTEST
@@ -77,5 +77,5 @@ add_subdirectory(test)
 #### // GTEST
 #####################################################################
 
-target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe Config Subscriber MarketData ${APAMA_LIBRARIRES})
+target_link_libraries(cme_sbe_latency ${Boost_LIBRARIES} sbe config subscriber marketdata ${APAMA_LIBRARIRES})
 

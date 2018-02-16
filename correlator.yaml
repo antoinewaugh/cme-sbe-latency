@@ -6,7 +6,6 @@ correlator:
   runtime-cache: ${PARENT_DIR}/cache
   initialization:
     list:
-       - ${APAMA_HOME}/monitors/ConnectivityPluginsControl.mon
        - ${APAMA_HOME}/monitors/ConnectivityPlugins.mon
        - init.mon
 

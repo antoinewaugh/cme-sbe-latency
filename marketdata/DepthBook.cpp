@@ -1,6 +1,6 @@
 #include "DepthBook.h"
 
-//MarketData::MarketData() : bids_(true), asks_(false) {}
+//marketdata::marketdata() : bids_(true), asks_(false) {}
 
 void DepthBook::AddBid(int level, float price, int quantity) {
   bids_.Add(level, price, quantity);

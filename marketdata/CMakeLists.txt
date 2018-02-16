@@ -1,4 +1,4 @@
-project(MarketData)
+project(marketdata)
 
 add_definitions(-std=c++17)
 add_definitions(-fPIC)
@@ -19,4 +19,4 @@ set(SOURCE_FILES
         SessionStatistics.cpp
         SecurityStatus.cpp)
 
-add_library(MarketData STATIC ${SOURCE_FILES} ${HEADER_FILES})
+add_library(marketdata STATIC ${SOURCE_FILES} ${HEADER_FILES})

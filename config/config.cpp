@@ -1,4 +1,4 @@
-#include "Config.h"
+#include "config.h"
 
 void ChannelConfig::AddProduct(std::string product) {
   products.push_back(product);

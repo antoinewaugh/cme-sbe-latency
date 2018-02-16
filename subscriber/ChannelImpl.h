@@ -13,7 +13,7 @@
 #include<string>
 #include<algorithm>
 #include<memory>
-#include "Config.h"
+#include "config.h"
 
 namespace sp {
 namespace lltp {

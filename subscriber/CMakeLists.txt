@@ -1,5 +1,5 @@
 
-project(Subscriber)
+project(subscriber)
 
 add_definitions(-std=c++17)
 add_definitions(-fPIC)
@@ -36,5 +36,5 @@ set(SOURCE_FILES
         Channel.cpp
         ChannelImpl.cpp)
 
-add_library(Subscriber STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(Subscriber sbe)
+add_library(subscriber STATIC ${SOURCE_FILES} ${HEADER_FILES})
+target_link_libraries(subscriber sbe)
