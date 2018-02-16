@@ -91,6 +91,8 @@ void HandlerImpl::OnQuote(uint64_t securityid, DepthBook const &book) {
 }
 
 void HandlerImpl::Send(DepthBook const &book) {
+  timings.presend_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::system_clock::now().time_since_epoch()).count();
   map_t payload;
   payload.insert(data_t("symbol"), data_t("ESH8"));
 
@@ -116,11 +118,14 @@ void HandlerImpl::Send(DepthBook const &book) {
   payload[data_t("ask_volumes")] = data_t(std::move(askv));
 
   list_t timestamps;
-  int64_t ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+  timings.send_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
           std::chrono::system_clock::now().time_since_epoch()).count();
 
-  timestamps.push_back(data_t(rec_ts));
-  timestamps.push_back(data_t(ts));
+
+  timestamps.push_back(data_t(timings.rec_ts));
+  timestamps.push_back(data_t(timings.dec_ts));
+  timestamps.push_back(data_t(timings.presend_ts));
+  timestamps.push_back(data_t(timings.send_ts));
   payload[data_t("timestamps")] = data_t(std::move(timestamps));
 
   com::softwareag::connectivity::Message msg(data_t(std::move(payload)));

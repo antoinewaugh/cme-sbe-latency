@@ -1,7 +1,7 @@
 #include "Message.h"
 
 #include <type_traits>
-
+#include <chrono>
 
 ChannelReset4& Message::GetChannelReset() {
   channel_reset.wrapForDecode(buffer_, offset_, header.blockLength(), header.version(), header.bufferLength());
@@ -50,6 +50,8 @@ SnapshotFullRefreshOrderBook44 &Message::GetSnapshotFullRefreshOrderBook() {
 
 MDIncrementalRefreshBook32 &Message::GetIncrementalRefreshBook() {
   incremental_refresh_book.wrapForDecode(buffer_, offset_, header.blockLength(), header.version(), header.bufferLength());
+  timings.dec_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::system_clock::now().time_since_epoch()).count();
   return incremental_refresh_book;
 }
 

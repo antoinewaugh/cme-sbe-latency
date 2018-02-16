@@ -361,7 +361,6 @@ namespace cme {
   }
 
   void InstrumentMdHandler::Commit() {
-
     if (statechange_) {
       statechange_ = false;
       channelcontext->NotifyBookRefresh(instrument_.securityid, book_);

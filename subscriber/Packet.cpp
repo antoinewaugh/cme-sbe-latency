@@ -13,7 +13,7 @@ Message& Packet::NextMessage() {
 }
 
 void Packet::Reset(char *data, size_t received) {
-    rec_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    timings.rec_ts = std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
   rawbytes_ = data;
   received_ = received  ;

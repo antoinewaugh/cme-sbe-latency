@@ -26,6 +26,14 @@ constexpr int kMsgSize = 2;
 constexpr int kByteOffest = 12;
 constexpr int kMsgHeaderVersion = 0;
 
+struct timing {
+    int64_t rec_ts;
+    int64_t dec_ts;
+    int64_t presend_ts;
+    int64_t send_ts;
+};
+
+extern timing timings;
 
 class Message {
 public:
