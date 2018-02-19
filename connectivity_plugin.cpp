@@ -55,14 +55,14 @@ class HandlerImpl: public MarketDataListener {
 //
 //   }
 
-void Subscribe(MarketDataListener* handler) {
-    boost::asio::io_service io_service;
+void Subscribe(MarketDataListener* handler, boost::asio::io_service *io_service) {
+
     auto listen_address = boost::asio::ip::address::from_string("0.0.0.0");
     auto configs = Config::load("config.xml");
-    auto channel = ChannelImpl::make_channel("310", configs, io_service, listen_address);
+    auto channel = ChannelImpl::make_channel("310", configs, *io_service, listen_address);
     channel->RegisterMarketDataListener(handler);
     channel->Subscribe("ESH8");
-    io_service.run();
+    io_service->run();
 }
 
 class CMEConnectivityPlugin: public AbstractTransport {
@@ -75,10 +75,10 @@ public:
 
   virtual void sendBatchTowardsTransport(com::softwareag::connectivity::Message* start, com::softwareag::connectivity::Message* end) {}
   virtual void start() { logger.info("CME SBE plugin started."); }
-  virtual void shutdown() { logger.info("CME SBE plugin shutting down."); }
+  virtual void shutdown() { io_service.stop(); logger.info("CME SBE plugin shutting down."); }
   virtual void hostReady() {
       handler = HandlerImpl(&hostSide);
-      std::thread t(Subscribe, &handler);
+      std::thread t(Subscribe, &handler, &io_service);
 //      std::thread t(Subscribe, &hostSide);
       t.detach();
       logger.info("HostReady received.");
@@ -86,6 +86,7 @@ public:
 
 private:
     HandlerImpl handler;
+    boost::asio::io_service io_service;
 };
 
 void HandlerImpl::OnQuote(uint64_t securityid, DepthBook const &book) {
